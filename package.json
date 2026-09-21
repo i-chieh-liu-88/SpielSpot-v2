@@ -9,5 +9,32 @@
     "lint": "npm --prefix frontend run lint",
     "test": "npm --prefix frontend test"
   },
-  "engines": { "node": ">=22.12.0" }
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "description": "保留 SpielSpot React 前端與 Clerk 登入，為重做後端準備的獨立專案。 Supabase 已移除，目前使用本地示範資料，無須啟動 API 伺服器。",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/i-chieh-liu-88/SpielSpot-v2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/i-chieh-liu-88/SpielSpot-v2/issues"
+  },
+  "homepage": "https://github.com/i-chieh-liu-88/SpielSpot-v2#readme",
+  "dependencies": {
+    "dotenv": "^18.0.1",
+    "express": "^5.2.1",
+    "mongoose": "^9.10.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
 }
