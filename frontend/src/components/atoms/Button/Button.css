@@ -1,0 +1,92 @@
+.beui-button {
+  border: 1px solid transparent;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.beui-button-primary {
+  border-color: #050505;
+  background: #050505;
+  color: #ffffff;
+}
+
+.beui-button-primary:hover:not(:disabled) {
+  border-color: #232323;
+  background: #232323;
+}
+
+.beui-button-secondary {
+  border-color: #d1d5db;
+  background: #ffffff;
+  color: #111827;
+}
+
+.beui-button-ghost {
+  background: transparent;
+  color: #4b5563;
+}
+
+.beui-button-ghost:hover:not(:disabled) {
+  background: rgba(5, 5, 5, 0.06);
+  color: #111827;
+}
+
+.beui-button-outline {
+  border-color: #9ca3af;
+  background: transparent;
+  color: #111827;
+}
+
+.beui-button-outline:hover:not(:disabled) {
+  background: rgba(5, 5, 5, 0.06);
+}
+
+.beui-button:focus-visible {
+  outline: 2px solid #16a34a;
+  outline-offset: 3px;
+}
+
+.beui-button:disabled {
+  cursor: not-allowed;
+}
+
+html[data-theme="dark"] .beui-button-primary {
+  border-color: rgba(248, 250, 252, 0.72);
+  background: transparent;
+  color: #f8fafc;
+}
+
+html[data-theme="dark"] .beui-button-primary:hover:not(:disabled) {
+  border-color: #f8fafc;
+  background: rgba(248, 250, 252, 0.08);
+}
+
+html[data-theme="dark"] .beui-button-secondary {
+  border-color: rgba(248, 250, 252, 0.35);
+  background: rgba(248, 250, 252, 0.08);
+  color: #f8fafc;
+}
+
+html[data-theme="dark"] .beui-button-ghost,
+html[data-theme="dark"] .beui-button-outline {
+  color: #f8fafc;
+}
+
+html[data-theme="dark"] .beui-button-outline {
+  border-color: rgba(248, 250, 252, 0.72);
+}
+
+html[data-theme="dark"] .beui-button-ghost:hover:not(:disabled),
+html[data-theme="dark"] .beui-button-outline:hover:not(:disabled) {
+  background: rgba(248, 250, 252, 0.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beui-button {
+    transform: none !important;
+  }
+}

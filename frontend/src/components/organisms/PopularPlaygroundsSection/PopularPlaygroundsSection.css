@@ -1,0 +1,70 @@
+.popular-cover-slide {
+  view-timeline: --popular-cover inline calc(50% - 210px);
+}
+
+.popular-cover-frame {
+  animation: popular-cover-slide linear both;
+  animation-timeline: --popular-cover;
+  animation-range: contain;
+}
+
+.popular-cover-card {
+  animation: popular-cover-rotate linear both;
+  animation-timeline: --popular-cover;
+  animation-range: contain;
+}
+
+.popular-cover-card > article {
+  height: 100%;
+  transition: box-shadow 180ms ease;
+}
+
+.popular-cover-card:hover > article {
+  box-shadow: 0 24px 48px rgb(20 83 45 / 0.22);
+}
+
+@keyframes popular-cover-rotate {
+  0% {
+    transform: rotateY(-55deg);
+  }
+
+  50% {
+    transform: rotateY(0deg);
+  }
+
+  100% {
+    transform: rotateY(55deg);
+  }
+}
+
+@keyframes popular-cover-slide {
+  0% {
+    transform: translateX(30%);
+  }
+
+  50% {
+    transform: translateX(0) scale(1.2);
+  }
+
+  100% {
+    transform: translateX(-30%);
+  }
+}
+
+@supports not (animation-timeline: view(inline)) {
+  .popular-cover-frame,
+  .popular-cover-card {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popular-cover-carousel {
+    scroll-behavior: auto;
+  }
+
+  .popular-cover-frame,
+  .popular-cover-card {
+    animation: none;
+  }
+}

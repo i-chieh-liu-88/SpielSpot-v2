@@ -1,0 +1,22 @@
+{
+  "name": "SpielSpot - Find Playgrounds Near You",
+  "short_name": "SpielSpot",
+  "description": "Discover safe, fun, and age-appropriate playgrounds nearby, rated by parents in your community.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ecfdf5",
+  "theme_color": "#16a34a",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

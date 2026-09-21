@@ -1,0 +1,139 @@
+.playground-cover-flow-shell {
+  --blossom-dot-color: #15803d;
+  --blossom-dot-size: 0.7rem;
+  overflow: hidden;
+}
+
+.playground-cover-flow {
+  display: flex;
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+  overflow-x: auto;
+  padding-block: 1.5rem 2rem;
+  padding-inline: max(1rem, calc(50% - min(82vw, 22rem) / 2));
+  perspective: 70rem;
+  scroll-padding-inline: max(1rem, calc(50% - min(82vw, 22rem) / 2));
+  scroll-snap-type: x mandatory;
+}
+
+.playground-cover-flow-slide {
+  --cover-flow-opacity: 0.72;
+  --cover-flow-rotation: 24deg;
+  --cover-flow-scale: 0.84;
+  flex: 0 0 min(82vw, 22rem);
+  scroll-snap-align: center;
+  transform: rotateY(var(--cover-flow-rotation))
+    scale(var(--cover-flow-scale));
+  transform-origin: center;
+  opacity: var(--cover-flow-opacity);
+  transition:
+    transform 220ms ease,
+    opacity 220ms ease;
+}
+
+.playground-cover-flow-slide:focus-within {
+  opacity: 1;
+}
+
+.playground-cover-flow-card {
+  min-height: 18rem;
+}
+
+.playground-cover-flow-controls {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 1rem;
+  margin-inline: auto;
+  max-width: 38rem;
+}
+
+.playground-cover-flow-button {
+  display: grid;
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 0.7);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.72);
+  box-shadow: 0 5px 16px rgb(22 101 52 / 0.16);
+  color: #166534;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.playground-cover-flow-button:hover:not(:disabled) {
+  background: white;
+  transform: translateY(-2px);
+}
+
+.playground-cover-flow-button:focus-visible,
+.playground-cover-flow-dot:focus-visible {
+  outline: 3px solid #22c55e;
+  outline-offset: 3px;
+}
+
+.playground-cover-flow-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
+.playground-cover-flow-dots {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.playground-cover-flow-dot {
+  display: grid;
+  min-height: 1.75rem;
+  min-width: 1.75rem;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.playground-cover-flow-dot span {
+  display: block;
+  width: var(--blossom-dot-size);
+  height: var(--blossom-dot-size);
+  border-radius: 999px;
+  background: var(--blossom-dot-color);
+  opacity: 0.3;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.playground-cover-flow-dot[data-active="true"] span {
+  opacity: 1;
+  transform: scale(1.25);
+}
+
+@media (min-width: 768px) {
+  .playground-cover-flow {
+    padding-inline: max(1rem, calc(50% - 12rem));
+    scroll-padding-inline: max(1rem, calc(50% - 12rem));
+  }
+
+  .playground-cover-flow-slide {
+    flex-basis: 24rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .playground-cover-flow {
+    scroll-behavior: auto;
+  }
+
+  .playground-cover-flow-slide {
+    transform: none;
+    opacity: 1;
+    transition: none;
+  }
+
+  .playground-cover-flow-button {
+    transition: none;
+  }
+}

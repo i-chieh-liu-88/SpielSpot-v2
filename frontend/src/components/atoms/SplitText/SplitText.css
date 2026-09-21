@@ -1,0 +1,21 @@
+.split-parent {
+  display: inline-block;
+  white-space: normal;
+  overflow-wrap: break-word;
+  will-change: transform, opacity;
+}
+
+.split-char,
+.split-word,
+.split-line {
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .split-parent,
+  .split-char,
+  .split-word,
+  .split-line {
+    will-change: auto;
+  }
+}
