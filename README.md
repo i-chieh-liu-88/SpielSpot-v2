@@ -1,72 +1,76 @@
-# SpielSpot_2.0
+# SpielSpot Backend
 
-保留 SpielSpot React 前端與 Clerk 登入，為重做後端準備的獨立專案。
-Supabase 已移除，目前使用本地示範資料，無須啟動 API 伺服器。
+Backend API for the SpielSpot playground discovery platform. The frontend reuses the existing SpielSpot project under `frontend/`, and this backend provides CRUD APIs for two related entities, Playground and Review, with Clerk authentication.
 
-## 結構
+Full API plan and ERD: [`docs/api-plan.md`](./docs/api-plan.md). Development log: [`docs/day1-log.md`](./docs/day1-log.md).
 
-```text
-frontend/   React、TypeScript、Vite、Clerk、UI、路由與測試
-backend/    預留新後端，目前只有說明檔
-docs/       後端接入說明
+## Tech Stack
+
+- Node.js + Express
+- MongoDB Atlas + Mongoose
+- Clerk (JWT authentication)
+- Zod (input validation)
+- helmet / cors / express-rate-limit (security middleware)
+
+## Installation
+
+```bash
+cd backend
+npm install
 ```
 
-## 啟動
+## Environment Variables
 
-使用 Node.js 22.12 以上版本。在本專案根目錄執行：
+Create a `.env` file in the `backend/` root:
 
-```powershell
-npm.cmd --prefix frontend install
-npm.cmd run dev
+```
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/spielspot?retryWrites=true&w=majority
+PORT=5000
+CLERK_SECRET_KEY=sk_test_xxxxx
+CLERK_PUBLISHABLE_KEY=pk_test_xxxxx
 ```
 
-開啟 Vite 顯示的網址。macOS/Linux 使用 `npm` 代替 `npm.cmd`。
-首頁、搜尋與篩選、地圖、詳細頁、語言和主題切換可以預覽。
-儲存尚未開放；新增、編輯與評論表單保留，但不會寫入資料。
-示範評分及評論並非真實使用者資料。地圖圖磚、地址查詢與字體仍需網路。
+- `MONGODB_URI`: MongoDB Atlas connection string
+- `CLERK_SECRET_KEY` / `CLERK_PUBLISHABLE_KEY`: must belong to the same Clerk application as the frontend's `VITE_CLERK_PUBLISHABLE_KEY`
 
-### Clerk 登入
+## Running the Server
 
-不設定 Clerk 也能瀏覽，登入按鈕會停用。要啟用登入，在根目錄執行：
-
-```powershell
-Copy-Item frontend/.env.example frontend/.env.local
+```bash
+npm start
 ```
 
-在新檔案填入 Clerk 的 `VITE_CLERK_PUBLISHABLE_KEY`，再重新啟動 Vite。
-可以使用自己的既有 Clerk app；舊專案的 `.env.local` 不會自動複製。
-登入成功不代表資料能儲存，仍需新後端接入。不要將 secret key 放進前端。
+A successful start prints:
 
-## 檢查
-
-```powershell
-npm.cmd run lint
-npm.cmd test
-npm.cmd run build
-npm.cmd run preview
+```
+MongoDB connected
+Server running on port 5000
 ```
 
-建置輸出在 `frontend/dist/`。部署時設定 SPA fallback 到 `index.html`，
-並在確定正式網址後補上 canonical、og:url 及完整 og:image 網址。
+## API Endpoints
 
-## 上傳新的 GitHub repo
+| Method | Endpoint                     | Description                      | Auth            |
+| ------ | ---------------------------- | -------------------------------- | --------------- |
+| GET    | /api/playgrounds             | Get all playgrounds              | No              |
+| GET    | /api/playgrounds/:id         | Get a single playground          | No              |
+| POST   | /api/playgrounds             | Create a playground              | Yes             |
+| PATCH  | /api/playgrounds/:id         | Update (owner only)              | Yes + ownership |
+| DELETE | /api/playgrounds/:id         | Delete (owner only)              | Yes + ownership |
+| GET    | /api/playgrounds/:id/reviews | Get all reviews for a playground | No              |
+| POST   | /api/playgrounds/:id/reviews | Create a review                  | Yes             |
+| DELETE | /api/reviews/:id             | Delete own review                | Yes + ownership |
 
-在新的 `SpielSpot_2.0` 資料夾初始化 Git。原本的 `Project-Spielspot` 獨立保留。
-不要在原專案根目錄執行以下指令。
-在 GitHub 建立空白的 `SpielSpot_2.0` repo 後執行：
+Full request/response formats and ERD are in [`docs/api-plan.md`](./docs/api-plan.md).
 
-```powershell
-git init
-git add .
-git status
-git commit -m "Initialize SpielSpot 2.0 frontend"
-git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/SpielSpot_2.0.git
-git push -u origin main
-```
+## Security
 
-將 `YOUR_USERNAME` 換成自己的帳號。`.gitignore` 已排除依賴、建置輸出和
-環境變數檔案。這份專案沒有複製舊 `.git`，會建立全新的提交歷史。
+- Clerk JWT authentication (`requireLogin` middleware)
+- Ownership checks: only the resource owner can PATCH/DELETE
+- Input validation with Zod
+- `helmet`, `cors` (whitelisted frontend origin), `express-rate-limit`
+- Centralized error handler that never leaks internal stack traces
+- Secrets stored in `.env`, excluded via `.gitignore`
 
-後端需接入的功能見 [接入說明](docs/backend-handoff.md)。
+## Current Status
 
+- Done: Playground/Review CRUD, Clerk auth, ownership checks, and security middleware are implemented and tested via Postman
+- Not done: the frontend still uses fixture data and is not yet connected to this API
