@@ -59,7 +59,40 @@ Server running on port 5000
 | POST   | /api/playgrounds/:id/reviews | Create a review                  | Yes             |
 | DELETE | /api/reviews/:id             | Delete own review                | Yes + ownership |
 
-Full request/response formats and ERD are in [`docs/api-plan.md`](./docs/api-plan.md).
+Full request/response formats is in [`docs/api-plan.md`](./docs/api-plan.md).
+
+## ERD
+
+> GitHub automatically renders the Mermaid syntax below as a diagram, so no separate image file is needed
+
+```mermaid
+erDiagram
+  PLAYGROUND ||--o{ REVIEW : has
+  PLAYGROUND {
+    ObjectId _id PK
+    string name
+    string description
+    string address
+    number lat
+    number lng
+    string category
+    string_array images
+    string ownerId
+    date createdAt
+    date updatedAt
+  }
+  REVIEW {
+    ObjectId _id PK
+    ObjectId playgroundId FK
+    string authorId
+    number rating
+    string comment
+    date createdAt
+    date updatedAt
+  }
+```
+
+Relationship: `Playground 1 --- N Review` (Review stores `playgroundId` as a foreign key)
 
 ## Security
 
