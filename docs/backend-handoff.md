@@ -1,7 +1,7 @@
 # Frontend integration boundary
 
-The frontend uses local sample data, not live records. Clerk authentication is
-retained. Old Supabase configuration, migrations and live data are not included.
+Playground services now call the backend API. Clerk authentication is retained.
+Old Supabase configuration, migrations and live data are not included.
 
 ## Reads
 
@@ -22,9 +22,11 @@ retained. Old Supabase configuration, migrations and live data are not included.
   authorization. The new backend must verify Clerk tokens and enforce ownership.
 - Playground forms retain validation and local photo previews, but saving is
   disabled. `PlaygroundMutationInput` documents the future service input.
-- Review pages set `previewOnly`; the review service rejects writes.
-  `CreateReviewInput` documents the input. Connect a real service before enabling
-  submission. Decide review authentication policy with the new backend.
+- Review pages allow submission. The review service posts to
+  `/api/playgrounds/:id/reviews` with a Clerk bearer token. Open the form from a
+  playground detail page to supply its ID. Missing IDs or tokens prevent saving;
+  API errors stay visible in the form. End-to-end persistence has not been
+  verified by the change enabling this button.
 - Validate input, file type and size on the server. The UI supports JPEG, PNG and
   WebP up to 5 MB. Add ownership-aware storage rules and upload cleanup.
 - Choose the API contract before adding endpoints or a base URL configuration.
@@ -34,5 +36,5 @@ retained. Old Supabase configuration, migrations and live data are not included.
 Lists, filtering, maps, carousel, details, language and theme remain available.
 Sample records have no Clerk owner IDs, so they cannot be edited through the
 ownership-gated edit page. Add forms can be previewed after sign-in. Nothing is
-saved. A global banner identifies sample data, including ratings and reviews.
+saved by those playground forms. Review submission uses the backend as described above.
 Map tiles, address lookup, fonts and Clerk still need internet.

@@ -52,7 +52,6 @@ export function ReviewPage() {
           </p>
         ) : (
           <ReviewForm
-            previewOnly
             playground={playground ?? undefined}
             onSubmitted={() => navigate({ to: "/playgrounds", search: {} })}
           />

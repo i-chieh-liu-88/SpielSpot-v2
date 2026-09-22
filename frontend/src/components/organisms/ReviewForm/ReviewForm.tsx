@@ -5,6 +5,7 @@ import { createReview } from "../../../services/reviews";
 import { playgroundReviewSchema } from "./ReviewForm.schema";
 import type { PlaygroundReview, ReviewFormErrors } from "./ReviewForm.types";
 import { useLanguage } from "../../../providers/LanguageProvider";
+import { useAuth } from "@clerk/clerk-react";
 
 const facilities = [
   "Fenced",
@@ -84,8 +85,13 @@ type ReviewFormProps = {
   };
 };
 
-export function ReviewForm({ onSubmitted, playground, previewOnly = false }: ReviewFormProps) {
+export function ReviewForm({
+  onSubmitted,
+  playground,
+  previewOnly = false,
+}: ReviewFormProps) {
   const { t } = useLanguage();
+  const { getToken } = useAuth(); // 加這行
   const [form, setForm] = useState<PlaygroundReview>(() => ({
     ...initialReview,
     playgroundName: playground?.name ?? "",
@@ -143,7 +149,14 @@ export function ReviewForm({ onSubmitted, playground, previewOnly = false }: Rev
     setIsSubmitting(true);
 
     try {
-      await createReview({ ...result.data, playgroundId: playground?.id });
+      const token = await getToken();
+      if (!token) {
+        throw new Error("You must be logged in to submit a review.");
+      }
+      await createReview(
+        { ...result.data, playgroundId: playground?.id },
+        token,
+      );
       await onSubmitted?.(result.data);
     } catch (error) {
       setSubmissionError(t(getSubmissionErrorMessage(error)));
@@ -396,7 +409,11 @@ export function ReviewForm({ onSubmitted, playground, previewOnly = false }: Rev
         <FieldError id="parent-name-error" message={errors.parentName} />
       </label>
 
-      {previewOnly && <p className="mt-6 font-semibold" role="status">{t("Preview only. Your changes will not be saved.")}</p>}
+      {previewOnly && (
+        <p className="mt-6 font-semibold" role="status">
+          {t("Preview only. Your changes will not be saved.")}
+        </p>
+      )}
       <Button
         disabled={previewOnly}
         type="submit"

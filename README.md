@@ -48,6 +48,12 @@ Server running on port 5000
 
 ## API Endpoints
 
+Review submission is enabled in the frontend. Run `npm run dev` from the project
+root, sign in with Clerk, and open the review form from a playground detail page
+so its `playgroundId` is included. The backend must be running; the frontend uses
+`VITE_API_BASE_URL` or `http://localhost:5000`. Database persistence requires a
+successful API response and has not been verified by this UI change.
+
 | Method | Endpoint                     | Description                      | Auth            |
 | ------ | ---------------------------- | -------------------------------- | --------------- |
 | GET    | /api/playgrounds             | Get all playgrounds              | No              |
