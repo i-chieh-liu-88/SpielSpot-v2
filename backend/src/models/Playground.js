@@ -2,46 +2,18 @@ import mongoose from "mongoose";
 
 const playgroundSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    description: {
-      type: String,
-      trim: true,
-    },
-    address: {
-      type: String,
-      required: true,
-    },
-    lat: {
-      type: Number,
-      required: true,
-    },
-    lng: {
-      type: Number,
-      required: true,
-    },
-    category: {
-      type: String,
-    },
-    images: {
-      type: [String],
-      default: [],
-    },
-    ownerId: {
-      type: String,
-      required: true,
-    },
+    name: { type: String, required: true, trim: true },
+    description: { type: String, trim: true },
+    location: { type: String, required: true, trim: true },
+    postcode: { type: String, trim: true },
+    latitude: { type: Number, required: true },
+    longitude: { type: Number, required: true },
+    ageRange: { type: String, trim: true },
+    safetyRating: { type: Number, min: 1, max: 5 },
+    tags: { type: [String], default: [] },
+    ownerId: { type: String, required: true },
   },
-  { timestamps: true }, // 自動產生 createdAt / updatedAt
+  { timestamps: true },
 );
 
-const playgroundModel = mongoose.model(
-  "playgroundModel",
-  playgroundSchema,
-  "playgrounds",
-);
-
-export default playgroundModel;
+export default mongoose.model("Playground", playgroundSchema);

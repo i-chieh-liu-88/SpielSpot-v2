@@ -9,6 +9,8 @@ import helmet from "helmet";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
 
+import { errorHandler } from "./src/middleware/errorHandler.js";
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 

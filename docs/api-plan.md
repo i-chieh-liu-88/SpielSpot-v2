@@ -19,11 +19,13 @@ erDiagram
     ObjectId _id PK
     string name
     string description
-    string address
-    number lat
-    number lng
-    string category
-    string_array images
+    string location
+    string postcode
+    number latitude
+    number longitude
+    string ageRange
+    number safetyRating
+    string_array tags
     string ownerId
     date createdAt
     date updatedAt
@@ -31,9 +33,16 @@ erDiagram
   REVIEW {
     ObjectId _id PK
     ObjectId playgroundId FK
+    string playgroundName
+    string location
+    string ageGroup
+    string_array facilities
+    string safetyRating
+    string overallRating
+    string recommendation
+    string review
+    string parentName
     string authorId
-    number rating
-    string comment
     date createdAt
     date updatedAt
   }
