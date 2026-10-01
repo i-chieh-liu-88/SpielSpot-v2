@@ -35,6 +35,15 @@ app.use(express.json()); // 讓 Express 看得懂 JSON body，這行不能漏
 app.use(clerkMiddleware()); // 讓每個 request 都能讀到登入狀態
 //clerkMiddleware() 本身不會擋掉任何請求，它只是幫每個 request 加上 req.auth，之後在需要保護的 route 上用 requireAuth() 才會真的擋。
 
+/* ------------------------------- 讓根路徑看起來更友善 ------------------------------ */
+app.get("/", (req, res) => {
+  res.json({
+    status: "SpielSpot backend is running",
+    docs: "/api/playgrounds",
+  });
+});
+/* ------------------------------- 讓根路徑看起來更友善 ------------------------------ */
+
 app.use("/api/playgrounds", playgroundRoutes);
 app.use("/api/reviews", reviewRoutes);
 
