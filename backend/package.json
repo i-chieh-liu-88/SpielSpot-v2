@@ -4,8 +4,9 @@
   "description": "Reserved for the new backend. No framework or database has been selected. There is no server to run yet. See ../docs/backend-handoff.md for frontend needs.",
   "main": "server.js",
   "scripts": {
+    "start": "node server.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
-    "start": "node server.js"
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage"
   },
   "keywords": [],
   "author": "",
@@ -14,8 +15,11 @@
   "dependencies": {
     "@clerk/express": "^2.1.69",
     "cors": "^2.8.6",
+    "dotenv": "^18.0.5",
+    "express": "^5.2.1",
     "express-rate-limit": "^8.7.0",
     "helmet": "^8.3.0",
+    "mongoose": "^9.10.3",
     "zod": "^4.6.5"
   },
   "devDependencies": {

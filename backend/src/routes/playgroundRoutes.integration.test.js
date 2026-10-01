@@ -92,3 +92,100 @@ describe("Playground endpoints (integration)", () => {
     expect(res.body.data.ownerId).toBe("user-abc");
   });
 });
+
+/* ---------------------------- PATCH 的 ownership --------------------------- */
+/* ---------------------------- PATCH 的 ownership --------------------------- */
+/* ---------------------------- PATCH 的 ownership --------------------------- */
+describe("PATCH /api/playgrounds/:id (ownership)", () => {
+  beforeEach(() => {
+    getAuth.mockReturnValue({ userId: null });
+  });
+
+  test("returns 403 and does not save when the user is not the owner", async () => {
+    getAuth.mockReturnValue({ userId: "user-not-owner" });
+    const fake = { ownerId: "user-real-owner", save: jest.fn() };
+    Playground.findById.mockResolvedValue(fake);
+
+    const res = await request(app)
+      .patch("/api/playgrounds/p1")
+      .send({ name: "Hacked Name" })
+      .expect(403);
+
+    expect(res.body).toEqual({
+      success: false,
+      error: "Not allowed to edit this playground",
+    });
+    expect(fake.save).not.toHaveBeenCalled();
+  });
+
+  test("returns 200 and saves when the user is the owner", async () => {
+    getAuth.mockReturnValue({ userId: "user-real-owner" });
+    const fake = {
+      ownerId: "user-real-owner",
+      name: "Old Name",
+      save: jest.fn().mockResolvedValue(true),
+    };
+    Playground.findById.mockResolvedValue(fake);
+
+    const res = await request(app)
+      .patch("/api/playgrounds/p1")
+      .send({ name: "New Name" })
+      .expect(200);
+
+    expect(fake.save).toHaveBeenCalled();
+    expect(res.body.data.name).toBe("New Name");
+  });
+
+  test("does not let the owner change ownerId through the body", async () => {
+    getAuth.mockReturnValue({ userId: "user-real-owner" });
+    const fake = {
+      ownerId: "user-real-owner",
+      name: "Old Name",
+      save: jest.fn().mockResolvedValue(true),
+    };
+    Playground.findById.mockResolvedValue(fake);
+
+    await request(app)
+      .patch("/api/playgrounds/p1")
+      .send({ name: "New Name", ownerId: "someone-else" })
+      .expect(200);
+
+    expect(fake.ownerId).toBe("user-real-owner");
+  });
+});
+/* --------------------------- DELETE 的 ownership --------------------------- */
+/* --------------------------- DELETE 的 ownership --------------------------- */
+/* --------------------------- DELETE 的 ownership --------------------------- */
+describe("DELETE /api/playgrounds/:id (ownership)", () => {
+  beforeEach(() => {
+    getAuth.mockReturnValue({ userId: null });
+  });
+
+  test("returns 403 and does not delete when the user is not the owner", async () => {
+    getAuth.mockReturnValue({ userId: "user-not-owner" });
+    const fake = { ownerId: "user-real-owner", deleteOne: jest.fn() };
+    Playground.findById.mockResolvedValue(fake);
+
+    const res = await request(app).delete("/api/playgrounds/p1").expect(403);
+
+    expect(res.body).toEqual({
+      success: false,
+      error: "Not allowed to delete this playground",
+    });
+    expect(fake.deleteOne).not.toHaveBeenCalled();
+  });
+
+  test("returns 200 and deletes when the user is the owner", async () => {
+    getAuth.mockReturnValue({ userId: "user-real-owner" });
+    const fake = {
+      ownerId: "user-real-owner",
+      deleteOne: jest.fn().mockResolvedValue(true),
+    };
+    Playground.findById.mockResolvedValue(fake);
+
+    const res = await request(app).delete("/api/playgrounds/p1").expect(200);
+
+    expect(fake.deleteOne).toHaveBeenCalled();
+    expect(res.body).toEqual({ success: true, data: null });
+  });
+});

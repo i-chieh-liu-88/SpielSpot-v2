@@ -52,16 +52,23 @@ Relationship: `Playground 1 --- N Review` (Review stores `playgroundId` as a for
 
 ## API Endpoints
 
-| Method | Endpoint                     | Description                                  | Auth required?  |
-| ------ | ---------------------------- | -------------------------------------------- | --------------- |
-| GET    | /api/playgrounds             | Get all playgrounds (query filters optional) | No              |
-| GET    | /api/playgrounds/:id         | Get a single playground + its reviews        | No              |
-| POST   | /api/playgrounds             | Create a playground                          | Yes             |
-| PATCH  | /api/playgrounds/:id         | Update (owner only)                          | Yes + ownership |
-| DELETE | /api/playgrounds/:id         | Delete (owner only)                          | Yes + ownership |
-| GET    | /api/playgrounds/:id/reviews | Get all reviews for a playground             | No              |
-| POST   | /api/playgrounds/:id/reviews | Create a review                              | Yes             |
-| DELETE | /api/reviews/:id             | Delete own review                            | Yes + ownership |
+| Method | Endpoint                     | Description                      | Auth required?  |
+| ------ | ---------------------------- | -------------------------------- | --------------- |
+| GET    | /api/playgrounds             | Get all playgrounds              | No              |
+| GET    | /api/playgrounds/:id         | Get a single playground          | No              |
+| POST   | /api/playgrounds             | Create a playground              | Yes             |
+| PATCH  | /api/playgrounds/:id         | Update (owner only)              | Yes + ownership |
+| DELETE | /api/playgrounds/:id         | Delete (owner only)              | Yes + ownership |
+| GET    | /api/playgrounds/:id/reviews | Get all reviews for a playground | No              |
+| POST   | /api/playgrounds/:id/reviews | Create a review                  | Yes             |
+| DELETE | /api/reviews/:id             | Delete own review                | Yes + ownership |
+
+To load a playground with its reviews, request `GET /api/playgrounds/:id` and
+`GET /api/playgrounds/:id/reviews` separately. The playground list does not
+currently support query filtering.
+
+> Note: `safetyRating` is a Number on Playground but a String on Review,
+> matching the frontend's PlaygroundMutationInput vs CreateReviewInput types.
 
 ### Response Format
 
