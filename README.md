@@ -4,6 +4,13 @@ Backend API for the SpielSpot playground discovery platform. The frontend reuses
 
 Full API plan and ERD: [`docs/api-plan.md`](./docs/api-plan.md). Development log: [`docs/day1-log.md`](./docs/day1-log.md).
 
+## Netlify frontend routing
+
+The frontend uses client-side routes. `frontend/public/_redirects` is copied into
+`frontend/dist` during the Vite build so Netlify serves `index.html` for direct
+visits and refreshes of routes such as `/playgrounds/:id`. Keep the Netlify
+publish directory set to `frontend/dist`.
+
 ## Tech Stack
 
 - Node.js + Express

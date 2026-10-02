@@ -3,6 +3,10 @@
 Playground services now call the backend API. Clerk authentication is retained.
 Old Supabase configuration, migrations and live data are not included.
 
+Netlify serves the frontend from `frontend/dist`. Vite copies
+`frontend/public/_redirects` into that directory; its SPA rewrite lets a direct
+visit or refresh of `/playgrounds/:id` load the client-side route.
+
 ## Reads
 
 - `frontend/src/services/playgrounds.ts` exposes `getPlaygrounds()` and
