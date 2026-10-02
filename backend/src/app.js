@@ -11,14 +11,19 @@ import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  ...(process.env.NODE_ENV === "production" ? [] : ["http://localhost:5173"]),
+].filter(Boolean);
+
 //處理資安 middleware---------------------------------
 app.use(helmet());
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // 你前端跑的網址，正式上線後換成真實網域
+    origin: allowedOrigins,
   }),
-); //只白名單開放你前端的網址，不要為了方便寫 origin: "*"（開放所有來源），不然任何網站都能呼叫你的 API，失去 CORS 保護的意義。
+);
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15分鐘
