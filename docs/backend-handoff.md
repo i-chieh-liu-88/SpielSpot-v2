@@ -42,3 +42,13 @@ Sample records have no Clerk owner IDs, so they cannot be edited through the
 ownership-gated edit page. Add forms can be previewed after sign-in. Nothing is
 saved by those playground forms. Review submission uses the backend as described above.
 Map tiles, address lookup, fonts and Clerk still need internet.
+
+## Live review persistence check (2026-10-05)
+
+- Frontend: https://spielspot.netlify.app
+- Backend: https://spielspot.onrender.com
+- Playground ID: 6ab30f098ae8fbfd4d48c945
+- Submitted a review named `TEST - persistence` through the live website.
+- Refreshed the playground detail page and confirmed the review remained visible.
+- Result: review submission and retrieval after a page refresh passed.
+- This check does not verify persistence across a backend restart or redeployment.
