@@ -10,6 +10,8 @@ export async function getReviewsForPlayground(req, res) {
     res.status(400).json({ success: false, error: "Invalid playground id" });
   }
 }
+/* ---------------------------------- POST ---------------------------------- */
+/* ---------------------------------- POST ---------------------------------- */
 
 export async function createReview(req, res) {
   try {
@@ -31,7 +33,35 @@ export async function createReview(req, res) {
   }
 }
 
-//DELETE
+/* ------------------------------ UPDATE(PATCH) ----------------------------- */
+/* ------------------------------ UPDATE(PATCH) ----------------------------- */
+export async function updateReview(req, res) {
+  try {
+    const { userId } = getAuth(req);
+    const review = await Review.findById(req.params.id);
+
+    if (!review) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Review not found" });
+    }
+    if (review.authorId !== userId) {
+      return res
+        .status(403)
+        .json({ success: false, error: "Not allowed to edit this review" });
+    }
+
+    Object.assign(review, req.body);
+    await review.save();
+
+    res.json({ success: true, data: review });
+  } catch (err) {
+    res.status(400).json({ success: false, error: err.message });
+  }
+}
+
+/* --------------------------------- DELETE --------------------------------- */
+/* --------------------------------- DELETE --------------------------------- */
 export async function deleteReview(req, res) {
   try {
     const { userId } = getAuth(req);

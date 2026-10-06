@@ -179,3 +179,39 @@ describe("POST /api/playgrounds/:id/reviews", () => {
   // 1. 狀態碼是 404，不是之前那種會直接成功建立孤兒資料的 201
   // 2. Review.create 完全沒被呼叫（證明漏洞真的被擋住了，不是只有回應訊息對了但背地裡還是建立了資料）
 });
+
+/* ---------------------------------- PATCH --------------------------------- */
+/* ---------------------------------- PATCH --------------------------------- */
+/* ---------------------------------- PATCH --------------------------------- */
+
+describe("PATCH /api/reviews/:id", () => {
+  test("author can update their own review", async () => {
+    const fake = {
+      authorId: "user-author",
+      review: "Old text",
+      save: jest.fn().mockResolvedValue(true),
+    };
+    Review.findById.mockResolvedValue(fake);
+
+    const res = await request(app)
+      .patch(`/api/reviews/${reviewId}`)
+      .send({ review: "Updated text" })
+      .expect(200);
+
+    expect(fake.save).toHaveBeenCalled();
+    expect(fake.review).toBe("Updated text");
+  });
+
+  test("another user cannot update the review", async () => {
+    getAuth.mockReturnValue({ userId: "user-other" });
+    const fake = { authorId: "user-author", save: jest.fn() };
+    Review.findById.mockResolvedValue(fake);
+
+    const res = await request(app)
+      .patch(`/api/reviews/${reviewId}`)
+      .send({ review: "Hacked" })
+      .expect(403);
+
+    expect(fake.save).not.toHaveBeenCalled();
+  });
+});

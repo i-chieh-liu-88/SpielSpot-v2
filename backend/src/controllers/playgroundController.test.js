@@ -28,7 +28,7 @@ describe("getPlaygrounds", () => {
 
   //beforeEach 代表「每一個測試開始前都先執行這段」，確保每個測試都是從乾淨的狀態開始，不會互相污染。
   beforeEach(() => {
-    req = {};
+    req = { query: {} }; //有 req.query = {} 當預設值（不然 req.query 會是 undefined，解構賦值會報錯）
     res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(), //單純一個假函式，之後可以檢查它有沒有被呼叫、被傳了什麼參數
@@ -61,6 +61,20 @@ describe("getPlaygrounds", () => {
       success: false,
       error: "DB connection failed",
     });
+  });
+
+  //驗證 filter 邏輯本身
+  test("applies location filter from query string", async () => {
+    Playground.find.mockResolvedValue([]);
+    req.query = { location: "Essen" };
+
+    await getPlaygrounds(req, res);
+
+    expect(Playground.find).toHaveBeenCalledWith(
+      expect.objectContaining({
+        location: { $regex: "Essen", $options: "i" },
+      }),
+    );
   });
 });
 

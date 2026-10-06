@@ -8,6 +8,26 @@ Mini project planning document. The frontend reuses `frontend/` from `i-chieh-li
 - Database: MongoDB Atlas + Mongoose
 - Auth: Clerk (verifies JWTs sent from the frontend)
 
+### Why these choices (Tech Stack Rationale)
+
+- **MongoDB + Mongoose over a relational database**: the two core entities
+  (Playground, Review) have a simple one-to-many relationship with no need
+  for complex joins or multi-table transactions. Mongoose's schema
+  validation plus Zod at the API layer gave enough structure without the
+  overhead of migrations during fast iteration.
+- **Clerk over a custom auth system**: building and securing password
+  storage, session management, and token refresh correctly is a large
+  surface area to get right. Clerk handles this, and both frontend and
+  backend already shared the same provider, so verifying backend-issued
+  JWTs was a natural fit.
+- **Zod over express-validator**: schema-first validation reads closer to
+  the TypeScript types already used on the frontend, supports `.partial()`
+  for PATCH requests out of the box, and gives typed, composable schemas
+  instead of per-field middleware chains.
+- **Render over Vercel for the backend**: this is a long-running Express
+  server with a persistent Mongoose connection, not a stateless function,
+  so a traditional always-on host fit better than a serverless platform.
+
 ## ERD
 
 > GitHub automatically renders the Mermaid syntax below as a diagram, so no separate image file is needed
@@ -61,6 +81,7 @@ Relationship: `Playground 1 --- N Review` (Review stores `playgroundId` as a for
 | DELETE | /api/playgrounds/:id         | Delete (owner only)              | Yes + ownership |
 | GET    | /api/playgrounds/:id/reviews | Get all reviews for a playground | No              |
 | POST   | /api/playgrounds/:id/reviews | Create a review                  | Yes             |
+| PATCH  | /api/reviews/:id             | Edit user's review               | Yes + ownership |
 | DELETE | /api/reviews/:id             | Delete own review                | Yes + ownership |
 
 To load a playground with its reviews, request `GET /api/playgrounds/:id` and
@@ -78,6 +99,16 @@ currently support query filtering.
 // Failure
 { "success": false, "error": "message" }
 ```
+
+### Example Error Responses
+
+| Status | Example                                                                                      | When                                  |
+| ------ | -------------------------------------------------------------------------------------------- | ------------------------------------- |
+| 400    | `{ "success": false, "error": "latitude: Invalid input: expected number, received string" }` | Validation failure (Zod)              |
+| 401    | `{ "success": false, "error": "Please login" }`                                              | Missing or invalid auth token         |
+| 403    | `{ "success": false, "error": "Not allowed to edit this playground" }`                       | Logged in, but not the resource owner |
+| 404    | `{ "success": false, "error": "Playground not found" }`                                      | Resource ID does not exist            |
+| 500    | `{ "success": false, "error": "Internal server error" }`                                     | Unexpected server-side error          |
 
 ## Security Checklist
 
