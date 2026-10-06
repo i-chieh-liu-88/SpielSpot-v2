@@ -9,9 +9,13 @@ jest.unstable_mockModule("@clerk/express", () => ({
   clerkMiddleware: jest.fn(() => (req, res, next) => next()),
   getAuth: jest.fn(),
 }));
+jest.unstable_mockModule("../models/Playground.js", () => ({
+  default: { findById: jest.fn() },
+}));
 
 const { default: app } = await import("../app.js");
 const Review = (await import("../models/Review.js")).default;
+const Playground = (await import("../models/Playground.js")).default;
 const { getAuth } = await import("@clerk/express");
 const reviewId = "507f1f77bcf86cd799439011";
 const playgroundId = "607f1f77bcf86cd799439099";
@@ -31,6 +35,8 @@ let deleteOne;
 beforeEach(() => {
   jest.resetAllMocks();
   getAuth.mockReturnValue({ userId: "user-author" });
+  Playground.findById.mockResolvedValue({ _id: playgroundId }); //預設「存在」
+  //因為現在每一個 POST review 的測試都會先經過 Playground.findById，如果沒有預設值，所有 POST 測試都會因為 findById 回傳 undefined 而被誤判成「playground 不存在」，連帶讓本來該成功的測試也失敗。
   deleteOne = jest.fn().mockResolvedValue({ deletedCount: 1 });
   Review.findById.mockResolvedValue({ authorId: "user-author", deleteOne });
 });
@@ -155,4 +161,21 @@ describe("POST /api/playgrounds/:id/reviews", () => {
       expect.objectContaining({ authorId: "user-author" }),
     );
   });
+
+  test("returns 404 when the playground does not exist", async () => {
+    Playground.findById.mockResolvedValue(null);
+
+    const res = await request(app)
+      .post(`/api/playgrounds/${playgroundId}/reviews`)
+      .send(validReviewBody)
+      .expect(404);
+
+    expect(res.body).toEqual({
+      success: false,
+      error: "Playground not found",
+    });
+    expect(Review.create).not.toHaveBeenCalled();
+  }); //這個測試在做什麼：故意讓 Playground.findById 回傳 null（模擬 id 不存在），驗證兩件事：
+  // 1. 狀態碼是 404，不是之前那種會直接成功建立孤兒資料的 201
+  // 2. Review.create 完全沒被呼叫（證明漏洞真的被擋住了，不是只有回應訊息對了但背地裡還是建立了資料）
 });

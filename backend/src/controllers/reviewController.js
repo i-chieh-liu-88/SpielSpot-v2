@@ -1,5 +1,6 @@
 import { getAuth } from "@clerk/express";
 import Review from "../models/Review.js";
+import Playground from "../models/Playground.js";
 
 export async function getReviewsForPlayground(req, res) {
   try {
@@ -12,6 +13,12 @@ export async function getReviewsForPlayground(req, res) {
 
 export async function createReview(req, res) {
   try {
+    const playground = await Playground.findById(req.params.id); //確認存在才繼續建立 review
+    if (!playground) {
+      return res
+        .status(404)
+        .json({ success: false, error: "Playground not found" });
+    }
     const { userId } = getAuth(req);
     const review = await Review.create({
       ...req.body,
