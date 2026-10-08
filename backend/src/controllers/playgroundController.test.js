@@ -50,17 +50,16 @@ describe("getPlaygrounds", () => {
   });
 
   //測試錯誤情況
-  test("returns 500 when Playground.find throws an error", async () => {
-    Playground.find.mockRejectedValue(new Error("DB connection failed")); //假裝 Playground.find() 失敗，丟出一個 Error，模擬資料庫掛掉的情境，完全不用真的把資料庫關掉
+  test("passes database errors to the error handler", async () => {
+    const databaseError = new Error("DB connection failed");
+    const next = jest.fn();
+    Playground.find.mockRejectedValue(databaseError);
 
-    await getPlaygrounds(req, res);
+    await getPlaygrounds(req, res, next);
 
-    //驗證 res.status 有被叫 500，res.json 有帶正確的錯誤格式
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({
-      success: false,
-      error: "DB connection failed",
-    });
+    expect(next).toHaveBeenCalledWith(databaseError);
+    expect(res.status).not.toHaveBeenCalled();
+    expect(res.json).not.toHaveBeenCalled();
   });
 
   //驗證 filter 邏輯本身

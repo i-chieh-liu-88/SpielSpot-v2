@@ -7,6 +7,13 @@ vi.mock("../../../services/reviews", () => ({
   createReview: vi.fn(),
 }));
 
+//測試缺少 Clerk 環境的問題
+vi.mock("@clerk/clerk-react", () => ({
+  useAuth: () => ({
+    getToken: vi.fn().mockResolvedValue("test-token"),
+  }),
+}));
+
 async function completeReviewForm() {
   fireEvent.change(screen.getByLabelText("Playground name"), {
     target: { value: "Riverside Play Park" },
@@ -38,7 +45,9 @@ describe("ReviewForm", () => {
   it("blocks submission in preview mode, including direct form submission", () => {
     const onSubmitted = vi.fn();
     render(<ReviewForm previewOnly onSubmitted={onSubmitted} />);
-    expect(screen.getByRole("button", { name: "Submit review" })).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: "Submit review" }),
+    ).toBeDisabled();
     expect(screen.getByRole("status")).toHaveTextContent("will not be saved");
     fireEvent.submit(screen.getByRole("form", { name: "Playground review" }));
     expect(createReview).not.toHaveBeenCalled();
@@ -86,7 +95,16 @@ describe("ReviewForm", () => {
       overallRating: "5",
       recommendation: "Yes",
     });
-    expect(createReview).toHaveBeenCalledWith(submittedReview);
+    await vi.waitFor(() => {
+      expect(createReview).toHaveBeenCalledWith(
+        expect.objectContaining({
+          playgroundName: "Riverside Play Park",
+          overallRating: "5",
+          recommendation: "Yes",
+        }),
+        "test-token",
+      );
+    });
     await vi.waitFor(() => {
       expect(onSubmitted).toHaveBeenCalledWith(submittedReview);
     });
@@ -125,4 +143,3 @@ describe("ReviewForm", () => {
     );
   });
 });
-

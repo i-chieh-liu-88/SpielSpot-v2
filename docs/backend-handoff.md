@@ -56,3 +56,14 @@ Map tiles, address lookup, fonts and Clerk still need internet.
 - Refreshed the playground detail page and confirmed the review remained visible.
 - Result: review submission and retrieval after a page refresh passed.
 - This check does not verify persistence across a backend restart or redeployment.
+
+## Local API checks (2026-10-08)
+
+- `GET /health` returns `200` with `{ "success": true, "status": "ok" }`. It confirms the API responds, but does not check MongoDB.
+- Unknown routes return JSON with `404`. Malformed JSON returns `400`.
+- Unexpected database errors return a generic `500` response without exposing internal error details.
+- Local CORS checks allowed `http://localhost:5173` and `http://localhost:4173`. The production frontend origin still comes from `CLIENT_URL`.
+- Local rate limiting returned `429` after 100 requests within the configured window.
+- Backend tests: 37 passed. Frontend tests: 49 passed. Lint and build passed.
+- The playground list, detail page, and detail-page refresh worked in development and production preview.
+- These checks cover local behavior. The new error responses and `/health` have not yet been verified on Render.

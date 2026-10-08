@@ -3,7 +3,7 @@ import Playground from "../models/Playground.js";
 
 /* ----------------------------------- GET ---------------------------------- */
 /* ----------------------------------- GET ---------------------------------- */
-export async function getPlaygrounds(req, res) {
+export async function getPlaygrounds(req, res, next) {
   try {
     const { location, ageRange, tags } = req.query;
     const filter = {};
@@ -27,7 +27,7 @@ export async function getPlaygrounds(req, res) {
     const playgrounds = await Playground.find(filter);
     res.json({ success: true, data: playgrounds });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    next(err);
   }
 }
 
@@ -50,7 +50,7 @@ export async function getPlaygroundById(req, res) {
 
 /* ---------------------------------- POST ---------------------------------- */
 /* ---------------------------------- POST ---------------------------------- */
-export async function createPlayground(req, res) {
+export async function createPlayground(req, res, next) {
   try {
     const { userId } = getAuth(req);
     const playground = await Playground.create({
@@ -59,14 +59,14 @@ export async function createPlayground(req, res) {
     });
     res.status(201).json({ success: true, data: playground });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    next(err);
   }
 }
 //重點：ownerId: userId 放在 ...req.body 後面，這樣就算前端在 body 裡故意傳了 ownerId: "別人的id"，也會被後面這個真正的 userId 蓋掉，不會被冒用。
 
 /* ------------------------- PATCH+ ownership check ------------------------- */
 /* ------------------------- PATCH+ ownership check ------------------------- */
-export async function updatePlayground(req, res) {
+export async function updatePlayground(req, res, next) {
   try {
     const { userId } = getAuth(req);
     const playground = await Playground.findById(req.params.id);
@@ -88,13 +88,13 @@ export async function updatePlayground(req, res) {
 
     res.json({ success: true, data: playground });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    next(err);
   }
 }
 
 /* ------------------------- DELETE+ ownership check ------------------------ */
 /* ------------------------- DELETE+ ownership check ------------------------ */
-export async function deletePlayground(req, res) {
+export async function deletePlayground(req, res, next) {
   try {
     const { userId } = getAuth(req);
     const playground = await Playground.findById(req.params.id);
@@ -114,7 +114,7 @@ export async function deletePlayground(req, res) {
     await playground.deleteOne();
     res.json({ success: true, data: null });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    next(err);
   }
 }
 

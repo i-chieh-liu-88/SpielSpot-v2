@@ -1,7 +1,18 @@
 export function errorHandler(err, req, res, next) {
-  console.error(err.stack);
-  res.status(err.status || 500).json({
+  if (err.type === "entity.parse.failed") {
+    return res.status(400).json({
+      success: false,
+      error: "Invalid JSON format",
+    });
+  }
+
+  const status = err.status || 500;
+
+  res.status(status).json({
     success: false,
-    error: err.message || "Internal server error",
+    error:
+      status >= 500
+        ? "Internal server error"
+        : "Request could not be processed",
   });
 }

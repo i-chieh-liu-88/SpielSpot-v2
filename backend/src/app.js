@@ -13,7 +13,9 @@ const app = express();
 
 const allowedOrigins = [
   process.env.CLIENT_URL,
-  ...(process.env.NODE_ENV === "production" ? [] : ["http://localhost:5173"]),
+  ...(process.env.NODE_ENV === "production"
+    ? []
+    : ["http://localhost:5173", "http://localhost:4173"]),
 ].filter(Boolean);
 
 //處理資安 middleware---------------------------------
@@ -48,9 +50,23 @@ app.get("/", (req, res) => {
   });
 });
 /* ------------------------------- 讓根路徑看起來更友善 ------------------------------ */
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    success: true,
+    status: "ok",
+  });
+});
 
 app.use("/api/playgrounds", playgroundRoutes);
 app.use("/api/reviews", reviewRoutes);
+
+// 放在所有路由後面 (Express 會由上往下尋找路由；前面都沒有符合的路徑，才會走到這個 404 處理)
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    error: "Route not found",
+  });
+});
 
 //統一錯誤處理 middleware
 app.use(errorHandler);

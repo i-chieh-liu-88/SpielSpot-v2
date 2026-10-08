@@ -13,7 +13,7 @@ export async function getReviewsForPlayground(req, res) {
 /* ---------------------------------- POST ---------------------------------- */
 /* ---------------------------------- POST ---------------------------------- */
 
-export async function createReview(req, res) {
+export async function createReview(req, res, next) {
   try {
     const playground = await Playground.findById(req.params.id); //確認存在才繼續建立 review
     if (!playground) {
@@ -29,13 +29,13 @@ export async function createReview(req, res) {
     }); //authorId: userId 放最後，蓋掉任何前端傳來的 authorId
     res.status(201).json({ success: true, data: review });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    next(err);
   }
 }
 
 /* ------------------------------ UPDATE(PATCH) ----------------------------- */
 /* ------------------------------ UPDATE(PATCH) ----------------------------- */
-export async function updateReview(req, res) {
+export async function updateReview(req, res, next) {
   try {
     const { userId } = getAuth(req);
     const review = await Review.findById(req.params.id);
@@ -56,13 +56,13 @@ export async function updateReview(req, res) {
 
     res.json({ success: true, data: review });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    next(err);
   }
 }
 
 /* --------------------------------- DELETE --------------------------------- */
 /* --------------------------------- DELETE --------------------------------- */
-export async function deleteReview(req, res) {
+export async function deleteReview(req, res, next) {
   try {
     const { userId } = getAuth(req);
     const review = await Review.findById(req.params.id);
@@ -81,6 +81,6 @@ export async function deleteReview(req, res) {
     await review.deleteOne();
     res.json({ success: true, data: null });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    next(err);
   }
 }

@@ -63,6 +63,7 @@ successful API response and has not been verified by this UI change.
 
 | Method | Endpoint                     | Description                      | Auth            |
 | ------ | ---------------------------- | -------------------------------- | --------------- |
+| GET    | /health                      | Check that the API responds      | No              |
 | GET    | /api/playgrounds             | Get all playgrounds              | No              |
 | GET    | /api/playgrounds/:id         | Get a single playground          | No              |
 | POST   | /api/playgrounds             | Create a playground              | Yes             |
@@ -71,6 +72,10 @@ successful API response and has not been verified by this UI change.
 | GET    | /api/playgrounds/:id/reviews | Get all reviews for a playground | No              |
 | POST   | /api/playgrounds/:id/reviews | Create a review                  | Yes             |
 | DELETE | /api/reviews/:id             | Delete own review                | Yes + ownership |
+
+Unknown routes return JSON with status 404. Malformed JSON returns status 400.
+Unexpected server errors return a generic 500 message without internal details.
+`/health` checks that the API responds; it does not check the database connection.
 
 Full request/response formats is in [`docs/api-plan.md`](./docs/api-plan.md).
 
