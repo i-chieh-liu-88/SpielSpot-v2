@@ -17,6 +17,7 @@ type BackendPlayground = {
 
 type BackendReview = {
   _id: string;
+  authorId?: string;
   parentName?: string;
   overallRating: string;
   review: string;
@@ -49,6 +50,7 @@ function toDisplayPlayground(raw: BackendPlayground): Playground {
 function toDisplayReview(raw: BackendReview): PlaygroundParentReview {
   return {
     id: raw._id,
+    authorId: raw.authorId,
     author: raw.parentName || "Anonymous",
     rating: Number(raw.overallRating) || 0,
     text: raw.review,

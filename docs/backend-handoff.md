@@ -15,9 +15,9 @@ visit or refresh of `/playgrounds/:id` load the client-side route.
 
 - `frontend/src/services/playgrounds.ts` exposes `getPlaygrounds()` and
   `getPlayground(id)`. Keep their async return types when replacing fixtures.
-- UI models are in `frontend/src/types/content.ts`. Detail records include
-  reviews. Unknown IDs return `null`. The data originates from the original
-  frontend's `homeContent.ts` fixtures, not the previous live database.
+- UI models are in `frontend/src/types/content.ts`. Playground details and
+  reviews come from the backend API. Unknown playground IDs return `null`.
+  Landing-page testimonials in `homeContent.ts` remain sample content.
 - `frontend/src/services/instruments.ts` preserves an existing sample route;
   instruments are not a playground product requirement.
 
@@ -33,8 +33,14 @@ visit or refresh of `/playgrounds/:id` load the client-side route.
 - Review pages allow submission. The review service posts to
   `/api/playgrounds/:id/reviews` with a Clerk bearer token. Open the form from a
   playground detail page to supply its ID. Missing IDs or tokens prevent saving;
-  API errors stay visible in the form. End-to-end persistence has not been
-  verified by the change enabling this button.
+  API errors stay visible in the form. A live submission and refresh check
+  confirmed the review remained visible on October 5.
+- Review authors can edit their review text and overall rating from the
+  playground detail page. The frontend sends `PATCH /api/reviews/:id` with a
+  Clerk bearer token. The backend checks authorship. Cancel sends no request;
+  failed saves keep the form input. Local development and production preview
+  checks confirmed saved changes remain after refresh. This frontend change
+  has not yet been deployed.
 - Validate input, file type and size on the server. The UI supports JPEG, PNG and
   WebP up to 5 MB. Add ownership-aware storage rules and upload cleanup.
 - Choose the API contract before adding endpoints or a base URL configuration.
@@ -66,4 +72,13 @@ Map tiles, address lookup, fonts and Clerk still need internet.
 - Local rate limiting returned `429` after 100 requests within the configured window.
 - Backend tests: 37 passed. Frontend tests: 49 passed. Lint and build passed.
 - The playground list, detail page, and detail-page refresh worked in development and production preview.
-- These checks cover local behavior. The new error responses and `/health` have not yet been verified on Render.
+- These were local checks on October 8. The Render checks are recorded below.
+
+## Render verification (2026-10-09)
+
+- Commit `57171d9` was live on Render.
+- `GET /health` returned the expected OK response.
+- An unknown API route returned a JSON error.
+- Malformed JSON returned `400` with `Invalid JSON format`.
+- `GET /api/playgrounds` returned playground data.
+- The deployed frontend loaded the playground list, detail page, and reviews.

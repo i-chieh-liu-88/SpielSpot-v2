@@ -25,6 +25,7 @@ export type Playground = {
 
 export type PlaygroundParentReview = {
   id: string;
+  authorId?: string;
   author: string;
   rating: number;
   text: string;

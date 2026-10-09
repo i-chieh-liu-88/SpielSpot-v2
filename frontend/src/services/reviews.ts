@@ -29,3 +29,23 @@ export async function createReview(
     token,
   );
 }
+
+/* -------------------------------- 編輯評論文字 -------------------------------- */
+export async function updateReview(
+  reviewId: string,
+  reviewText: string,
+  reviewRating: number,
+  token: string,
+): Promise<void> {
+  await apiFetch(
+    `/api/reviews/${reviewId}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({
+        review: reviewText,
+        overallRating: String(reviewRating),
+      }),
+    },
+    token,
+  );
+}

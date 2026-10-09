@@ -55,11 +55,12 @@ Server running on port 5000
 
 ## API Endpoints
 
-Review submission is enabled in the frontend. Run `npm run dev` from the project
-root, sign in with Clerk, and open the review form from a playground detail page
-so its `playgroundId` is included. The backend must be running; the frontend uses
-`VITE_API_BASE_URL` or `http://localhost:5000`. Database persistence requires a
-successful API response and has not been verified by this UI change.
+The frontend reads playgrounds and reviews from the backend API. Signed-in
+users can submit reviews. Review authors can edit review text and overall
+rating through `PATCH /api/reviews/:id`; the frontend includes a Clerk bearer
+token, and the backend enforces ownership. Review editing has passed local
+development and production preview checks but is not yet deployed to the
+frontend. The frontend uses `VITE_API_BASE_URL` or `http://localhost:5000`.
 
 | Method | Endpoint                     | Description                      | Auth            |
 | ------ | ---------------------------- | -------------------------------- | --------------- |
@@ -71,6 +72,7 @@ successful API response and has not been verified by this UI change.
 | DELETE | /api/playgrounds/:id         | Delete (owner only)              | Yes + ownership |
 | GET    | /api/playgrounds/:id/reviews | Get all reviews for a playground | No              |
 | POST   | /api/playgrounds/:id/reviews | Create a review                  | Yes             |
+| PATCH  | /api/reviews/:id             | Update own review                | Yes + ownership |
 | DELETE | /api/reviews/:id             | Delete own review                | Yes + ownership |
 
 Unknown routes return JSON with status 404. Malformed JSON returns status 400.
@@ -132,5 +134,5 @@ Relationship: `Playground 1 --- N Review` (Review stores `playgroundId` as a for
 
 ## Current Status
 
-- Done: Playground/Review CRUD, Clerk auth, ownership checks, and security middleware are implemented and tested via Postman
-- Not done: the frontend still uses fixture data and is not yet connected to this API
+- Done: The Render backend provides Playground and Review APIs with Clerk authentication, ownership checks, validation, and security middleware. The frontend reads playgrounds and reviews from the API and can submit reviews.
+- In progress: Review editing (text and overall rating) works in local development and production preview but has not yet been deployed to the frontend. Playground form saving remains disabled.
