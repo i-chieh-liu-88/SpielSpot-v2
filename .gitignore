@@ -8,5 +8,7 @@ coverage/
 .env.*
 !.env.example
 .local-backups/
+/docs/DAILY PLAN/
+/docs/DAILY PROGRESS/
 .DS_Store
 Thumbs.db
