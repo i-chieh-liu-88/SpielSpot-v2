@@ -13,6 +13,8 @@ import { usePlaygrounds } from "../../hooks/usePlaygrounds";
 import { filterPlaygrounds } from "../../utils/filterPlaygrounds";
 import type { MapLocation } from "../../types/map";
 import { useLanguage } from "../../providers/LanguageProvider";
+import type { PlaygroundFilters } from "../../services/playgrounds";
+import { PlaygroundFiltersForm } from "../../components/organisms/PlaygroundFiltersForm/PlaygroundFiltersForm";
 
 function getAreaCardLimit(zoom: number) {
   if (zoom >= 15) return 6;
@@ -24,7 +26,13 @@ export function PlaygroundsPage() {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { q } = useSearch({ from: "/playgrounds" });
-  const { playgrounds, isLoading, error } = usePlaygrounds();
+  const [filters, setFilters] = useState<PlaygroundFilters>({});
+  const [filterFormKey, setFilterFormKey] = useState(0);
+  const [filterRequestKey, setFilterRequestKey] = useState(0);
+  const { playgrounds, isLoading, error } = usePlaygrounds(
+    filters,
+    filterRequestKey,
+  );
   const [focusLocation, setFocusLocation] = useState<MapLocation>();
   const [mapArea, setMapArea] = useState<PlaygroundMapArea>();
   const mappedPlaygrounds = useMemo(
@@ -59,37 +67,6 @@ export function PlaygroundsPage() {
     [navigate],
   );
 
-  if (isLoading) {
-    return (
-      <section
-        className="grass-bg min-h-screen px-6 py-24 text-center text-lg font-bold text-gray-700"
-      >
-        <LoadingSpinner label={t("Loading playgrounds…")} size="xl" />
-      </section>
-    );
-  }
-
-  if (error) {
-    return (
-      <section className="grass-bg min-h-screen px-6 py-24 text-center">
-        <h1 className="text-4xl font-black text-gray-800">
-          {t("Could not load playgrounds")}
-        </h1>
-        <p className="mt-3 text-red-700" role="alert">
-          {error}
-        </p>
-        <Button
-          type="button"
-          className="mt-7"
-          size="lg"
-          onClick={() => window.location.reload()}
-        >
-          {t("Try again")}
-        </Button>
-      </section>
-    );
-  }
-
   return (
     <section className="grass-bg relative min-h-screen overflow-hidden px-4 py-12 sm:px-6">
       <div className="dot-grid absolute inset-0 opacity-20" />
@@ -110,68 +87,110 @@ export function PlaygroundsPage() {
           </p>
         </header>
 
+        <PlaygroundFiltersForm
+          key={filterFormKey}
+          onApply={(nextFilters) => {
+            setFilters(nextFilters);
+            setMapArea(undefined);
+            setFilterRequestKey((current) => current + 1);
+          }}
+        />
         <MapLocationSearch onLocationFound={setFocusLocation} />
-
-        {mappedPlaygrounds.length > 0 ? (
-          <PlaygroundMap
-            playgrounds={mappedPlaygrounds}
-            onSelect={openPlayground}
-            focusLocation={focusLocation}
-            onAreaChange={updateMapArea}
-          />
-        ) : (
-          <section
-            className="rounded-3xl border border-white/60 bg-white/40 px-6 py-16 text-center shadow-xl backdrop-blur-xl"
-            role="status"
-          >
-            <MapOutlined className="text-5xl text-grass" aria-hidden="true" />
-            <h2 className="mt-4 text-3xl font-black text-gray-800">
-              {t("No mapped playgrounds found")}
-            </h2>
-            <p className="mt-2 text-gray-600">
-              {t("Try another city, postcode, or neighbourhood.")}
-            </p>
-            <Button
-              type="button"
-              className="mt-6"
-              size="lg"
-              onClick={() => navigate({ to: "/playgrounds", search: {} })}
-            >
-              {t("Show all playgrounds")}
-            </Button>
-          </section>
+        {isLoading && (
+          <div className="py-8" role="status">
+            <LoadingSpinner label={t("Loading playgrounds…")} size="xl" />
+          </div>
         )}
 
-        <section className="mt-10" aria-labelledby="mapped-playgrounds-heading">
-          <div className="mb-5 flex flex-wrap items-end justify-between gap-2">
-            <div>
-              <h2
-                id="mapped-playgrounds-heading"
-                className="scroll-mt-24 text-2xl font-black text-gray-800"
-              >
-                {t("Playgrounds in this map area")}
-              </h2>
-              <p className="mt-1 text-sm font-semibold text-gray-600">
-                {t(
-                  "Showing {shown} of {total} visible playgrounds, nearest to the map centre.",
-                  {
-                    shown: areaPlaygrounds.length,
-                    total: visibleAreaCount,
-                  },
-                )}
-              </p>
-            </div>
-            {visibleAreaCount > areaPlaygrounds.length && (
-              <p className="text-sm font-semibold text-gray-600">
-                {t("Move or zoom the map to explore another area.")}
-              </p>
-            )}
+        {error && (
+          <div
+            role="alert"
+            className="my-6 rounded-2xl bg-red-50 p-5 text-red-800"
+          >
+            <h2 className="font-bold">{t("Could not load playgrounds")}</h2>
+            <p className="mt-2">{error}</p>
+            <p className="mt-2">
+              Change the filters or use Reset filters to try again.
+            </p>
           </div>
-          <PlaygroundCarousel
-            playgrounds={areaPlaygrounds}
-            onSelect={openPlayground}
-          />
-        </section>
+        )}
+
+        {!isLoading && !error && (
+          <>
+            {mappedPlaygrounds.length > 0 ? (
+              <PlaygroundMap
+                playgrounds={mappedPlaygrounds}
+                onSelect={openPlayground}
+                focusLocation={focusLocation}
+                onAreaChange={updateMapArea}
+              />
+            ) : (
+              <section
+                className="rounded-3xl border border-white/60 bg-white/40 px-6 py-16 text-center shadow-xl backdrop-blur-xl"
+                role="status"
+              >
+                <MapOutlined
+                  className="text-5xl text-grass"
+                  aria-hidden="true"
+                />
+                <h2 className="mt-4 text-3xl font-black text-gray-800">
+                  {t("No mapped playgrounds found")}
+                </h2>
+                <p className="mt-2 text-gray-600">
+                  {t("Try another city, postcode, or neighbourhood.")}
+                </p>
+                <Button
+                  type="button"
+                  className="mt-6"
+                  size="lg"
+                  onClick={() => {
+                    setFilters({});
+                    setMapArea(undefined);
+                    setFilterFormKey((current) => current + 1);
+                    setFilterRequestKey((current) => current + 1);
+                    navigate({ to: "/playgrounds", search: {} });
+                  }}
+                >
+                  {t("Show all playgrounds")}
+                </Button>
+              </section>
+            )}
+
+            <section
+              className="mt-10"
+              aria-labelledby="mapped-playgrounds-heading"
+            >
+              <div className="mb-5 flex flex-wrap items-end justify-between gap-2">
+                <div>
+                  <h2
+                    id="mapped-playgrounds-heading"
+                    className="scroll-mt-24 text-2xl font-black text-gray-800"
+                  >
+                    {t("Playgrounds in this map area")}
+                  </h2>
+                  <p className="mt-1 text-sm font-semibold text-gray-600">
+                    {t(
+                      "Showing {shown} of {total} visible playgrounds, nearest to the map centre.",
+                      {
+                        shown: areaPlaygrounds.length,
+                        total: visibleAreaCount,
+                      },
+                    )}
+                  </p>
+                </div>
+                {visibleAreaCount > areaPlaygrounds.length && (
+                  <p className="text-sm font-semibold text-gray-600">
+                    {t("Move or zoom the map to explore another area.")}
+                  </p>
+                )}
+              </div>
+              <PlaygroundCarousel
+                playgrounds={areaPlaygrounds}
+                onSelect={openPlayground}
+              />
+            </section>
+          </>
+        )}
       </div>
     </section>
   );

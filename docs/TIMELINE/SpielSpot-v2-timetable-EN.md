@@ -1,3 +1,59 @@
+# SpielSpot 2.0 | Rolling work plan
+
+Updated October 12, 2026 (Europe/Berlin), using progress reports through October 12 and the latest results confirmed in this chat.
+This section is the active schedule. The original plan below is historical reference only.
+The original budget is 14 weekdays at 3 hours each (42 planned hours, not actual time spent). Five working days and 15 planned hours remain from October 13. Keep weekends off and the October 19, 23:59 deadline.
+
+## Reported progress
+
+Checkbox review: October 7, using reports through October 6. Checked baseline tasks below reflect reported completion, sometimes earlier than their planned date. Unchecked tasks may be partly complete; they are not necessarily unstarted. A passing test suite does not establish coverage of every planned scenario.
+
+- Sep 30: Backend baseline and review deletion permission tests completed. Frontend test/build failures still need current verification.
+- Oct 1: API/ERD checks, backend deployment on Render, and dependency fixes completed.
+- Oct 2: Frontend deployed on Netlify; CORS and detail-page refresh fixed; review saving reported successful.
+- Oct 5: Review creation tests and missing-playground check added; ownership deletion checks and persistence after page refresh reported.
+- Oct 6: Live missing-playground 404 and missing/invalid-token 401 checks completed. Review PATCH and playground filters added; 33 passing Jest tests and documentation updates reported.
+- Oct 7: The [daily report](../DAILY%20PROGRESS/2026-10-07-progress.md) records deployment of PATCH and filters, live editing checks (owner 200, signed-out 401, non-owner 403), saved changes after refresh, and filter/empty-result checks. The frontend still has no Edit UI.
+- Oct 8: The [daily report](../DAILY%20PROGRESS/2026-10-08-progress.md) records JSON 404/400 errors, local CORS/input/rate-limit checks, shared error handling, 37 passing backend tests, 49 passing frontend tests, lint and build. Commit `57171d9` was deployed to Render. The user confirmed the live `/health` response, unknown-route JSON, malformed-JSON 400, playground API data, and frontend list/detail/review loading. `/health` checks the API process, not database health.
+- Oct 9: The [daily report](../DAILY%20PROGRESS/2026-10-09-progress.md) confirms the author-only Edit button, prefilled text/rating form, Cancel and PATCH saving. Saved changes remained after refresh in development and local production preview. Lint, 50 frontend tests and build passed. The user committed this work as `ab53ff0`; frontend deployment remains unconfirmed.
+- Oct 12: The [daily report](../DAILY%20PROGRESS/2026-10-12-progress.md) confirms success/sign-in/connection feedback, retained drafts after failed saves, API location/age/tag filters, Reset, loading/error/empty states and retries with unchanged filters. Two filter UI tests were added. Keyboard/mobile checks, lint, all 52 frontend tests and build passed. Assistant checks on localhost:4173 confirmed save feedback and filtering/reset flows. README and handoff notes were updated. These changes are local; the October 12 work still needs commit, push and frontend deployment.
+
+Sources: dated files in [DAILY PROGRESS](../DAILY%20PROGRESS/) through October 12 and the latest confirmed results in this chat. This planning update did not rerun tests or deploy changes.
+
+## Active daily schedule
+
+Each row contains three tasks budgeted at 60 minutes each. All scheduled work remains pending until supported by a completion report.
+
+| Date | Task 1 | Task 2 | Task 3 |
+| --- | --- | --- | --- |
+| Oct 13 | Review and commit the completed frontend changes, then push; check staged files so unrelated report changes are excluded | Deploy the frontend and confirm the deployed commit and production configuration | Verify live review editing, ownership, refresh persistence, filters and reset; record results and fix blockers |
+| Oct 14 | Verify clean installation and lockfiles using README | Define/test playground-deletion relationship rules and close Playground ownership/spoofing test gaps | Complete API examples and reconcile brief evidence, README and handoff notes with verified behavior |
+| Oct 15 | Fix remaining core issues and run appropriate frontend/backend regression checks | Check Atlas permissions, indexes, export and recovery steps with test data | Complete missing brief evidence and documentation |
+| Oct 16 | Rehearse architecture, models, permissions and testing explanation | Rehearse API demo | Check submission files, repository access and live URLs |
+| Oct 19 | Run final live checks | Submit and confirm success | Reserve time for submission issues and final report |
+
+## Adjustment rules and changes
+
+- October 7 scope update: include frontend UI and UX work that exposes the new backend features. Backend PATCH implementation does not mean review editing is available in the UI.
+- October 12 rollover: local review editing, filter UI, feedback and preview checks are complete. Use October 13 for the latest report's priority: commit/push, frontend deployment and live verification. Move relationship/ownership gaps and final documentation to October 14, and Atlas checks to October 15. These replace lower-priority work within the three-hour daily budget; no weekend work is added.
+- Preserve existing routes and visual design, reuse Atomic Design components, and keep Clerk. An owner-only Edit button improves the UI but never replaces server authorization. Handle expired sessions and denied edits with clear feedback.
+- Review editing acceptance: an owner can open a prefilled form, save permitted fields through PATCH, see the saved values after reload, and cancel without changing data. Non-owners have no edit action and the backend rejects unauthorized requests. Failed saves preserve the user's input.
+- Filter/UX acceptance: existing controls use the supported API parameters, reset restores the list, and loading, errors and empty results have clear messages. Check mobile layout, keyboard operation and focus. Prioritize functional clarity over a visual redesign.
+- Future nightly updates must track frontend integration and UX gaps alongside backend progress. Keep these tasks pending until DAILY PROGRESS reports their implementation and verification; backend-only success is insufficient.
+
+- Use the latest progress reports. Move unfinished work to the next working day, replacing lower-priority work without adding hours or weekend tasks.
+- Initial deployment is complete. Replace the original October 9 deployment and October 12 frontend setup with persistence, relationship and verification gaps.
+- October 6 documentation work is complete as reported; October 14 fills gaps rather than rewriting it.
+- Carry blockers forward before optional work. Keep the deadline and daily budget.
+- Morning drafts run on weekdays at 09:00. Nightly planning maintenance runs daily at 23:00, including weekends, without assigning weekend project work.
+- Leave files unchanged when there is no new evidence or correction. Record evidence dates; a plan or intended action is not proof of completion.
+- This update changes planning documents only; it does not deploy, mutate test data, commit or push.
+
+---
+
+<details>
+<summary>Original baseline (historical reference, superseded by the active schedule)</summary>
+
 # SpielSpot 2.0 | Daily work plan
 
 > **Deadline: Monday, October 19, 2026, at 23:59 (Europe/Berlin)**  
@@ -55,11 +111,13 @@ Sources: [Deployment blueprint](https://github.com/i-chieh-liu-88/Backend-Deploy
 - [ ] **Plan the remaining work** · 60 minutes  
   Compare the project with the brief and the Backend-Deployment plan. List what is implemented, verified, and still missing.
 
-- [ ] **Run the existing tests** · 60 minutes  
+- [x] **Run the existing tests** · 60 minutes
   Run the backend tests and record the results.
+  Completed: [September 30 report](../DAILY%20PROGRESS/2026-09-30-progress.md), 16 backend tests passed; the October 6 report records 33 passing tests.
 
-- [ ] **Test review deletion** · 60 minutes  
+- [x] **Test review deletion** · 60 minutes
   Check that authors can delete their own reviews and other users cannot.
+  Completed: [September 30 report](../DAILY%20PROGRESS/2026-09-30-progress.md), automated owner/non-owner checks; [October 5 report](../DAILY%20PROGRESS/2026-10-05-progress.md), live owner deletion and non-owner rejection.
 
 **Daily goal:** A remaining-work checklist and a record of today's test results.
 
@@ -67,9 +125,11 @@ Sources: [Deployment blueprint](https://github.com/i-chieh-liu-88/Backend-Deploy
 
 - [ ] **Review the API** · 60 minutes  
   Compare endpoints with documentation and list success and error cases to test.
+  Partial: [October 1 report](../DAILY%20PROGRESS/2026-10-01-progress.md) confirms endpoint/documentation checks. A complete success/error scenario list is not confirmed.
 
-- [ ] **Check models and the ERD** · 60 minutes  
+- [x] **Check models and the ERD** · 60 minutes
   Verify Playground and Review fields and relationships, and correct outdated descriptions.
+  Completed: [October 1 report](../DAILY%20PROGRESS/2026-10-01-progress.md), both models matched the ERD.
 
 - [ ] **Confirm the Render and Atlas plan** · 60 minutes  
   Check accounts, repository access, existing Atlas resources, and deployment regions. Verify current plan costs, quotas, and sleep behavior; list environment variable names and required test accounts.
@@ -117,6 +177,7 @@ Sources: [Deployment blueprint](https://github.com/i-chieh-liu-88/Backend-Deploy
 
 - [ ] **Define relationship rules** · 60 minutes  
   Test a playground ID that does not exist. Decide what should happen to reviews when a playground is deleted.
+  Partial: [October 6 report](../DAILY%20PROGRESS/2026-10-06-progress.md) confirms the live missing-playground 404. Review handling after playground deletion remains unconfirmed.
 
 - [ ] **Implement relationship checks** · 60 minutes  
   Add the necessary checks and tests, and document the agreed behavior.
@@ -127,9 +188,11 @@ Sources: [Deployment blueprint](https://github.com/i-chieh-liu-88/Backend-Deploy
 
 - [ ] **Check real authentication and ownership** · 45 minutes  
   Use Postman with valid, missing, and invalid tokens. Confirm account B cannot update or delete account A's records.
+  Partial: October 5–6 reports confirm review deletion ownership and missing/invalid-token rejection. Live update ownership and the broader Playground checks remain unconfirmed.
 
 - [ ] **Verify persistence** · 60 minutes  
   Create and update records, read them back, inspect them in Atlas, and check again after restarting the backend. Separate test and production data.
+  Partial: [October 5 report](../DAILY%20PROGRESS/2026-10-05-progress.md) confirms a review survives page refresh. Update and restart/redeployment persistence remain unconfirmed.
 
 - [ ] **Prepare Atlas for deployment** · 75 minutes  
   Check the database name, a database user with only required permissions, URI encoding, and the network allowlist plan. Review connection pooling, indexes, and backup/export arrangements for existing data.
@@ -154,8 +217,9 @@ Sources: [Deployment blueprint](https://github.com/i-chieh-liu-88/Backend-Deploy
 - [ ] **Configure the Render service** · 45 minutes  
   Select SpielSpot-v2 and the deployment branch. Use the verified Root Directory, install/build, and start commands. Obtain the service's outbound IP ranges and update the Atlas allowlist.
 
-- [ ] **Deploy and resolve startup issues** · 90 minutes  
+- [x] **Deploy and resolve startup issues** · 90 minutes
   Set the required MONGODB_URI, Clerk keys, NODE_ENV, CLIENT_URL, and other applicable variables in Render. Use the platform PORT; inspect build/runtime logs and verify the Atlas connection.
+  Completed ahead of schedule: [October 1 report](../DAILY%20PROGRESS/2026-10-01-progress.md) records Render deployment, dependency fixes and environment setup; [October 2 report](../DAILY%20PROGRESS/2026-10-02-progress.md) confirms live reads and a saved review. This checks initial deployment only, not the later PATCH/filter release or the separate health checks.
 
 - [ ] **Run HTTPS smoke checks** · 45 minutes  
   Test /health, public reads, and authenticated create/read requests. Confirm the record in Atlas and note the URL, deployed commit, and remaining issues.
@@ -281,3 +345,5 @@ Evening updates should report actual results. Explain unfinished work and the ne
 > **Reporting reminder:** This work schedule excludes weekends, but the brief requires daily updates. The existing 09:00 English draft schedule still includes weekends. Adjust it separately if the instructor agrees that weekend reports are unnecessary.
 
 **Submit during the day on October 19. Keep the final hour available for submission or access issues.**
+
+</details>

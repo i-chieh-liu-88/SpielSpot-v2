@@ -1,6 +1,12 @@
 import { apiFetch } from "./apiClient";
 import type { Playground, PlaygroundParentReview } from "../types/content";
 
+export type PlaygroundFilters = {
+  location?: string;
+  ageRange?: string;
+  tags?: string[];
+}; //定義可送出的篩選條件
+
 type BackendPlayground = {
   _id: string;
   name: string;
@@ -58,11 +64,6 @@ function toDisplayReview(raw: BackendReview): PlaygroundParentReview {
   };
 }
 
-export async function getPlaygrounds(): Promise<Playground[]> {
-  const raw: BackendPlayground[] = await apiFetch("/api/playgrounds");
-  return raw.map(toDisplayPlayground);
-}
-
 export async function getPlayground(id: string): Promise<Playground | null> {
   try {
     const [raw, rawReviews]: [BackendPlayground, BackendReview[]] =
@@ -70,6 +71,7 @@ export async function getPlayground(id: string): Promise<Playground | null> {
         apiFetch(`/api/playgrounds/${id}`),
         apiFetch(`/api/playgrounds/${id}/reviews`),
       ]);
+
     return {
       ...toDisplayPlayground(raw),
       reviews: rawReviews.map(toDisplayReview),
@@ -77,4 +79,27 @@ export async function getPlayground(id: string): Promise<Playground | null> {
   } catch {
     return null;
   }
+}
+
+export async function getPlaygrounds(
+  filters: PlaygroundFilters = {},
+): Promise<Playground[]> {
+  const params = new URLSearchParams();
+
+  if (filters.location?.trim()) {
+    params.set("location", filters.location.trim());
+  }
+  if (filters.ageRange) {
+    params.set("ageRange", filters.ageRange);
+  }
+  if (filters.tags?.length) {
+    params.set("tags", filters.tags.join(","));
+  }
+
+  const query = params.toString();
+  const raw: BackendPlayground[] = await apiFetch(
+    `/api/playgrounds${query ? `?${query}` : ""}`,
+  );
+
+  return raw.map(toDisplayPlayground);
 }

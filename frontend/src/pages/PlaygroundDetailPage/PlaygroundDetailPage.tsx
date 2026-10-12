@@ -67,10 +67,12 @@ function ReviewSaveButton({
   reviewId,
   reviewText,
   reviewRating,
+  onSaved, //讓 Save 按鈕通知詳細頁「儲存成功」
 }: {
   reviewId: string;
   reviewText: string;
   reviewRating: number;
+  onSaved: () => void;
 }) {
   const { getToken } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
@@ -87,12 +89,22 @@ function ReviewSaveButton({
 
     try {
       const token = await getToken();
-      if (!token) throw new Error("Please sign in again.");
+      if (!token) {
+        throw new Error(
+          "Please sign in to save your changes. Your edits are still here.",
+        );
+      } //使用者會知道下一步怎麼做，也知道輸入仍保留
 
       await updateReview(reviewId, reviewText.trim(), reviewRating, token);
-      window.location.reload();
+      onSaved();
     } catch (error) {
-      setSaveError(error instanceof Error ? error.message : "Save failed.");
+      setSaveError(
+        error instanceof TypeError
+          ? "Could not connect to the server. Your edits are still here. Please try again."
+          : error instanceof Error
+            ? error.message
+            : "Could not save your review. Please try again.",
+      );
     } finally {
       setIsSaving(false);
     }
@@ -112,11 +124,16 @@ export function PlaygroundDetailPage() {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { playgroundId } = useParams({ from: "/playgrounds_/$playgroundId" });
-  const { playground, isLoading, error } = usePlayground(playgroundId);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const { playground, isLoading, error } = usePlayground(
+    playgroundId,
+    refreshKey,
+  );
   const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
   //這個狀態會記錄目前要編輯的評論 ID；null 表示沒有開啟編輯。
   const [editText, setEditText] = useState("");
   const [editRating, setEditRating] = useState(0);
+  const [saveNotice, setSaveNotice] = useState("");
 
   if (isLoading) {
     return (
@@ -286,6 +303,17 @@ export function PlaygroundDetailPage() {
               playgroundId={playground.id}
             />
           </div>
+
+          {/* 把成功訊息顯示在評論列表上方 */}
+          {saveNotice && (
+            <p
+              role="status" //讓螢幕閱讀器也能讀出成功提示
+              className="mb-4 rounded-xl bg-green-50 p-3 text-green-800"
+            >
+              {saveNotice}
+            </p>
+          )}
+
           <div className="grid gap-5 md:grid-cols-2">
             {playground.reviews.map((review) => (
               <figure
@@ -307,6 +335,7 @@ export function PlaygroundDetailPage() {
                   <ReviewEditButton
                     authorId={review.authorId}
                     onEdit={() => {
+                      setSaveNotice("");
                       setEditingReviewId(review.id);
                       setEditText(review.text);
                       setEditRating(review.rating);
@@ -351,6 +380,11 @@ export function PlaygroundDetailPage() {
                         reviewId={review.id}
                         reviewText={editText}
                         reviewRating={editRating}
+                        onSaved={() => {
+                          setEditingReviewId(null);
+                          setSaveNotice("Your review has been updated.");
+                          setRefreshKey((current) => current + 1);
+                        }}
                       />
                     )}
                     <Button

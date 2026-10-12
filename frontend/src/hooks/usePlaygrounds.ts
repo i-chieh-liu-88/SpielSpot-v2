@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getPlayground, getPlaygrounds } from "../services/playgrounds";
 import type { Playground } from "../types/content";
+import type { PlaygroundFilters } from "../services/playgrounds";
 
 type PlaygroundCollectionState = {
   playgrounds: Playground[];
@@ -29,25 +30,42 @@ function getErrorMessage(error: unknown) {
   return "Unable to load playground data.";
 }
 
-export function usePlaygrounds(): PlaygroundCollectionState {
-  const [state, setState] = useState<PlaygroundCollectionState>({
+export function usePlaygrounds(
+  filters: PlaygroundFilters = {},
+  refreshKey = 0,
+): PlaygroundCollectionState {
+  const location = filters.location?.trim() ?? "";
+  const ageRange = filters.ageRange ?? "";
+  const tags = filters.tags?.join(",") ?? "";
+  const requestKey = JSON.stringify([location, ageRange, tags, refreshKey]);
+  const [state, setState] = useState<
+    PlaygroundCollectionState & { requestKey: string }
+  >({
     playgrounds: [],
     isLoading: true,
+    requestKey: "",
   });
 
   useEffect(() => {
     let isActive = true;
 
-    getPlaygrounds()
+    getPlaygrounds({
+      location,
+      ageRange,
+      tags: tags ? tags.split(",") : [],
+    })
       .then((playgrounds) => {
-        if (isActive) setState({ playgrounds, isLoading: false });
+        //成功回應
+        if (isActive) setState({ playgrounds, isLoading: false, requestKey });
       })
       .catch((error: unknown) => {
+        //失敗回應
         if (isActive) {
           setState({
             playgrounds: [],
             isLoading: false,
             error: getErrorMessage(error),
+            requestKey,
           });
         }
       });
@@ -55,17 +73,24 @@ export function usePlaygrounds(): PlaygroundCollectionState {
     return () => {
       isActive = false;
     };
-  }, []);
+  }, [location, ageRange, tags, requestKey]);
 
-  return state;
+  return {
+    playgrounds: state.requestKey === requestKey ? state.playgrounds : [],
+    isLoading: state.requestKey !== requestKey || state.isLoading,
+    error: state.requestKey === requestKey ? state.error : undefined,
+  };
 }
 
-export function usePlayground(playgroundId?: string): PlaygroundState {
+/* -------------------------- 先讓儲存成功後更新評論並顯示成功訊息 -------------------------- */
+export function usePlayground(
+  playgroundId?: string,
+  refreshKey = 0,
+): PlaygroundState {
   const [state, setState] = useState<PlaygroundState>({
     playground: null,
     isLoading: true,
   });
-
   useEffect(() => {
     let isActive = true;
 
@@ -92,7 +117,7 @@ export function usePlayground(playgroundId?: string): PlaygroundState {
     return () => {
       isActive = false;
     };
-  }, [playgroundId]);
+  }, [playgroundId, refreshKey]);
 
   return playgroundId
     ? state

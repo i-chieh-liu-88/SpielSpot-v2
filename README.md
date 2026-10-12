@@ -62,6 +62,12 @@ token, and the backend enforces ownership. Review editing has passed local
 development and production preview checks but is not yet deployed to the
 frontend. The frontend uses `VITE_API_BASE_URL` or `http://localhost:5000`.
 
+The playground list sends location, age range and tag filters to the API.
+Location matches part of an address without case sensitivity; age range is an
+exact match; tags match any selected value. Reset clears the API filters, while
+Show all also clears the URL keyword search. Review saves refresh the displayed
+data and show a success message without reloading the page.
+
 | Method | Endpoint                     | Description                      | Auth            |
 | ------ | ---------------------------- | -------------------------------- | --------------- |
 | GET    | /health                      | Check that the API responds      | No              |
@@ -135,4 +141,4 @@ Relationship: `Playground 1 --- N Review` (Review stores `playgroundId` as a for
 ## Current Status
 
 - Done: The Render backend provides Playground and Review APIs with Clerk authentication, ownership checks, validation, and security middleware. The frontend reads playgrounds and reviews from the API and can submit reviews.
-- In progress: Review editing (text and overall rating) works in local development and production preview but has not yet been deployed to the frontend. Playground form saving remains disabled.
+- In progress: Review editing and the API filter UI work in local development and production preview but have not yet been deployed to the frontend. Playground form saving remains disabled.

@@ -13,8 +13,9 @@ visit or refresh of `/playgrounds/:id` load the client-side route.
 
 ## Reads
 
-- `frontend/src/services/playgrounds.ts` exposes `getPlaygrounds()` and
-  `getPlayground(id)`. Keep their async return types when replacing fixtures.
+- `frontend/src/services/playgrounds.ts` exposes `getPlaygrounds(filters)` and
+  `getPlayground(id)`. Filters accept `location`, `ageRange` and a `tags` array.
+  The service encodes query parameters; the API applies the filters.
 - UI models are in `frontend/src/types/content.ts`. Playground details and
   reviews come from the backend API. Unknown playground IDs return `null`.
   Landing-page testimonials in `homeContent.ts` remain sample content.
@@ -82,3 +83,24 @@ Map tiles, address lookup, fonts and Clerk still need internet.
 - Malformed JSON returned `400` with `Invalid JSON format`.
 - `GET /api/playgrounds` returned playground data.
 - The deployed frontend loaded the playground list, detail page, and reviews.
+
+## Local frontend checks (2026-10-12)
+
+- Review Save now closes the edit form, refreshes the data and shows a success
+  message without a full-page reload. Opening Edit clears the old success message.
+- Missing tokens show a sign-in instruction. Failed network requests show a
+  connection message and preserve the draft.
+- The filter form uses age ranges and tags from the unfiltered API data. Apply
+  sends the selected conditions; Reset clears them. Show all also clears the
+  URL keyword search and resets the form.
+- Each Apply or Reset starts a new request, including repeated conditions.
+  Loading, request errors and empty results have separate display states.
+- The user confirmed development checks for keyboard use, 390 px mobile layout,
+  failed requests with retained input and recovery with the same conditions.
+- Assistant checks on localhost:4173 confirmed review save feedback, clearing
+  the notice on Edit, Dresden filtering (3 results), age 3-8 with outdoor
+  filtering (2 results), and empty results followed by Show all (5 results).
+  The review save check used an existing test review with unchanged text/rating.
+- Lint, all 52 frontend tests across 20 files, and the production build passed.
+  The build still reports the existing warning for chunks larger than 500 kB.
+- These checks are local. The new frontend changes have not been deployed.
