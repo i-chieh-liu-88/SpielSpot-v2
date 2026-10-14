@@ -28,9 +28,12 @@ visit or refresh of `/playgrounds/:id` load the client-side route.
   keys belong in Vite environment variables. Configure allowed origins in Clerk
   for the eventual deployment domain.
 - Add/edit pages retain sign-in and ownership UI checks. These are not server
-  authorization. The new backend must verify Clerk tokens and enforce ownership.
-- Playground forms retain validation and local photo previews, but saving is
-  disabled. `PlaygroundMutationInput` documents the future service input.
+  authorization. The backend verifies Clerk tokens and enforces ownership.
+- The local Add playground form uses `createPlayground(input, token)` and
+  `CreatePlaygroundInput` in `services/playgrounds.ts`. It posts validated details
+  to `/api/playgrounds`; latitude, longitude and safety rating are numbers.
+  The backend assigns `ownerId`. Photos are local previews and are not sent.
+  Playground edit-mode saving remains disabled. The creation UI is not deployed.
 - Review pages allow submission. The review service posts to
   `/api/playgrounds/:id/reviews` with a Clerk bearer token. Open the form from a
   playground detail page to supply its ID. Missing IDs or tokens prevent saving;
@@ -40,18 +43,18 @@ visit or refresh of `/playgrounds/:id` load the client-side route.
   playground detail page. The frontend sends `PATCH /api/reviews/:id` with a
   Clerk bearer token. The backend checks authorship. Cancel sends no request;
   failed saves keep the form input. Local development and production preview
-  checks confirmed saved changes remain after refresh. This frontend change
-  has not yet been deployed.
-- Validate input, file type and size on the server. The UI supports JPEG, PNG and
-  WebP up to 5 MB. Add ownership-aware storage rules and upload cleanup.
-- Choose the API contract before adding endpoints or a base URL configuration.
+  checks confirmed saved changes remain after refresh. Live review editing and
+  filtering checks were reported on October 13.
+- Photo upload is deferred until after submission. The local preview accepts
+  JPEG, PNG and WebP up to 5 MB; this does not provide server upload validation.
+  Future uploads need server validation, ownership checks, storage and cleanup.
 
 ## Preview behavior
 
 Lists, filtering, maps, carousel, details, language and theme remain available.
 Sample records have no Clerk owner IDs, so they cannot be edited through the
-ownership-gated edit page. Add forms can be previewed after sign-in. Nothing is
-saved by those playground forms. Review submission uses the backend as described above.
+ownership-gated edit page. The local Add form saves details after sign-in;
+edit-mode saving remains disabled. Review submission uses the backend as described above.
 Map tiles, address lookup, fonts and Clerk still need internet.
 
 ## Live review persistence check (2026-10-05)
@@ -103,4 +106,28 @@ Map tiles, address lookup, fonts and Clerk still need internet.
   The review save check used an existing test review with unchanged text/rating.
 - Lint, all 52 frontend tests across 20 files, and the production build passed.
   The build still reports the existing warning for chunks larger than 500 kB.
-- These checks are local. The new frontend changes have not been deployed.
+- These checks were local on October 12. Live checks were reported on October 13.
+
+## Local playground creation checks (2026-10-14)
+
+- The form obtains a Clerk token, sends validated details and prevents concurrent
+  submissions. Missing tokens show a sign-in instruction. Failed saves keep input
+  and restore the submit button. Success uses the existing detail or review
+  navigation callback; manual checks covered the detail-page path.
+- Assistant browser checks created `TEST Oct 14 Create Flow`
+  (`6acf3d950376e912e6416b79`) in development and `TEST Preview Oct 14`
+  (`6acf468d1cffacd465453076`) on localhost:4173. Both opened detail pages.
+  The user confirmed the development refresh; the assistant confirmed the
+  production preview refresh. These test records remain in the connected database.
+- With the local backend stopped, saving showed an error, preserved the fields
+  and selected tag, and restored the button. The backend was restarted and
+  `/health` returned OK. This failed attempt did not create a record.
+- Four form tests cover disabled edit saving, successful creation with a token,
+  input retention after failure, and duplicate-submission prevention.
+- Lint passed. The user reported 55 frontend tests passing across 20 files and
+  a successful build with the existing chunk-size warning. After the banner and
+  translation edits, the user confirmed both languages in development and the
+  assistant reran the production build successfully.
+- The global banner now states that photos are preview only. The creation form
+  update has not been deployed or verified on the live frontend. Photo upload,
+  playground edit saving and backend restart persistence are not verified here.

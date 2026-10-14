@@ -3,6 +3,7 @@ import PhotoCameraOutlined from "@mui/icons-material/PhotoCameraOutlined";
 import {
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ChangeEvent,
   type FormEvent,
@@ -12,6 +13,8 @@ import Button from "../../atoms/Button";
 import { LocationPickerMap } from "../../molecules/LocationPickerMap/LocationPickerMap";
 import { playgroundEditorSchema } from "./PlaygroundForm.schema";
 import { useLanguage } from "../../../providers/LanguageProvider";
+import { useAuth } from "@clerk/clerk-react";
+import { createPlayground } from "../../../services/playgrounds";
 
 const facilityOptions = [
   "Fenced",
@@ -74,12 +77,16 @@ function getInitialState(playground?: Playground): PlaygroundFormState {
 export function PlaygroundForm({
   mode,
   playground,
+  onSaved,
 }: PlaygroundFormProps) {
   const { t } = useLanguage();
+  const { getToken } = useAuth();
   const [form, setForm] = useState(() => getInitialState(playground));
   const [photo, setPhoto] = useState<File>();
   const [writeReview, setWriteReview] = useState(mode === "create");
   const [error, setError] = useState<string>();
+  const [isSaving, setIsSaving] = useState(false); //控制按鈕和提示
+  const savingRef = useRef(false); //避免重複送出。確保同一時間只送出一次 request
   const photoPreview = useMemo(
     () => (photo ? URL.createObjectURL(photo) : playground?.image),
     [photo, playground?.image],
@@ -137,8 +144,25 @@ export function PlaygroundForm({
     setError(undefined);
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  /* ------------------------------ handleSubmit; ----------------------------- */
+  /* ------------------------------ handleSubmit; ----------------------------- */
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (savingRef.current) return;
+
+    if (mode !== "create") {
+      setError(t("Saving is not available in this preview."));
+      return;
+    }
+
+    if (!form.latitude.trim() || !form.longitude.trim()) {
+      setError(
+        t("Please select a location on the map or enter both coordinates."),
+      );
+      return;
+    } //這樣使用者沒有選擇位置時，就不會誤存成經緯度 0, 0。手動輸入的 "0" 仍然是有效值。
+
     const result = playgroundEditorSchema.safeParse(form);
 
     if (!result.success) {
@@ -146,8 +170,31 @@ export function PlaygroundForm({
       return;
     }
 
-    setError(t("Saving is not available in this preview."));
-  }
+    savingRef.current = true;
+    setIsSaving(true);
+    setError(undefined);
+
+    try {
+      const token = await getToken();
+
+      if (!token) {
+        setError(t("Please sign in again."));
+        return;
+      }
+
+      const savedPlayground = await createPlayground(result.data, token);
+      onSaved(savedPlayground, writeReview);
+    } catch {
+      setError(
+        t(
+          "Could not save the playground. Your input is still here. Please try again.",
+        ),
+      );
+    } finally {
+      savingRef.current = false;
+      setIsSaving(false);
+    }
+  } //先驗證資料，再取得 Clerk token 並送出。失敗時保留輸入
 
   const latitude = Number(form.latitude);
   const longitude = Number(form.longitude);
@@ -160,12 +207,17 @@ export function PlaygroundForm({
     <form
       className="rounded-3xl border border-white/60 bg-white/35 p-6 shadow-xl backdrop-blur-xl sm:p-9"
       onSubmit={handleSubmit}
-      aria-label={t(
-        mode === "create" ? "Add a playground" : "Edit playground",
-      )}
+      aria-label={t(mode === "create" ? "Add a playground" : "Edit playground")}
       noValidate
     >
-      <p className="mb-6 font-semibold" role="status">{t("Preview only. Your changes will not be saved.")}</p>
+      <p className="mb-6 font-semibold" role="status">
+        {/* 遊樂場資料可以儲存，照片目前只供預覽，不會上傳 */}
+        {mode === "create"
+          ? t(
+              "Playground details can be saved. Photos are preview only and will not be uploaded.",
+            )
+          : t("Preview only. Your changes will not be saved.")}
+      </p>
       {error && (
         <p
           className="mb-6 rounded-2xl border border-red-200 bg-red-50/90 px-4 py-3 font-bold text-red-700"
@@ -348,9 +400,11 @@ export function PlaygroundForm({
         type="submit"
         className="mt-8 w-full sm:w-auto"
         size="lg"
-        disabled
+        disabled={mode !== "create" || isSaving}
       >
-        {mode === "create"
+        {isSaving
+          ? t("Saving...")
+          : mode === "create"
             ? t("Add playground")
             : t("Save changes")}
       </Button>

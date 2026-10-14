@@ -1,5 +1,5 @@
 export const germanTranslations: Record<string, string> = {
-  "Preview with sample data. Changes cannot be saved yet.": "Vorschau mit Beispieldaten. Änderungen können noch nicht gespeichert werden.",
+  "Photos are preview only and will not be uploaded.": "Fotos dienen nur der Vorschau und werden nicht hochgeladen.",
   "Preview only. Your changes will not be saved.": "Nur Vorschau. Deine Änderungen werden nicht gespeichert.",
   "Saving is not available in this preview.": "Speichern ist in dieser Vorschau nicht verfügbar.",
   "Features": "Funktionen",

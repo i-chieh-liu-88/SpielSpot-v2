@@ -7,6 +7,18 @@ export type PlaygroundFilters = {
   tags?: string[];
 }; //定義可送出的篩選條件
 
+export type CreatePlaygroundInput = {
+  name: string;
+  location: string;
+  postcode: string;
+  latitude: number;
+  longitude: number;
+  ageRange: string;
+  safetyRating: number;
+  description: string;
+  tags: string[];
+}; //規定建立遊樂場時要傳哪些資料
+
 type BackendPlayground = {
   _id: string;
   name: string;
@@ -102,4 +114,21 @@ export async function getPlaygrounds(
   );
 
   return raw.map(toDisplayPlayground);
+}
+
+/* ---------------------------- 傳送資料的 createPlayground function, 帶著 Clerk token 傳送資料---------------------------- */
+export async function createPlayground(
+  input: CreatePlaygroundInput,
+  token: string,
+): Promise<Playground> {
+  const raw: BackendPlayground = await apiFetch(
+    "/api/playgrounds",
+    {
+      method: "POST",
+      body: JSON.stringify(input),
+    },
+    token,
+  );
+
+  return toDisplayPlayground(raw);
 }

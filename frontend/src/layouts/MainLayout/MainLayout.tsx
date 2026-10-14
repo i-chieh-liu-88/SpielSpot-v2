@@ -9,11 +9,15 @@ export function MainLayout() {
     <>
       <Navbar />
       <main>
-        <p className="bg-amber-100 px-6 py-3 text-center text-sm font-semibold text-amber-950" role="status">{t("Preview with sample data. Changes cannot be saved yet.")}</p>
+        <p
+          className="bg-amber-100 px-6 py-3 text-center text-sm font-semibold text-amber-950"
+          role="status"
+        >
+          {t("Photos are preview only and will not be uploaded.")}
+        </p>
         <Outlet />
       </main>
       <Footer />
     </>
   );
 }
-

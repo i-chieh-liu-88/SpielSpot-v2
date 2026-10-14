@@ -58,9 +58,16 @@ Server running on port 5000
 The frontend reads playgrounds and reviews from the backend API. Signed-in
 users can submit reviews. Review authors can edit review text and overall
 rating through `PATCH /api/reviews/:id`; the frontend includes a Clerk bearer
-token, and the backend enforces ownership. Review editing has passed local
-development and production preview checks but is not yet deployed to the
-frontend. The frontend uses `VITE_API_BASE_URL` or `http://localhost:5000`.
+token, and the backend enforces ownership. Review editing and filtering passed
+live checks reported on October 13. The frontend uses `VITE_API_BASE_URL` or
+`http://localhost:5000`.
+
+The local Add playground form now sends `POST /api/playgrounds` with a Clerk
+bearer token. It validates input, blocks duplicate submissions while saving,
+keeps input after a failed save, and opens the detail page or review form after
+success. The backend assigns `ownerId` from the authenticated user. Photos are
+local previews only and are not uploaded. Playground edit-mode saving remains
+disabled. The creation form update has not yet been deployed.
 
 The playground list sends location, age range and tag filters to the API.
 Location matches part of an address without case sensitivity; age range is an
@@ -141,4 +148,6 @@ Relationship: `Playground 1 --- N Review` (Review stores `playgroundId` as a for
 ## Current Status
 
 - Done: The Render backend provides Playground and Review APIs with Clerk authentication, ownership checks, validation, and security middleware. The frontend reads playgrounds and reviews from the API and can submit reviews.
-- In progress: Review editing and the API filter UI work in local development and production preview but have not yet been deployed to the frontend. Playground form saving remains disabled.
+- Verified live on October 13: Review editing and the API filter UI, based on the reported live checks.
+- Verified locally on October 14: Playground creation, detail navigation and retrieval after refresh in development and production preview. A failed network request preserved input and restored the Save button. Lint and 55 frontend tests across 20 files passed. The final build also passed after the banner and translation edits, with the existing chunk-size warning.
+- Pending: Deploy and verify the creation form update. Photos are preview only; playground edit-mode saving remains disabled. The user confirmed the English banner and German translation in development.
