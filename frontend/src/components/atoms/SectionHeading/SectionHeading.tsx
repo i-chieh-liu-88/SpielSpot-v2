@@ -1,19 +1,29 @@
-import type { ReactNode } from 'react'
+import type { ReactNode } from "react";
 
-type SectionHeadingProps = { eyebrow?: string; title: string; description?: ReactNode; id: string; tone?: 'coral' | 'grass' | 'sand' }
+type SectionHeadingProps = {
+  title: string;
+  description?: ReactNode;
+  id: string;
+};
 
-const eyebrowStyles = {
-  coral: 'bg-coral/10 text-coral',
-  grass: 'bg-white text-grass shadow-sm',
-  sand: 'bg-sand text-bark',
-}
-
-export function SectionHeading({ eyebrow, title, description, id, tone = 'coral' }: SectionHeadingProps) {
+export function SectionHeading({
+  title,
+  description,
+  id,
+}: SectionHeadingProps) {
   return (
-    <header className="mx-auto mb-14 max-w-2xl text-center">
-      {eyebrow && <p className={`mb-4 inline-block rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-widest ${eyebrowStyles[tone]}`}>{eyebrow}</p>}
-      <h2 id={id} className="display text-5xl font-bold text-gray-800">{title}</h2>
-      {description && <p className="mt-3 text-lg font-normal text-gray-400">{description}</p>}
+    <header className="mx-auto mb-8 max-w-3xl text-center sm:mb-10">
+      <h2
+        id={id}
+        className="display text-4xl font-bold leading-tight tracking-tight text-balance text-gray-800 sm:text-5xl lg:text-6xl"
+      >
+        {title}
+      </h2>
+      {description && (
+        <p className="mt-3 text-base leading-relaxed text-pretty text-gray-600 sm:text-lg">
+          {description}
+        </p>
+      )}
     </header>
-  )
+  );
 }

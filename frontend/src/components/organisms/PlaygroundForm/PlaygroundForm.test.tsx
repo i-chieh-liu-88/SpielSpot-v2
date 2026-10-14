@@ -21,11 +21,66 @@ vi.mock("../../../services/playgrounds", () => ({
 }));
 
 vi.mock("../../molecules/LocationPickerMap/LocationPickerMap", () => ({
-  LocationPickerMap: () => <div>Map preview</div>,
+  LocationPickerMap: ({ coordinates }: { coordinates?: [number, number] }) => (
+    <div data-testid="map-preview">
+      {coordinates ? coordinates.join(",") : "No selected position"}
+    </div>
+  ),
 }));
 
 describe("playground preview form", () => {
   afterEach(cleanup);
+  it("identifies invalid fields and focuses the first one without submitting", () => {
+    vi.mocked(createPlayground).mockReset();
+    render(<PlaygroundForm mode="create" onSaved={vi.fn()} />);
+    fireEvent.click(screen.getByRole("button", { name: "Add playground" }));
+
+    const name = screen.getByLabelText("Playground name");
+    expect(name).toHaveFocus();
+    expect(name).toHaveAttribute("aria-invalid", "true");
+    expect(name).toHaveAccessibleDescription(
+      "Enter a playground name with at least 2 characters.",
+    );
+    expect(screen.getByLabelText("Latitude")).toHaveAccessibleDescription(
+      "Select a location on the map or enter a latitude.",
+    );
+    expect(
+      screen.getByRole("checkbox", { name: "Climbing" }),
+    ).toHaveAccessibleDescription("Select at least one facility.");
+    expect(createPlayground).not.toHaveBeenCalled();
+
+    fireEvent.change(name, { target: { value: "Valid name" } });
+    expect(name).not.toHaveAttribute("aria-invalid");
+    expect(screen.getByLabelText("Latitude")).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+  });
+
+  it("shows a map position only for a complete valid coordinate pair, including zero", () => {
+    render(<PlaygroundForm mode="create" onSaved={vi.fn()} />);
+    const map = screen.getByTestId("map-preview");
+    expect(map).toHaveTextContent("No selected position");
+    fireEvent.change(screen.getByLabelText("Latitude"), {
+      target: { value: "0" },
+    });
+    expect(map).toHaveTextContent("No selected position");
+    fireEvent.change(screen.getByLabelText("Longitude"), {
+      target: { value: "0" },
+    });
+    expect(map).toHaveTextContent("0,0");
+    fireEvent.change(screen.getByLabelText("Latitude"), {
+      target: { value: "91" },
+    });
+    expect(map).toHaveTextContent("No selected position");
+    fireEvent.change(screen.getByLabelText("Latitude"), {
+      target: { value: "51" },
+    });
+    fireEvent.change(screen.getByLabelText("Longitude"), {
+      target: { value: "" },
+    });
+    expect(map).toHaveTextContent("No selected position");
+  });
   it("keeps edits local and never reports a saved playground", () => {
     const onSaved = vi.fn();
     render(

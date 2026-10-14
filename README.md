@@ -75,6 +75,13 @@ exact match; tags match any selected value. Reset clears the API filters, while
 Show all also clears the URL keyword search. Review saves refresh the displayed
 data and show a success message without reloading the page.
 
+The local playground browsing update uses a vertical results list beside a
+sticky map on desktop. Smaller screens start with the list and provide List/Map
+buttons. Address lookup moves the map; the separate address filter narrows API
+results. Filters can be expanded when needed. Moving the map keeps the list
+unchanged until Search this area is pressed. Mouse-wheel map zoom is disabled;
+the map retains zoom controls. These browsing changes are not yet deployed.
+
 | Method | Endpoint                     | Description                      | Auth            |
 | ------ | ---------------------------- | -------------------------------- | --------------- |
 | GET    | /health                      | Check that the API responds      | No              |

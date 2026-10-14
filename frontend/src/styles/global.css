@@ -299,6 +299,13 @@ span {
     box-shadow 0.35s ease,
     background-image 0.45s ease;
 }
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --app-dark-surface: #172033;
+  --app-dark-control: #111b2d;
+  --app-dark-text: #f3f4f6;
+  --app-dark-muted: #cbd5e1;
+}
 html[data-theme="dark"] body {
   background: #0f172a;
   color: #e5e7eb;
@@ -325,11 +332,24 @@ html[data-theme="dark"] .dot-grid {
   );
 }
 html[data-theme="dark"] .bg-white,
+html[data-theme="dark"] .bg-white\/30,
+html[data-theme="dark"] .bg-white\/35,
+html[data-theme="dark"] .bg-white\/40,
+html[data-theme="dark"] .bg-white\/45,
+html[data-theme="dark"] .bg-white\/50,
+html[data-theme="dark"] .bg-white\/60,
+html[data-theme="dark"] .bg-white\/70,
+html[data-theme="dark"] .bg-white\/75,
 html[data-theme="dark"] .bg-white\/80,
 html[data-theme="dark"] .bg-white\/90,
 html[data-theme="dark"] .bg-white\/20,
 html[data-theme="dark"] .bg-white\/10 {
-  background-color: rgba(15, 23, 42, 0.9) !important;
+  background-color: var(--app-dark-surface) !important;
+}
+html[data-theme="dark"] .bg-sand,
+html[data-theme="dark"] .bg-sand\/60,
+html[data-theme="dark"] .bg-sky\/40 {
+  background-color: var(--app-dark-surface) !important;
 }
 html[data-theme="dark"] .bg-gray-900 {
   background-color: #020617 !important;
@@ -345,6 +365,22 @@ html[data-theme="dark"] .text-gray-600 {
 html[data-theme="dark"] .text-gray-500,
 html[data-theme="dark"] .text-gray-400 {
   color: #cbd5e1 !important;
+}
+html[data-theme="dark"] .text-grass,
+html[data-theme="dark"] .text-green-700,
+html[data-theme="dark"] .text-green-800,
+html[data-theme="dark"] .text-green-900,
+html[data-theme="dark"] .text-green-950 {
+  color: #a7f3d0 !important;
+}
+html[data-theme="dark"] .text-amber-800,
+html[data-theme="dark"] .text-amber-950 {
+  color: #fde68a !important;
+}
+html[data-theme="dark"] .text-red-600,
+html[data-theme="dark"] .text-red-700,
+html[data-theme="dark"] .text-red-800 {
+  color: #fecaca !important;
 }
 html[data-theme="dark"] .mobile-nav-header {
   background-color: #172033 !important;
@@ -378,6 +414,7 @@ html[data-theme="dark"] .bg-sky-50,
 html[data-theme="dark"] .bg-amber-50,
 html[data-theme="dark"] .bg-blue-50,
 html[data-theme="dark"] .bg-red-50,
+html[data-theme="dark"] .bg-red-50\/90,
 html[data-theme="dark"] .bg-purple-50,
 html[data-theme="dark"] .bg-teal-100,
 html[data-theme="dark"] .bg-green-100,
@@ -388,7 +425,26 @@ html[data-theme="dark"] .bg-purple-100,
 html[data-theme="dark"] .bg-green-200,
 html[data-theme="dark"] .bg-sky-200,
 html[data-theme="dark"] .bg-amber-200 {
-  background-color: rgba(30, 41, 59, 0.9) !important;
+  background-color: #1e293b !important;
+}
+html[data-theme="dark"] main :is(input:not([type="checkbox"]):not([type="radio"]), textarea, select),
+html[data-theme="dark"] main select option {
+  background-color: var(--app-dark-control) !important;
+  color: var(--app-dark-text) !important;
+  border-color: #94a3b8;
+}
+html[data-theme="dark"] main :is(input, textarea)::placeholder {
+  color: #b8c5d6 !important;
+  opacity: 1;
+}
+html[data-theme="dark"] main :is(input, textarea, select):focus-visible,
+html[data-theme="dark"] main summary:focus-visible {
+  outline: 2px solid #86efac;
+  outline-offset: 3px;
+}
+html[data-theme="dark"] main input[type="file"]::file-selector-button {
+  background: #234336;
+  color: #dcfce7;
 }
 html[data-theme="dark"] .search-input {
   background-color: #0f172a !important;

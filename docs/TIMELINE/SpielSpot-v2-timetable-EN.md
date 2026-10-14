@@ -1,8 +1,8 @@
 # SpielSpot 2.0 | Rolling work plan
 
-Updated October 12, 2026 (Europe/Berlin), using progress reports through October 12 and the latest results confirmed in this chat.
+Updated October 14, 2026 (Europe/Berlin), using progress reports through October 14 and the latest implementation and deployment evidence in this chat.
 This section is the active schedule. The original plan below is historical reference only.
-The original budget is 14 weekdays at 3 hours each (42 planned hours, not actual time spent). Five working days and 15 planned hours remain from October 13. Keep weekends off and the October 19, 23:59 deadline.
+The original budget is 14 weekdays at 3 hours each (42 planned hours, not actual time spent). Three working days and 9 planned hours remain from October 15. Keep weekends off and the October 19, 23:59 deadline.
 
 ## Reported progress
 
@@ -18,24 +18,32 @@ Checkbox review: October 7, using reports through October 6. Checked baseline ta
 - Oct 9: The [daily report](../DAILY%20PROGRESS/2026-10-09-progress.md) confirms the author-only Edit button, prefilled text/rating form, Cancel and PATCH saving. Saved changes remained after refresh in development and local production preview. Lint, 50 frontend tests and build passed. The user committed this work as `ab53ff0`; frontend deployment remains unconfirmed.
 - Oct 12: The [daily report](../DAILY%20PROGRESS/2026-10-12-progress.md) confirms success/sign-in/connection feedback, retained drafts after failed saves, API location/age/tag filters, Reset, loading/error/empty states and retries with unchanged filters. Two filter UI tests were added. Keyboard/mobile checks, lint, all 52 frontend tests and build passed. Assistant checks on localhost:4173 confirmed save feedback and filtering/reset flows. README and handoff notes were updated. These changes are local; the October 12 work still needs commit, push and frontend deployment.
 
-Sources: dated files in [DAILY PROGRESS](../DAILY%20PROGRESS/) through October 12 and the latest confirmed results in this chat. This planning update did not rerun tests or deploy changes.
+- Oct 13: The [daily report](../DAILY%20PROGRESS/2026-10-13-progress.md) confirms the frontend deployment and live workflows. GitHub main and the Netlify production deployment use commit `460936e`. The user confirmed live Render API reads, review editing/success feedback, Cancel, refresh persistence, filters, Reset and empty-result recovery. Assistant checks confirmed a non-author PATCH returned 403, a PATCH without a token returned 401, and the test review remained unchanged. Online 390 px checks passed for review editing/Cancel, filter layout, filtering and Reset; no physical-device touch test was performed.
+- Oct 13 scope decision: the user chose option B. Before submission, connect playground creation and saving to the existing backend. Real photo upload/storage is planned after submission. At that point, photos were local previews and playground saving was not connected. The October 14 update below supersedes the saving status; photo upload remains pending.
+
+- Oct 14 creation: the [daily report](../DAILY%20PROGRESS/2026-10-14-progress.md) confirms Clerk-authenticated playground creation, validation, saving feedback, retained input after failed requests and duplicate-submission protection. Development and local production preview checks confirmed detail navigation and retrieval after refresh. This uses the existing backend POST API; it does not establish persistence across a backend restart.
+- Oct 14 deployment: commit `be1d945` was pushed to GitHub main and Netlify showed Published. The assistant confirmed the updated creation form and enabled button on the live frontend. Live creation and retrieval after refresh remain unverified. The backend stays on Render; Netlify hosts the frontend.
+- Oct 14 local UI work: browsing now has a desktop list/map layout, mobile List/Map switching, explicit Search this area, compact buttons and no mouse-wheel map zoom. Field errors identify inputs and focus the first invalid field. Empty coordinates no longer create a map marker. Dark-mode contrast, decorative-label removal, spacing and section-heading sizes were also adjusted. These later changes remain uncommitted and undeployed.
+- Oct 14 checks: lint, 64 frontend tests across 21 files and the final production build passed. Local browser checks covered development and production preview, filtering/reset, mobile view switching and 390 px overflow. Selected dark-mode text contrast checks passed; there was no complete WCAG audit or physical touch-device test. Backend tests were not rerun during this work. Photos still have no upload or storage.
+
+Sources: dated files in [DAILY PROGRESS](../DAILY%20PROGRESS/) through October 14, including the latest report and October 13 context, plus the latest chat evidence distinguishing local checks, commit/deployment and live verification. The user clarified that refresh checks were local, not live. This planning maintenance did not run tests or deploy changes.
 
 ## Active daily schedule
 
-Each row contains three tasks budgeted at 60 minutes each. All scheduled work remains pending until supported by a completion report.
+Each active row contains three tasks budgeted at 60 minutes each (3 hours per workday). October 14 completion is recorded above. Remaining tasks stay pending until supported by evidence; budgeted time is not actual time spent. No project work is scheduled for October 17-18.
 
 | Date | Task 1 | Task 2 | Task 3 |
 | --- | --- | --- | --- |
-| Oct 13 | Review and commit the completed frontend changes, then push; check staged files so unrelated report changes are excluded | Deploy the frontend and confirm the deployed commit and production configuration | Verify live review editing, ownership, refresh persistence, filters and reset; record results and fix blockers |
-| Oct 14 | Verify clean installation and lockfiles using README | Define/test playground-deletion relationship rules and close Playground ownership/spoofing test gaps | Complete API examples and reconcile brief evidence, README and handoff notes with verified behavior |
-| Oct 15 | Fix remaining core issues and run appropriate frontend/backend regression checks | Check Atlas permissions, indexes, export and recovery steps with test data | Complete missing brief evidence and documentation |
-| Oct 16 | Rehearse architecture, models, permissions and testing explanation | Rehearse API demo | Check submission files, repository access and live URLs |
+| Oct 15 | Review the local UI changes and staged files; commit/push only the intended changes, deploy the frontend and confirm its commit (60 min) | Verify live Clerk-authenticated playground creation, detail navigation, refresh retrieval and failure feedback; keep photos as preview only and record results (60 min) | Define/test playground-deletion behavior for related reviews; check required ownership and spoofing cases and fix blockers (60 min) |
+| Oct 16 | Verify clean installation and lockfiles from README; run required frontend/backend checks for the final changes (60 min) | Rehearse the architecture, models, permissions, tests and API demo (60 min) | Reconcile brief evidence and handoff notes; check submission files, repository access and live URLs (60 min) |
 | Oct 19 | Run final live checks | Submit and confirm success | Reserve time for submission issues and final report |
 
 ## Adjustment rules and changes
 
 - October 7 scope update: include frontend UI and UX work that exposes the new backend features. Backend PATCH implementation does not mean review editing is available in the UI.
-- October 12 rollover: local review editing, filter UI, feedback and preview checks are complete. Use October 13 for the latest report's priority: commit/push, frontend deployment and live verification. Move relationship/ownership gaps and final documentation to October 14, and Atlas checks to October 15. These replace lower-priority work within the three-hour daily budget; no weekend work is added.
+- October 13 rollover: frontend deployment and core live checks are complete. Option B adds playground creation/saving on October 14, followed by tests and live verification on October 15. Move relationship/ownership gaps and clean installation to October 15. Replace optional documentation polish and extended Atlas index/export/recovery work to keep the three-hour daily budget. Retain required database access checks during setup/deployment and preserve October 16 demo preparation and October 19 submission time. If creation takes longer, use October 15's time before optional polish; do not add weekends or photo upload before submission.
+- October 14 rollover: creation implementation, local checks and its first frontend deployment are complete. Follow the latest report by prioritizing the later UI commit/deployment and live creation verification on October 15. Retain deletion/relationship and ownership checks as the third task. Move clean installation and final regression checks to October 16, replacing part of the rehearsal time; combine architecture and API rehearsal into one hour. Defer further visual polish. If required security or relationship fixes exceed the budget, use October 16 rehearsal time first and record the remaining gap; do not add weekend hours. Keep the October 19, 23:59 deadline.
+- Playground creation acceptance: a signed-in user can submit permitted fields, reach the created detail page and read the saved data after refresh. The backend assigns the Clerk owner ID and rejects unauthenticated writes. Failed requests preserve input; saving prevents duplicate submissions. Photo selection remains a clearly labelled local preview and sends no image to the API.
 - Preserve existing routes and visual design, reuse Atomic Design components, and keep Clerk. An owner-only Edit button improves the UI but never replaces server authorization. Handle expired sessions and denied edits with clear feedback.
 - Review editing acceptance: an owner can open a prefilled form, save permitted fields through PATCH, see the saved values after reload, and cancel without changing data. Non-owners have no edit action and the backend rejects unauthorized requests. Failed saves preserve the user's input.
 - Filter/UX acceptance: existing controls use the supported API parameters, reset restores the list, and loading, errors and empty results have clear messages. Check mobile layout, keyboard operation and focus. Prioritize functional clarity over a visual redesign.
@@ -43,11 +51,16 @@ Each row contains three tasks budgeted at 60 minutes each. All scheduled work re
 
 - Use the latest progress reports. Move unfinished work to the next working day, replacing lower-priority work without adding hours or weekend tasks.
 - Initial deployment is complete. Replace the original October 9 deployment and October 12 frontend setup with persistence, relationship and verification gaps.
-- October 6 documentation work is complete as reported; October 14 fills gaps rather than rewriting it.
+- October 6 documentation work is complete as reported; October 15 fills gaps rather than rewriting it.
 - Carry blockers forward before optional work. Keep the deadline and daily budget.
 - Morning drafts run on weekdays at 09:00. Nightly planning maintenance runs daily at 23:00, including weekends, without assigning weekend project work.
 - Leave files unchanged when there is no new evidence or correction. Record evidence dates; a plan or intended action is not proof of completion.
 - This update changes planning documents only; it does not deploy, mutate test data, commit or push.
+
+## After-submission work (not scheduled before October 19)
+
+- Implement one photo per playground: authenticated upload, server-side file validation, persistent image storage and a saved image URL displayed on the detail page. Verify retrieval after refresh and redeployment, and handle failed uploads and orphaned files. This remains pending and has no assigned completion date.
+- Complete extended Atlas index/export/recovery checks deferred by the creation flow. Carry any required security or submission checks forward as blockers instead of deferring them.
 
 ---
 

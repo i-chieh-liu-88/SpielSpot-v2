@@ -18,7 +18,7 @@ describe("PlaygroundFiltersForm", () => {
     const onApply = vi.fn();
     render(<PlaygroundFiltersForm onApply={onApply} />);
 
-    fireEvent.change(screen.getByLabelText("Location"), {
+    fireEvent.change(screen.getByLabelText("Filter playground addresses"), {
       target: { value: "Dresden" },
     });
     fireEvent.change(screen.getByLabelText("Age range"), {
@@ -41,7 +41,7 @@ describe("PlaygroundFiltersForm", () => {
     const onApply = vi.fn();
     render(<PlaygroundFiltersForm onApply={onApply} />);
 
-    fireEvent.change(screen.getByLabelText("Location"), {
+    fireEvent.change(screen.getByLabelText("Filter playground addresses"), {
       target: { value: "Dresden" },
     });
     fireEvent.change(screen.getByLabelText("Age range"), {
@@ -51,7 +51,7 @@ describe("PlaygroundFiltersForm", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Reset filters" }));
 
-    expect(screen.getByLabelText("Location")).toHaveValue("");
+    expect(screen.getByLabelText("Filter playground addresses")).toHaveValue("");
     expect(screen.getByLabelText("Age range")).toHaveValue("");
     expect(screen.getByLabelText("outdoor")).not.toBeChecked();
     expect(onApply).toHaveBeenCalledTimes(1);

@@ -2,6 +2,7 @@ import AddLocationAltOutlined from "@mui/icons-material/AddLocationAltOutlined";
 import PhotoCameraOutlined from "@mui/icons-material/PhotoCameraOutlined";
 import {
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -30,7 +31,7 @@ const facilityOptions = [
 ];
 
 const fieldClass =
-  "mt-2 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-3 text-gray-800 shadow-sm outline-none backdrop-blur transition focus:border-green-500 focus:ring-4 focus:ring-green-200/60";
+  "mt-2 w-full rounded-2xl border border-white/60 bg-white/45 px-4 py-3 text-gray-800 shadow-sm outline-none backdrop-blur transition focus:border-green-500 focus:ring-4 focus:ring-green-200/60 aria-[invalid=true]:border-red-500 aria-[invalid=true]:ring-2 aria-[invalid=true]:ring-red-200";
 
 type PlaygroundFormState = {
   name: string;
@@ -49,6 +50,17 @@ type PlaygroundFormProps = {
   playground?: Playground;
   onSaved: (playground: Playground, writeReview: boolean) => void;
 };
+
+type FieldErrors = Partial<Record<keyof PlaygroundFormState, string>>;
+
+function FieldError({ id, message }: { id: string; message?: string }) {
+  const { t } = useLanguage();
+  return message ? (
+    <span id={id} className="mt-1 block text-sm font-semibold text-red-700">
+      {t(message)}
+    </span>
+  ) : null;
+}
 
 function getInitialState(playground?: Playground): PlaygroundFormState {
   return {
@@ -81,6 +93,8 @@ export function PlaygroundForm({
 }: PlaygroundFormProps) {
   const { t } = useLanguage();
   const { getToken } = useAuth();
+  const formId = useId();
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [form, setForm] = useState(() => getInitialState(playground));
   const [photo, setPhoto] = useState<File>();
   const [writeReview, setWriteReview] = useState(mode === "create");
@@ -97,6 +111,17 @@ export function PlaygroundForm({
     return () => URL.revokeObjectURL(photoPreview);
   }, [photo, photoPreview]);
 
+  function errorId(field: keyof PlaygroundFormState) {
+    return `${formId}-${field}-error`;
+  }
+
+  function errorAttributes(field: keyof PlaygroundFormState) {
+    return {
+      "aria-invalid": fieldErrors[field] ? true : undefined,
+      "aria-describedby": fieldErrors[field] ? errorId(field) : undefined,
+    };
+  }
+
   function updateField(
     event: ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -104,10 +129,12 @@ export function PlaygroundForm({
   ) {
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
+    setFieldErrors((current) => ({ ...current, [name]: undefined }));
     setError(undefined);
   }
 
   function toggleTag(event: ChangeEvent<HTMLInputElement>) {
+    setFieldErrors((current) => ({ ...current, tags: undefined }));
     const { checked, value } = event.target;
     setForm((current) => ({
       ...current,
@@ -119,6 +146,11 @@ export function PlaygroundForm({
   }
 
   function chooseCoordinates(coordinates: [number, number]) {
+    setFieldErrors((current) => ({
+      ...current,
+      latitude: undefined,
+      longitude: undefined,
+    }));
     setForm((current) => ({
       ...current,
       latitude: coordinates[0].toFixed(6),
@@ -156,20 +188,27 @@ export function PlaygroundForm({
       return;
     }
 
-    if (!form.latitude.trim() || !form.longitude.trim()) {
-      setError(
-        t("Please select a location on the map or enter both coordinates."),
-      );
-      return;
-    } //這樣使用者沒有選擇位置時，就不會誤存成經緯度 0, 0。手動輸入的 "0" 仍然是有效值。
-
     const result = playgroundEditorSchema.safeParse(form);
 
     if (!result.success) {
-      setError(t(result.error.issues[0]?.message ?? "Check the form fields."));
+      const nextErrors: FieldErrors = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as keyof PlaygroundFormState;
+        if (field && !nextErrors[field]) nextErrors[field] = issue.message;
+      }
+      setFieldErrors(nextErrors);
+      setError(t("Check the highlighted fields before saving."));
+      const firstInvalidControl = Array.from(event.currentTarget.elements).find(
+        (control) =>
+          control instanceof HTMLElement &&
+          nextErrors[control.getAttribute("name") as keyof PlaygroundFormState],
+      );
+      if (firstInvalidControl instanceof HTMLElement)
+        firstInvalidControl.focus();
       return;
     }
 
+    setFieldErrors({});
     savingRef.current = true;
     setIsSaving(true);
     setError(undefined);
@@ -199,7 +238,14 @@ export function PlaygroundForm({
   const latitude = Number(form.latitude);
   const longitude = Number(form.longitude);
   const coordinates =
-    Number.isFinite(latitude) && Number.isFinite(longitude)
+    form.latitude.trim() !== "" &&
+    form.longitude.trim() !== "" &&
+    Number.isFinite(latitude) &&
+    Number.isFinite(longitude) &&
+    latitude >= -90 &&
+    latitude <= 90 &&
+    longitude >= -180 &&
+    longitude <= 180
       ? ([latitude, longitude] as [number, number])
       : undefined;
 
@@ -228,52 +274,68 @@ export function PlaygroundForm({
       )}
 
       <div className="grid gap-6 md:grid-cols-2">
-        <label className="font-bold text-gray-700">
-          {t("Playground name")}
+        <div className="font-bold text-gray-700">
+          <label htmlFor={`${formId}-name`}>{t("Playground name")}</label>
           <input
             className={fieldClass}
             name="name"
+            id={`${formId}-name`}
+            {...errorAttributes("name")}
             value={form.name}
             onChange={updateField}
             required
           />
-        </label>
-        <label className="font-bold text-gray-700">
-          {t("City or neighbourhood")}
+          <FieldError id={errorId("name")} message={fieldErrors.name} />
+        </div>
+        <div className="font-bold text-gray-700">
+          <label htmlFor={`${formId}-location`}>
+            {t("City or neighbourhood")}
+          </label>
           <input
             className={fieldClass}
             name="location"
+            id={`${formId}-location`}
+            {...errorAttributes("location")}
             value={form.location}
             onChange={updateField}
             required
           />
-        </label>
-        <label className="font-bold text-gray-700">
-          {t("Postcode")}
+          <FieldError id={errorId("location")} message={fieldErrors.location} />
+        </div>
+        <div className="font-bold text-gray-700">
+          <label htmlFor={`${formId}-postcode`}>{t("Postcode")}</label>
           <input
             className={fieldClass}
             name="postcode"
+            id={`${formId}-postcode`}
+            {...errorAttributes("postcode")}
             value={form.postcode}
             onChange={updateField}
             required
           />
-        </label>
-        <label className="font-bold text-gray-700">
-          {t("Best suited ages")}
+          <FieldError id={errorId("postcode")} message={fieldErrors.postcode} />
+        </div>
+        <div className="font-bold text-gray-700">
+          <label htmlFor={`${formId}-ageRange`}>{t("Best suited ages")}</label>
           <input
             className={fieldClass}
             name="ageRange"
+            id={`${formId}-ageRange`}
+            {...errorAttributes("ageRange")}
             value={form.ageRange}
             onChange={updateField}
             placeholder={t("Ages 2–12")}
             required
           />
-        </label>
-        <label className="font-bold text-gray-700">
-          {t("Safety rating")}
+          <FieldError id={errorId("ageRange")} message={fieldErrors.ageRange} />
+        </div>
+        <div className="font-bold text-gray-700">
+          <label htmlFor={`${formId}-safetyRating`}>{t("Safety rating")}</label>
           <select
             className={fieldClass}
             name="safetyRating"
+            id={`${formId}-safetyRating`}
+            {...errorAttributes("safetyRating")}
             value={form.safetyRating}
             onChange={updateField}
           >
@@ -283,21 +345,31 @@ export function PlaygroundForm({
               </option>
             ))}
           </select>
-        </label>
+          <FieldError
+            id={errorId("safetyRating")}
+            message={fieldErrors.safetyRating}
+          />
+        </div>
       </div>
 
-      <label className="mt-6 block font-bold text-gray-700">
-        {t("Description")}
+      <div className="mt-6 block font-bold text-gray-700">
+        <label htmlFor={`${formId}-description`}>{t("Description")}</label>
         <textarea
           className={`${fieldClass} min-h-32 resize-y`}
           name="description"
+          id={`${formId}-description`}
+          {...errorAttributes("description")}
           value={form.description}
           onChange={updateField}
           minLength={20}
           maxLength={1000}
           required
         />
-      </label>
+        <FieldError
+          id={errorId("description")}
+          message={fieldErrors.description}
+        />
+      </div>
 
       <fieldset className="mt-7">
         <legend className="font-bold text-gray-700">{t("Facilities")}</legend>
@@ -309,6 +381,8 @@ export function PlaygroundForm({
             >
               <input
                 type="checkbox"
+                name="tags"
+                {...errorAttributes("tags")}
                 value={facility}
                 checked={form.tags.includes(facility)}
                 onChange={toggleTag}
@@ -317,6 +391,7 @@ export function PlaygroundForm({
             </label>
           ))}
         </div>
+        <FieldError id={errorId("tags")} message={fieldErrors.tags} />
       </fieldset>
 
       <section className="mt-8" aria-labelledby="pin-location-heading">
@@ -334,30 +409,42 @@ export function PlaygroundForm({
           onChange={chooseCoordinates}
         />
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <label className="font-bold text-gray-700">
-            {t("Latitude")}
+          <div className="font-bold text-gray-700">
+            <label htmlFor={`${formId}-latitude`}>{t("Latitude")}</label>
             <input
               className={fieldClass}
               name="latitude"
+              id={`${formId}-latitude`}
+              {...errorAttributes("latitude")}
               type="number"
               step="any"
               value={form.latitude}
               onChange={updateField}
               required
             />
-          </label>
-          <label className="font-bold text-gray-700">
-            {t("Longitude")}
+            <FieldError
+              id={errorId("latitude")}
+              message={fieldErrors.latitude}
+            />
+          </div>
+          <div className="font-bold text-gray-700">
+            <label htmlFor={`${formId}-longitude`}>{t("Longitude")}</label>
             <input
               className={fieldClass}
               name="longitude"
+              id={`${formId}-longitude`}
+              {...errorAttributes("longitude")}
               type="number"
               step="any"
               value={form.longitude}
               onChange={updateField}
               required
             />
-          </label>
+            <FieldError
+              id={errorId("longitude")}
+              message={fieldErrors.longitude}
+            />
+          </div>
         </div>
       </section>
 

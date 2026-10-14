@@ -54,20 +54,24 @@
   cursor: not-allowed;
 }
 
+html[data-theme="dark"] .beui-button {
+  font-weight: 600;
+}
+
 html[data-theme="dark"] .beui-button-primary {
-  border-color: rgba(248, 250, 252, 0.72);
-  background: transparent;
-  color: #f8fafc;
+  border-color: #86efac;
+  background: #86efac;
+  color: #052e16;
 }
 
 html[data-theme="dark"] .beui-button-primary:hover:not(:disabled) {
-  border-color: #f8fafc;
-  background: rgba(248, 250, 252, 0.08);
+  border-color: #bbf7d0;
+  background: #bbf7d0;
 }
 
 html[data-theme="dark"] .beui-button-secondary {
-  border-color: rgba(248, 250, 252, 0.35);
-  background: rgba(248, 250, 252, 0.08);
+  border-color: #94a3b8;
+  background: #1e293b;
   color: #f8fafc;
 }
 
@@ -83,6 +87,10 @@ html[data-theme="dark"] .beui-button-outline {
 html[data-theme="dark"] .beui-button-ghost:hover:not(:disabled),
 html[data-theme="dark"] .beui-button-outline:hover:not(:disabled) {
   background: rgba(248, 250, 252, 0.08);
+}
+
+html[data-theme="dark"] .beui-button:focus-visible {
+  outline-color: #86efac;
 }
 
 @media (prefers-reduced-motion: reduce) {

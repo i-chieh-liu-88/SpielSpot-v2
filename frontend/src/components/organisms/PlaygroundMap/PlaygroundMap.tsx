@@ -161,8 +161,7 @@ function ViewportMarkers({
   }, [map, onAreaChange, playgrounds]);
 
   const clusters = useMemo(
-    () =>
-      clusterVisiblePlaygrounds(map, playgrounds, viewport),
+    () => clusterVisiblePlaygrounds(map, playgrounds, viewport),
     [map, playgrounds, viewport],
   );
 
@@ -228,6 +227,24 @@ function MapFocusMarker({ location }: { location?: MapLocation }) {
   );
 }
 
+function MapLayoutUpdater({ bounds }: { bounds: LatLngBoundsExpression }) {
+  const map = useMap();
+  useEffect(() => {
+    if (!map.getContainer?.()?.clientWidth) return;
+    map.fitBounds?.(bounds, { padding: [40, 40], maxZoom: 15, animate: false });
+  }, [bounds, map]);
+  useEffect(() => {
+    const container = map.getContainer?.();
+    if (!container || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() =>
+      map.invalidateSize({ pan: false }),
+    );
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [map]);
+  return null;
+}
+
 function PlaygroundMapComponent({
   playgrounds,
   onSelect,
@@ -250,7 +267,7 @@ function PlaygroundMapComponent({
       <MapContainer
         bounds={bounds}
         boundsOptions={{ padding: [50, 50] }}
-        scrollWheelZoom
+        scrollWheelZoom={false}
         className="playground-map"
         placeholder={
           <LoadingSpinner
@@ -263,6 +280,7 @@ function PlaygroundMapComponent({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        <MapLayoutUpdater bounds={bounds} />
         <ViewportMarkers
           playgrounds={playgrounds}
           onSelect={onSelect}

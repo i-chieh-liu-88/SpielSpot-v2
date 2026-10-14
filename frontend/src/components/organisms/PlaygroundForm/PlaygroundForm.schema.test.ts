@@ -14,6 +14,24 @@ const validPlayground = {
 };
 
 describe("playgroundEditorSchema", () => {
+  it.each(["", "   "])("rejects blank coordinates: %j", (blank) => {
+    const result = playgroundEditorSchema.safeParse({
+      ...validPlayground,
+      latitude: blank,
+      longitude: blank,
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("accepts explicitly entered zero coordinates", () => {
+    expect(
+      playgroundEditorSchema.parse({
+        ...validPlayground,
+        latitude: "0",
+        longitude: "0",
+      }),
+    ).toMatchObject({ latitude: 0, longitude: 0 });
+  });
   it("coerces valid map coordinates and ratings", () => {
     expect(playgroundEditorSchema.parse(validPlayground)).toMatchObject({
       latitude: 51.05,

@@ -44,7 +44,6 @@ export function PopularPlaygroundsSection({
         <SectionHeading
           id="playgrounds-heading"
           title={t("Popular playgrounds")}
-          tone="sand"
         />
         {isLoading && (
           <LoadingSpinner

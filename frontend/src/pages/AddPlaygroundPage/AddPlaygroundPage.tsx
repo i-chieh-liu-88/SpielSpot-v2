@@ -65,24 +65,22 @@ export function AddPlaygroundPage() {
   const { t } = useLanguage();
 
   return (
-    <section className="grass-bg relative min-h-screen overflow-hidden px-6 py-16">
+    <section className="grass-bg relative min-h-screen overflow-hidden px-4 py-10 sm:px-6 sm:py-12">
       <div className="dot-grid absolute inset-0 opacity-20" />
-      <div className="relative mx-auto max-w-5xl">
+      <div className="relative mx-auto max-w-4xl">
         <Button
           type="button"
-          className="mb-8"
+          className="mb-6 min-h-11"
+          variant="secondary"
           onClick={() => navigate({ to: "/playgrounds" })}
         >
           {t("Back to playgrounds")}
         </Button>
-        <header className="mb-10 text-center">
-          <p className="mb-4 inline-block rounded-full bg-white/50 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-grass backdrop-blur">
-            {t("Community contribution")}
-          </p>
-          <h1 className="display text-5xl font-black text-gray-800 md:text-6xl">
+        <header className="mb-8 max-w-3xl text-left">
+          <h1 className="display text-3xl font-bold leading-tight tracking-tight text-balance text-gray-800 sm:text-4xl lg:text-5xl">
             {t("Add a playground")}
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg font-medium text-gray-600">
+          <p className="mt-3 max-w-2xl text-base leading-relaxed text-pretty text-gray-600 sm:text-lg">
             {t(
               "Pin a place you discovered, upload a photo, and help nearby families find it.",
             )}
@@ -95,13 +93,10 @@ export function AddPlaygroundPage() {
             className="rounded-3xl bg-white/50 p-8 text-center font-bold text-red-700"
             role="alert"
           >
-            {t(
-              "Configure Clerk authentication before adding playgrounds.",
-            )}
+            {t("Configure Clerk authentication before adding playgrounds.")}
           </p>
         )}
       </div>
     </section>
   );
 }
-

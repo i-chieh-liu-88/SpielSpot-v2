@@ -4,6 +4,28 @@
 
 # Frontend integration boundary
 
+## Local browsing UI update (2026-10-14)
+
+- Desktop results use a vertical list with a sticky map alongside it. Smaller
+  screens start in List view and offer a Map view. The map mounts only when
+  visible, avoiding invalid Leaflet dimensions in a hidden panel.
+- Address lookup and device location move the map. The separate, collapsible
+  filter form narrows API results. Search and secondary buttons fit their text
+  while keeping touch targets at least 44 px high.
+- Panning or zooming does not replace the list. Search this area explicitly
+  applies visible playground IDs; Show all matching results clears that area.
+  Applying or resetting API filters also clears the area selection.
+- Selecting a map pin shows a summary and detail link instead of navigating
+  immediately. Mouse-wheel zoom is disabled; zoom buttons remain available.
+- Local development checks confirmed page scrolling over the map without zoom,
+  mobile switching, and results changing from 7 to 5 only after area search.
+  Production preview confirmed Dresden filtering (5 results), Reset (7 results),
+  mobile switching and no horizontal overflow at 390 px. This is browser viewport
+  testing, not a physical touch-device or complete screen-reader audit.
+- Lint, all 64 frontend tests across 21 files, and build passed. The existing
+  chunk-size warning remains. These browsing and form accessibility updates are
+  local and have not been committed or deployed.
+
 Playground services now call the backend API. Clerk authentication is retained.
 Old Supabase configuration, migrations and live data are not included.
 

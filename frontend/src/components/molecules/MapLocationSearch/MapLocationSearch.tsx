@@ -27,9 +27,7 @@ function getGeolocationError(error: GeolocationPositionError, t: Translate) {
   return t("Your current location could not be determined.");
 }
 
-export function MapLocationSearch({
-  onLocationFound,
-}: MapLocationSearchProps) {
+export function MapLocationSearch({ onLocationFound }: MapLocationSearchProps) {
   const [query, setQuery] = useState("");
   const { t } = useLanguage();
   const [status, setStatus] = useState<string>();
@@ -110,15 +108,20 @@ export function MapLocationSearch({
     >
       <div className="mb-3">
         <h2 id="map-location-heading" className="font-black text-gray-800">
-          {t("Choose a map location")}
+          {t("Move the map to an address")}
         </h2>
         <p className="mt-1 text-sm font-medium text-gray-600">
-          {t("Search for a German address or use your device location.")}
+          {t(
+            "This moves the map. Use the filters below to narrow playground results.",
+          )}
         </p>
       </div>
 
-      <form className="flex flex-col gap-3 lg:flex-row" onSubmit={handleSearch}>
-        <label className="relative min-w-0 flex-1">
+      <form
+        className="flex flex-wrap items-center gap-3"
+        onSubmit={handleSearch}
+      >
+        <label className="relative min-w-0 basis-full sm:basis-64 flex-1">
           <span className="sr-only">{t("Address, postcode, or place")}</span>
           <SearchOutlined
             className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-xl text-gray-500"
@@ -133,12 +136,19 @@ export function MapLocationSearch({
             autoComplete="street-address"
           />
         </label>
-        <Button type="submit" disabled={isSearching || isLocating}>
+        <Button
+          type="submit"
+          aria-label={t("Search map")}
+          className="min-h-11 w-auto shrink-0"
+          disabled={isSearching || isLocating}
+        >
           <SearchOutlined aria-hidden="true" />
-          {isSearching ? t("Searching…") : t("Search map")}
+          {isSearching ? t("Searching…") : t("Search")}
         </Button>
         <Button
           type="button"
+          variant="secondary"
+          className="min-h-11 w-auto shrink-0"
           disabled={isSearching || isLocating}
           onClick={useCurrentLocation}
         >

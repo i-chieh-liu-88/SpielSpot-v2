@@ -1,0 +1,34 @@
+.explore-layout {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+.explore-layout[data-mobile-view="list"] .explore-map-panel,
+.explore-layout[data-mobile-view="map"] .explore-results {
+  display: none;
+}
+.explore-map-panel .playground-map {
+  height: 52vh;
+  min-height: 20rem;
+  max-height: 36rem;
+}
+@media (min-width: 64rem) {
+  .explore-layout {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  }
+  .explore-layout[data-mobile-view] .explore-map-panel,
+  .explore-layout[data-mobile-view] .explore-results {
+    display: block;
+  }
+  .explore-view-switch {
+    display: none;
+  }
+  .explore-map-panel {
+    position: sticky;
+    top: 6rem;
+  }
+  .explore-map-panel .playground-map {
+    height: 58vh;
+    min-height: 22rem;
+  }
+}

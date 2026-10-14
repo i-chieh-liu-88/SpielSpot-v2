@@ -211,10 +211,7 @@ export function PlaygroundDetailPage() {
           <div className="p-6 sm:p-9">
             <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
               <div>
-                <p className="text-sm font-bold uppercase tracking-widest text-grass">
-                  {t("Playground details")}
-                </p>
-                <h1 className="mt-2 text-4xl font-black text-gray-800 sm:text-5xl">
+                <h1 className="text-3xl font-bold leading-tight tracking-tight text-balance text-gray-800 sm:text-4xl">
                   {playground.name}
                 </h1>
               </div>
@@ -277,12 +274,9 @@ export function PlaygroundDetailPage() {
         <section className="mt-10" aria-labelledby="parent-reviews-heading">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-bold uppercase tracking-widest text-grass">
-                {t("Community voices")}
-              </p>
               <h2
                 id="parent-reviews-heading"
-                className="text-3xl font-black text-gray-800"
+                className="text-2xl font-bold leading-tight text-gray-800 sm:text-3xl"
               >
                 {t("Parent reviews")}
               </h2>
