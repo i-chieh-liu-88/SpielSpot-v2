@@ -136,12 +136,27 @@ a {
     color 320ms ease-out;
 }
 @media (hover: hover) and (pointer: fine) {
+  #shake-headline .hero-letter {
+    cursor: grab;
+    user-select: none;
+  }
+  #shake-headline .shake-letter { cursor: inherit; }
+  #shake-headline .hero-letter--dragging {
+    position: relative;
+    z-index: 10;
+    cursor: grabbing;
+  }
+  #shake-headline .hero-letter--dragging > .shake-letter {
+    transition: color 180ms ease-out;
+    will-change: transform;
+  }
   .hero-letter:hover > .shake-letter {
     color: var(--shake-color);
     transition-duration: 180ms, 220ms;
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  #shake-headline .hero-letter { cursor: default; }
   .hero-letter:hover > .shake-letter {
     transform: none;
   }
