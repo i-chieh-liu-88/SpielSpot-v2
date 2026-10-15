@@ -4,6 +4,19 @@
 
 # Frontend integration boundary
 
+## Playground deletion policy (local update, October 15)
+
+- A signed-in owner can delete a playground only when no reviews reference it.
+- Related reviews cause `409` with `Cannot delete a playground with reviews`.
+  No playground or review is deleted in this case. A review lookup failure
+  returns the shared server error and prevents deletion.
+- Permission checks run before the related-review lookup. Request-body
+  `ownerId` cannot grant deletion permission.
+- Local mocked route tests cover owner success, signed-out 401, non-owner and
+  spoofed-owner 403, missing playground 404, related-review 409 and lookup failure.
+  Deployment and real-database verification remain pending. The lookup and
+  deletion are separate operations, so concurrent review creation remains a gap.
+
 ## Local browsing UI update (2026-10-14)
 
 - Desktop results use a vertical list with a sticky map alongside it. Smaller

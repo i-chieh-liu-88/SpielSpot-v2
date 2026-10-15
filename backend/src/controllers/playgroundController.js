@@ -1,5 +1,6 @@
 import { getAuth } from "@clerk/express";
 import Playground from "../models/Playground.js";
+import Review from "../models/Review.js";
 
 /* ----------------------------------- GET ---------------------------------- */
 /* ----------------------------------- GET ---------------------------------- */
@@ -111,6 +112,19 @@ export async function deletePlayground(req, res, next) {
       });
     }
 
+    // 通過擁有者驗證後才查評論，避免未授權的請求進入刪除流程。
+    // 只需知道是否存在評論，不必載入全部評論內容。
+    const hasReviews = await Review.exists({ playgroundId: playground._id });
+    if (hasReviews) {
+      // 409 表示目前資料狀態不允許刪除，保留遊樂場與其他使用者的評論。
+      return res.status(409).json({
+        success: false,
+        error: "Cannot delete a playground with reviews",
+      });
+    }
+
+    // 只有確認沒有評論才刪除；查詢若拋出錯誤，會直接進入 catch。
+    // 注意：查詢與刪除不是 transaction，尚未防止兩者之間新增評論的情況。
     await playground.deleteOne();
     res.json({ success: true, data: null });
   } catch (err) {

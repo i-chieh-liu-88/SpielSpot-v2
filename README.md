@@ -11,6 +11,15 @@ The frontend uses client-side routes. `frontend/public/_redirects` is copied int
 visits and refreshes of routes such as `/playgrounds/:id`. Keep the Netlify
 publish directory set to `frontend/dist`.
 
+## Playground deletion policy (local update, October 15)
+
+`DELETE /api/playgrounds/:id` requires a signed-in owner. If related reviews
+exist, the API returns `409` with `Cannot delete a playground with reviews` and
+keeps both the playground and its reviews. A failed review lookup prevents
+deletion. This check and deletion are separate database operations; concurrent
+review creation is not protected by a transaction. Local route tests use mocked
+models and Clerk. This change still needs deployment and database verification.
+
 ## Tech Stack
 
 - Node.js + Express
