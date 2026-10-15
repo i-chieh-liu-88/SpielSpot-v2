@@ -1,3 +1,4 @@
+import { useHeroLetterMotion } from "../../../hooks/useHeroLetterMotion";
 import { useNavigate } from "@tanstack/react-router";
 import balloonImage from "../../../image/image-Hot Air Balloon.png";
 import kidsImage from "../../../image/image-kids-and-nature.png";
@@ -11,6 +12,7 @@ import { useLanguage } from "../../../providers/LanguageProvider";
 export function HeroSection() {
   const navigate = useNavigate();
   const { language, t } = useLanguage();
+  useHeroLetterMotion(language);
   const decorations = [
     { src: balloonImage, className: "left-[8%] top-24 hero-float-1" },
     { src: rainbowImage, className: "right-[10%] top-36 hero-float-2" },
@@ -21,11 +23,9 @@ export function HeroSection() {
   return (
     <section
       id="top"
-      className="relative z-0 flex min-h-[88vh] flex-col items-center justify-center overflow-hidden px-6 pb-32 pt-10 text-center"
+      className="spot-hero relative z-0 flex min-h-[88vh] flex-col items-center justify-center overflow-hidden px-6 pb-32 pt-10 text-center"
     >
-      <div className="dot-grid absolute inset-0 opacity-70" />
-      <div className="animate-blob absolute -left-20 top-10 z-0 h-72 w-72 rounded-full bg-sand/60 blur-2xl" />
-      <div className="animate-blob absolute -right-16 bottom-20 z-0 h-64 w-64 rounded-full bg-sky/40 blur-2xl" />
+
       {decorations.map(({ src, className }) => (
         <img
           className={`absolute hidden h-25 w-25 select-none object-contain md:block ${className}`}

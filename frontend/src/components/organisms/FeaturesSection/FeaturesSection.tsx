@@ -24,10 +24,9 @@ export function FeaturesSection() {
   return (
     <section
       id="features"
-      className="grass-bg relative scroll-mt-24 overflow-hidden px-6 py-24"
+      className="spot-home-section spot-features relative scroll-mt-24 overflow-hidden px-6 py-24"
       aria-labelledby="features-heading"
     >
-      <div className="dot-grid absolute inset-0 opacity-20" />
       <div className="relative mx-auto max-w-6xl">
         <SectionHeading
           id="features-heading"
@@ -51,7 +50,7 @@ export function FeaturesSection() {
                 <h3 className="mb-2 text-lg font-extrabold text-gray-800">
                   {t(feature.title)}
                 </h3>
-                <p className="text-sm font-semibold leading-relaxed text-gray-400">
+                <p className="text-base font-normal leading-relaxed text-gray-600">
                   {t(feature.description)}
                 </p>
               </article>

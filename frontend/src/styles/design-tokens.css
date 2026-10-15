@@ -1,0 +1,55 @@
+/* Nod homepage primitives, adapted for SpielSpot. Extracted 2026-10-14.
+   Source: https://nodcoding.com/ . Hanken Grotesk and the green brand are retained.
+   Spacing is rounded from observed values. Dark colors are SpielSpot adaptations,
+   not extracted Nod tokens. No font files or other website assets are copied. */
+:root {
+  --spot-paper: #fdfaf5;
+  --spot-surface: #ffffff;
+  --spot-ink: #383030;
+  --spot-muted: #655b57;
+  --spot-yellow: #ffd37d;
+  --spot-pink: #ffbaba;
+  --spot-mint: #77c6b3;
+  --spot-brand: #166534;
+  --spot-brand-hover: #14532d;
+  --spot-on-brand: #ffffff;
+  --spot-border: #b7aaa0;
+  --spot-focus: #166534;
+  --spot-space-small: 1.125rem;
+  --spot-space-medium: 1.5rem;
+  --spot-space-large: 3rem;
+  --spot-space-section: 6rem;
+  --spot-section-gap: clamp(3rem, 6vw, 6rem);
+  --spot-heading-leading: 1.05;
+  --spot-heading-tracking: -0.03em;
+  --spot-body-leading: 1.5;
+  --spot-motion-feedback: 140ms;
+  --spot-motion-detail: 240ms;
+  --spot-motion-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  /* SpielSpot form choices, not inferred Nod radius/shadow values. */
+  --spot-radius-panel: 1.5rem;
+  --spot-radius-control: 0.75rem;
+  --spot-control-height: 3rem;
+  --spot-cta-ground: #166534;
+  --spot-cta-text: #fdfaf5;
+  --spot-control-surface: #fdfaf5;
+  --spot-selected-surface: #e8f3eb;
+}
+
+html[data-theme="dark"] {
+  --spot-paper: #181716;
+  --spot-surface: #252320;
+  --spot-ink: #fdfaf5;
+  --spot-muted: #d5ccc3;
+  --spot-yellow: #392f20;
+  --spot-pink: #392629;
+  --spot-mint: #203831;
+  --spot-brand: #a7f3d0;
+  --spot-brand-hover: #d1fae5;
+  --spot-on-brand: #102c20;
+  --spot-border: #9c8f83;
+  --spot-focus: #a7f3d0;
+  --spot-control-surface: #1d1b19;
+  --spot-selected-surface: #203831;
+  --spot-cta-ground: #203831;
+}

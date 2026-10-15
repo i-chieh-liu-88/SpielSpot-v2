@@ -1,6 +1,8 @@
 .beui-button {
   border: 1px solid transparent;
-  line-height: 1;
+  line-height: 1.2;
+  min-height: 44px;
+  font-weight: 600;
   cursor: pointer;
   transition:
     background-color 180ms ease,
@@ -9,36 +11,36 @@
 }
 
 .beui-button-primary {
-  border-color: #050505;
-  background: #050505;
-  color: #ffffff;
+  border-color: var(--spot-brand);
+  background: var(--spot-brand);
+  color: var(--spot-on-brand);
 }
 
 .beui-button-primary:hover:not(:disabled) {
-  border-color: #232323;
-  background: #232323;
+  border-color: var(--spot-brand-hover);
+  background: var(--spot-brand-hover);
 }
 
 .beui-button-secondary {
-  border-color: #d1d5db;
-  background: #ffffff;
-  color: #111827;
+  border-color: var(--spot-border);
+  background: var(--spot-surface);
+  color: var(--spot-ink);
 }
 
 .beui-button-ghost {
   background: transparent;
-  color: #4b5563;
+  color: var(--spot-muted);
 }
 
 .beui-button-ghost:hover:not(:disabled) {
   background: rgba(5, 5, 5, 0.06);
-  color: #111827;
+  color: var(--spot-ink);
 }
 
 .beui-button-outline {
-  border-color: #9ca3af;
+  border-color: var(--spot-border);
   background: transparent;
-  color: #111827;
+  color: var(--spot-ink);
 }
 
 .beui-button-outline:hover:not(:disabled) {
@@ -46,7 +48,7 @@
 }
 
 .beui-button:focus-visible {
-  outline: 2px solid #16a34a;
+  outline: 2px solid var(--spot-focus);
   outline-offset: 3px;
 }
 
@@ -55,23 +57,23 @@
 }
 
 html[data-theme="dark"] .beui-button {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 html[data-theme="dark"] .beui-button-primary {
-  border-color: #86efac;
-  background: #86efac;
-  color: #052e16;
+  border-color: var(--spot-brand);
+  background: var(--spot-brand);
+  color: var(--spot-on-brand);
 }
 
 html[data-theme="dark"] .beui-button-primary:hover:not(:disabled) {
-  border-color: #bbf7d0;
-  background: #bbf7d0;
+  border-color: var(--spot-brand-hover);
+  background: var(--spot-brand-hover);
 }
 
 html[data-theme="dark"] .beui-button-secondary {
   border-color: #94a3b8;
-  background: #1e293b;
+  background: var(--spot-surface);
   color: #f8fafc;
 }
 
@@ -90,7 +92,7 @@ html[data-theme="dark"] .beui-button-outline:hover:not(:disabled) {
 }
 
 html[data-theme="dark"] .beui-button:focus-visible {
-  outline-color: #86efac;
+  outline-color: var(--spot-brand);
 }
 
 @media (prefers-reduced-motion: reduce) {

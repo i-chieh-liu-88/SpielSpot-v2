@@ -1,3 +1,4 @@
+import "./PlaygroundForm.css";
 import AddLocationAltOutlined from "@mui/icons-material/AddLocationAltOutlined";
 import PhotoCameraOutlined from "@mui/icons-material/PhotoCameraOutlined";
 import {
@@ -251,7 +252,7 @@ export function PlaygroundForm({
 
   return (
     <form
-      className="rounded-3xl border border-white/60 bg-white/35 p-6 shadow-xl backdrop-blur-xl sm:p-9"
+      className="playground-editor rounded-3xl border border-white/60 bg-white/35 p-6 shadow-xl backdrop-blur-xl sm:p-9"
       onSubmit={handleSubmit}
       aria-label={t(mode === "create" ? "Add a playground" : "Edit playground")}
       noValidate

@@ -107,6 +107,8 @@ export const germanTranslations: Record<string, string> = {
   "View All Playgrounds": "Alle Spielplätze anzeigen",
   "View details for {name}": "Details zu {name} anzeigen",
   "{distance} away": "{distance} entfernt",
+  "Photo unavailable": "Kein Foto verfügbar",
+  "Not rated": "Noch nicht bewertet",
   "Facilities": "Ausstattung",
   "What parents say": "Was Eltern sagen",
   "Trusted by families": "Von Familien empfohlen",

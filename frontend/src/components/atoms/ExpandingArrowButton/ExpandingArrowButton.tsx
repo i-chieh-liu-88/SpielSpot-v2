@@ -152,7 +152,7 @@ export const ExpandingArrowButton = forwardRef<
           borderRadius: 16,
         }}
         className={mergeClassNames(
-          "absolute inset-y-1.5 left-1.5 z-10 overflow-hidden bg-grass text-neutral-950",
+          "absolute inset-y-1.5 left-1.5 z-10 overflow-hidden bg-[#166534] text-white",
           accentClassName,
         )}
       >
@@ -181,7 +181,7 @@ export const ExpandingArrowButton = forwardRef<
                   active && !reduceMotion ? 0.04 + index * 0.025 : 0,
                 ease: EASE_OUT,
               }}
-              style={{ color: `rgb(10 10 10 / ${opacity})` }}
+              style={{ color: `rgb(255 255 255 / ${opacity})` }}
               className="inline-grid place-items-center"
             >
               <DottedChevron className="h-7 w-5" />

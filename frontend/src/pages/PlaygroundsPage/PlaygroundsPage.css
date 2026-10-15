@@ -3,6 +3,93 @@
   gap: 1.5rem;
   align-items: start;
 }
+
+/* Shared form and surface tokens, scoped to the browsing page. */
+.spot-explore-page {
+  color: var(--spot-ink);
+}
+.spot-explore-page :is(.map-location-search, .explore-filters, .explore-card, .explore-map-sticky) {
+  border-radius: var(--spot-radius-panel);
+  background: var(--spot-surface);
+  padding: var(--spot-space-medium);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.spot-explore-page .map-location-search {
+  border: 0;
+  margin-bottom: var(--spot-space-medium);
+}
+.spot-explore-page .playground-filters-form {
+  background: transparent;
+  padding: var(--spot-space-medium) 0 0;
+  margin-bottom: 0;
+}
+.spot-explore-page .explore-filters summary {
+  color: var(--spot-ink);
+  padding-block: 0.5rem;
+}
+.spot-explore-page :is(.map-location-search, .playground-filters-form) :is(input:not([type="checkbox"]), select) {
+  min-height: var(--spot-control-height);
+  border: 1px solid var(--spot-border);
+  border-radius: var(--spot-radius-control);
+  background: var(--spot-control-surface);
+  color: var(--spot-ink);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: var(--spot-body-leading);
+  box-shadow: none;
+}
+.spot-explore-page :is(input, select, summary):focus-visible {
+  outline: 2px solid var(--spot-focus);
+  outline-offset: 3px;
+  box-shadow: none;
+}
+.spot-explore-page .playground-filters-form fieldset label {
+  min-height: 44px;
+  padding-inline: 0.75rem;
+  border-radius: var(--spot-radius-control);
+  background: var(--spot-paper);
+  color: var(--spot-ink);
+}
+.spot-explore-page .playground-filters-form fieldset label:has(input:checked) {
+  background: var(--spot-selected-surface);
+  outline: 1px solid var(--spot-brand);
+}
+.spot-explore-page input[type="checkbox"] {
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--spot-brand);
+}
+.spot-explore-page .beui-button {
+  min-height: var(--spot-control-height);
+}
+.spot-explore-page .explore-card {
+  border-width: 2px;
+}
+.spot-explore-page .explore-card p,
+.spot-explore-page .explore-card dl {
+  line-height: var(--spot-body-leading);
+}
+.spot-explore-page .explore-card ul li {
+  background: var(--spot-selected-surface);
+  color: var(--spot-brand);
+}
+.spot-explore-page .explore-detail-link,
+html[data-theme="dark"] .spot-explore-page .explore-detail-link {
+  background: var(--spot-brand) !important;
+  color: var(--spot-on-brand) !important;
+  min-height: var(--spot-control-height);
+}
+.spot-explore-page .explore-detail-link:hover {
+  background: var(--spot-brand-hover) !important;
+}
+.spot-explore-page .explore-map-sticky .playground-map {
+  border-radius: var(--spot-radius-control);
+  box-shadow: none;
+}
+html[data-theme="dark"] .spot-explore-page :is(.map-location-search, .explore-card, .explore-map-sticky) {
+  box-shadow: none !important;
+}
 .explore-layout[data-mobile-view="list"] .explore-map-panel,
 .explore-layout[data-mobile-view="map"] .explore-results {
   display: none;

@@ -1,0 +1,144 @@
+.playground-card {
+  border: 0;
+  border-radius: var(--spot-radius-panel);
+  background: var(--spot-surface);
+  color: var(--spot-ink);
+  box-shadow: none;
+}
+.playground-card-media {
+  position: relative;
+  height: 11rem;
+  background: var(--spot-paper);
+  overflow: hidden;
+}
+.playground-card-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.playground-card-placeholder {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: var(--spot-muted);
+  font-size: 0.875rem;
+}
+.playground-card-placeholder svg {
+  font-size: 2rem;
+}
+.playground-card-distance {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--spot-radius-control);
+  background: var(--spot-surface);
+  color: var(--spot-ink);
+  font-size: 0.75rem;
+}
+.playground-card h3 {
+  font-weight: 700;
+  letter-spacing: var(--spot-heading-tracking);
+}
+.playground-card p {
+  color: var(--spot-muted);
+  font-weight: 400;
+  line-height: var(--spot-body-leading);
+}
+.playground-card-rating {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.25rem;
+  padding-block: 0.375rem;
+  background: transparent;
+  color: var(--spot-ink);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+.playground-card-rating svg {
+  font-size: 1rem;
+  color: #eab308;
+}
+.playground-card-rating-scale {
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+.playground-card ul li {
+  background: var(--spot-selected-surface);
+  color: var(--spot-brand);
+  font-weight: 600;
+}
+
+/* Interactive feedback belongs to the link, not to static cards. */
+.playground-card-link {
+  border-radius: var(--spot-radius-panel);
+  transition: transform var(--spot-motion-feedback) var(--spot-motion-ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.playground-card-link .playground-card-image {
+  transition: transform var(--spot-motion-detail) var(--spot-motion-ease);
+}
+.playground-card-link .playground-card h3 {
+  text-decoration-color: transparent;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 2px;
+  transition: text-decoration-color var(--spot-motion-feedback) ease;
+}
+.playground-card-link:focus-visible {
+  outline: 3px solid var(--spot-focus);
+  outline-offset: 4px;
+}
+.playground-card-link:focus-visible h3 {
+  text-decoration-line: underline;
+  text-decoration-color: currentColor;
+}
+.playground-card-link:active {
+  transform: scale(0.985);
+}
+.playground-card-marquee:focus-within {
+  overflow-x: auto;
+  mask-image: none;
+  scroll-padding-inline: 0.5rem;
+}
+.playground-card-marquee:focus-within > .animate-marquee {
+  animation: none;
+  transform: none;
+}
+.playground-card-marquee:focus-within > [inert] {
+  display: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .playground-card-link:hover h3 {
+    text-decoration-line: underline;
+    text-decoration-color: currentColor;
+  }
+  .playground-card-link:hover .playground-card-image {
+    transform: scale(1.035);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .playground-card-marquee {
+    overflow-x: auto;
+    mask-image: none;
+  }
+  .playground-card-marquee > .animate-marquee {
+    animation: none;
+    transform: none;
+  }
+  .playground-card-marquee > [inert] {
+    display: none;
+  }
+  .playground-card-link,
+  .playground-card-link .playground-card-image {
+    transition: none;
+  }
+  .playground-card-link:active,
+  .playground-card-link:hover .playground-card-image {
+    transform: none;
+  }
+}

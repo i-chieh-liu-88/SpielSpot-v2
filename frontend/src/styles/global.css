@@ -1,11 +1,18 @@
 @import "tailwindcss";
 @import "@heroui/styles";
+@import "./design-tokens.css";
 
 @theme {
   --color-grass: #3aaa5e;
   --color-sky: #38bdf8;
-  --color-sand: #fde68a;
-  --color-coral: #f97066;
+  --color-sand: #ffd37d;
+  --color-coral: #ffbaba;
+  --color-gray-400: #756962;
+  --color-gray-500: #6f625c;
+  --color-gray-600: #655b57;
+  --color-gray-700: #514642;
+  --color-gray-800: #383030;
+  --color-gray-900: #231d1d;
   --color-bark: #92400e;
   --color-leaf: #16a34a;
   --font-display: "Hanken Grotesk", sans-serif;
@@ -77,24 +84,6 @@
     transform: translateY(calc(-100% - var(--gap, 1rem)));
   }
 }
-@keyframes letterShake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  20% {
-    transform: translateX(-3px);
-  }
-  40% {
-    transform: translateX(3px);
-  }
-  60% {
-    transform: translateX(-2px);
-  }
-  80% {
-    transform: translateX(2px);
-  }
-}
 @keyframes heroFloatY {
   0%,
   100% {
@@ -108,8 +97,8 @@
 :root {
   font-family: "Hanken Grotesk", sans-serif;
   font-optical-sizing: auto;
-  color: #1f2937;
-  background: #ecfdf5;
+  color: var(--spot-ink);
+  background: var(--spot-paper);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -118,6 +107,8 @@ html {
   scroll-padding-top: 5rem;
 }
 body {
+  background: var(--spot-paper);
+  line-height: var(--spot-body-leading);
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
@@ -139,12 +130,21 @@ a {
   display: inline-block;
   color: inherit;
   cursor: default;
-  transition: color 1.5s ease 2s;
+  transform-origin: 50% 75%;
+  transition:
+    transform 320ms var(--spot-motion-ease),
+    color 320ms ease-out;
 }
-.shake-letter:hover {
-  color: var(--shake-color);
-  animation: letterShake 0.9s ease both;
-  transition: color 0s;
+@media (hover: hover) and (pointer: fine) {
+  .hero-letter:hover > .shake-letter {
+    color: var(--shake-color);
+    transition-duration: 180ms, 220ms;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-letter:hover > .shake-letter {
+    transform: none;
+  }
 }
 .hero-letter {
   display: inline-block;
@@ -169,10 +169,7 @@ a {
   transform: translateY(0.055em) rotate(-2deg);
 }
 .grass-bg {
-  background-color: #ecfdf5;
-  background-image:
-    radial-gradient(ellipse 80% 60% at 20% 90%, #bbf7d0 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 85%, #a7f3d0 0%, transparent 55%);
+  background: var(--spot-paper);
 }
 .dot-grid {
   background-image: radial-gradient(circle, #86efac 1px, transparent 1px);
@@ -301,28 +298,17 @@ span {
 }
 html[data-theme="dark"] {
   color-scheme: dark;
-  --app-dark-surface: #172033;
-  --app-dark-control: #111b2d;
-  --app-dark-text: #f3f4f6;
-  --app-dark-muted: #cbd5e1;
+  --app-dark-surface: var(--spot-surface);
+  --app-dark-control: #1d1b19;
+  --app-dark-text: var(--spot-ink);
+  --app-dark-muted: var(--spot-muted);
 }
 html[data-theme="dark"] body {
-  background: #0f172a;
-  color: #e5e7eb;
+  background: var(--spot-paper);
+  color: var(--spot-ink);
 }
 html[data-theme="dark"] .grass-bg {
-  background-color: #0b1222;
-  background-image:
-    radial-gradient(
-      ellipse 80% 60% at 20% 90%,
-      rgba(34, 197, 94, 0.18) 0%,
-      transparent 60%
-    ),
-    radial-gradient(
-      ellipse 60% 40% at 80% 85%,
-      rgba(56, 189, 248, 0.18) 0%,
-      transparent 55%
-    );
+  background: var(--spot-paper);
 }
 html[data-theme="dark"] .dot-grid {
   background-image: radial-gradient(
@@ -496,4 +482,113 @@ html[data-theme="dark"] .nav-glass {
     animation-iteration-count: 1 !important;
     transition: none !important;
   }
+}
+
+/* Reference-derived color fields and rhythm; existing routes and layouts stay intact. */
+.spot-hero {
+  background: var(--spot-paper);
+}
+.spot-hero h1 {
+  font-weight: 800;
+  letter-spacing: var(--spot-heading-tracking);
+  line-height: 1.05;
+}
+.spot-hero h1 .font-black {
+  font-weight: 800;
+}
+.spot-hero h1 .text-grass {
+  color: var(--spot-brand);
+}
+.spot-hero > div > p {
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  font-weight: 400;
+  line-height: var(--spot-body-leading);
+}
+.spot-home-section {
+  padding-block: var(--spot-section-gap);
+}
+.spot-section-title {
+  letter-spacing: var(--spot-heading-tracking);
+  line-height: var(--spot-heading-leading);
+}
+.spot-features {
+  background: var(--spot-yellow);
+}
+.spot-how,
+.spot-popular {
+  background: var(--spot-paper);
+}
+.spot-reviews {
+  background: var(--spot-pink);
+}
+.spot-cta {
+  background: var(--spot-cta-ground);
+  padding-block: var(--spot-section-gap);
+}
+html[data-theme="dark"] .spot-cta {
+  background: var(--spot-cta-ground);
+}
+.spot-cta h2 {
+  font-size: clamp(2.25rem, 4vw, 3.75rem);
+  font-weight: 700;
+  letter-spacing: var(--spot-heading-tracking);
+  line-height: 1.1;
+}
+.spot-cta h2,
+.spot-cta p {
+  color: var(--spot-cta-text);
+}
+.spot-cta p {
+  line-height: var(--spot-body-leading);
+}
+.spot-cta .beui-button-primary,
+html[data-theme="dark"] .spot-cta .beui-button-primary {
+  background: var(--spot-cta-text);
+  border-color: var(--spot-cta-text);
+  color: var(--spot-cta-ground);
+}
+.spot-cta .beui-button-secondary,
+html[data-theme="dark"] .spot-cta .beui-button-secondary {
+  background: transparent;
+  border-color: var(--spot-cta-text);
+  color: var(--spot-cta-text);
+}
+.spot-cta .beui-button:hover:not(:disabled) {
+  background: var(--spot-cta-text);
+  color: var(--spot-cta-ground);
+}
+.spot-cta .beui-button:focus-visible {
+  outline-color: var(--spot-cta-text);
+}
+footer :is(p, nav) {
+  color: #d5ccc3;
+}
+.spot-home-section .card-hover {
+  box-shadow: none;
+}
+.spot-home-section .card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: none;
+}
+html[data-theme="dark"] .spot-home-section .card-hover {
+  box-shadow: none !important;
+}
+.spot-how li {
+  background-color: var(--spot-surface);
+  border-color: transparent;
+}
+.spot-how li > span {
+  color: var(--spot-muted);
+  opacity: 0.3;
+}
+.nav-glass,
+html[data-theme="dark"] .nav-glass {
+  background: var(--spot-paper);
+  border-bottom: 1px solid var(--spot-border);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+html:not([data-theme="dark"]) :is(input, textarea, select):focus-visible {
+  outline: 2px solid var(--spot-focus);
+  outline-offset: 3px;
 }

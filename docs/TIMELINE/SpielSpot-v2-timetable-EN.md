@@ -1,6 +1,6 @@
 # SpielSpot 2.0 | Rolling work plan
 
-Updated October 14, 2026 (Europe/Berlin), using progress reports through October 14 and the latest implementation and deployment evidence in this chat.
+Updated October 15, 2026 (Europe/Berlin), using progress reports through October 14 and the October 15 scope clarification in this chat.
 This section is the active schedule. The original plan below is historical reference only.
 The original budget is 14 weekdays at 3 hours each (42 planned hours, not actual time spent). Three working days and 9 planned hours remain from October 15. Keep weekends off and the October 19, 23:59 deadline.
 
@@ -23,8 +23,8 @@ Checkbox review: October 7, using reports through October 6. Checked baseline ta
 
 - Oct 14 creation: the [daily report](../DAILY%20PROGRESS/2026-10-14-progress.md) confirms Clerk-authenticated playground creation, validation, saving feedback, retained input after failed requests and duplicate-submission protection. Development and local production preview checks confirmed detail navigation and retrieval after refresh. This uses the existing backend POST API; it does not establish persistence across a backend restart.
 - Oct 14 deployment: commit `be1d945` was pushed to GitHub main and Netlify showed Published. The assistant confirmed the updated creation form and enabled button on the live frontend. Live creation and retrieval after refresh remain unverified. The backend stays on Render; Netlify hosts the frontend.
-- Oct 14 local UI work: browsing now has a desktop list/map layout, mobile List/Map switching, explicit Search this area, compact buttons and no mouse-wheel map zoom. Field errors identify inputs and focus the first invalid field. Empty coordinates no longer create a map marker. Dark-mode contrast, decorative-label removal, spacing and section-heading sizes were also adjusted. These later changes remain uncommitted and undeployed.
-- Oct 14 checks: lint, 64 frontend tests across 21 files and the final production build passed. Local browser checks covered development and production preview, filtering/reset, mobile view switching and 390 px overflow. Selected dark-mode text contrast checks passed; there was no complete WCAG audit or physical touch-device test. Backend tests were not rerun during this work. Photos still have no upload or storage.
+- Oct 14 local UI work: browsing now has a desktop list/map layout, mobile List/Map switching, explicit Search this area, compact buttons and no mouse-wheel map zoom. Field errors identify inputs and focus the first invalid field. Empty coordinates no longer create a map marker. These later changes remain uncommitted and undeployed.
+- Oct 14 checks: lint, 64 frontend tests across 21 files and the final production build passed. Local browser checks covered development and production preview, filtering/reset, mobile view switching and 390 px overflow. No complete WCAG audit or physical touch-device test was performed. Backend tests were not rerun during this work. Photos still have no upload or storage.
 
 Sources: dated files in [DAILY PROGRESS](../DAILY%20PROGRESS/) through October 14, including the latest report and October 13 context, plus the latest chat evidence distinguishing local checks, commit/deployment and live verification. The user clarified that refresh checks were local, not live. This planning maintenance did not run tests or deploy changes.
 
@@ -34,11 +34,13 @@ Each active row contains three tasks budgeted at 60 minutes each (3 hours per wo
 
 | Date | Task 1 | Task 2 | Task 3 |
 | --- | --- | --- | --- |
-| Oct 15 | Review the local UI changes and staged files; commit/push only the intended changes, deploy the frontend and confirm its commit (60 min) | Verify live Clerk-authenticated playground creation, detail navigation, refresh retrieval and failure feedback; keep photos as preview only and record results (60 min) | Define/test playground-deletion behavior for related reviews; check required ownership and spoofing cases and fix blockers (60 min) |
+| Oct 15 | Review required functional changes and staged files; commit/push only the intended scope, deploy required frontend fixes and confirm its commit (60 min) | Verify live Clerk-authenticated playground creation, detail navigation, refresh retrieval and failure feedback; keep photos as preview only and record results (60 min) | Define/test playground-deletion behavior for related reviews; check required ownership and spoofing cases and fix blockers (60 min) |
 | Oct 16 | Verify clean installation and lockfiles from README; run required frontend/backend checks for the final changes (60 min) | Rehearse the architecture, models, permissions, tests and API demo (60 min) | Reconcile brief evidence and handoff notes; check submission files, repository access and live URLs (60 min) |
 | Oct 19 | Run final live checks | Submit and confirm success | Reserve time for submission issues and final report |
 
 ## Adjustment rules and changes
+
+- October 15 scope clarification: follow the existing backend-focused plan. Optional visual polish, design-token styling and decorative motion are personal extras; exclude them from active tasks and teacher-facing plans and progress reports. Do not undo this work or make its completion a submission requirement. Retain required frontend API integration, validation, error handling and live workflow checks. Prioritize backend behavior, authorization, related-data handling, tests and submission evidence.
 
 - October 7 scope update: include frontend UI and UX work that exposes the new backend features. Backend PATCH implementation does not mean review editing is available in the UI.
 - October 13 rollover: frontend deployment and core live checks are complete. Option B adds playground creation/saving on October 14, followed by tests and live verification on October 15. Move relationship/ownership gaps and clean installation to October 15. Replace optional documentation polish and extended Atlas index/export/recovery work to keep the three-hour daily budget. Retain required database access checks during setup/deployment and preserve October 16 demo preparation and October 19 submission time. If creation takes longer, use October 15's time before optional polish; do not add weekends or photo upload before submission.

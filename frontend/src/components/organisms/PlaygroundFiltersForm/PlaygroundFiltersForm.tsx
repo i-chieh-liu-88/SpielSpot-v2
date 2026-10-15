@@ -32,7 +32,7 @@ export function PlaygroundFiltersForm({ onApply }: PlaygroundFiltersFormProps) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mb-6 rounded-2xl bg-white/60 p-4 sm:p-5"
+      className="playground-filters-form mb-6 rounded-2xl bg-white/60 p-4 sm:p-5"
       aria-label={t("Filter playgrounds")}
     >
       <div className="grid gap-4 sm:grid-cols-2">

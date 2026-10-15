@@ -8,6 +8,7 @@ import {
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import Button from "../../components/atoms/Button";
 import { LoadingSpinner } from "../../components/atoms/LoadingSpinner";
+import { SplitText } from "../../components/atoms/SplitText";
 import { MapLocationSearch } from "../../components/molecules/MapLocationSearch";
 import {
   PlaygroundMap,
@@ -61,6 +62,9 @@ export function PlaygroundsPage() {
     [mappedPlaygrounds, appliedArea],
   );
   const selected = mappedPlaygrounds.find((p) => p.id === selectedId);
+  const pageTitle = q
+    ? t("Playgrounds near “{query}”", { query: q })
+    : t("Find a playground");
   const updateMapArea = useCallback(
     (area: PlaygroundMapArea) => setPendingArea(area),
     [],
@@ -82,15 +86,25 @@ export function PlaygroundsPage() {
   }
 
   return (
-    <section className="grass-bg min-h-screen px-4 pb-12 pt-10 sm:px-6">
+    <section className="spot-explore-page grass-bg min-h-screen px-4 pb-12 pt-10 sm:px-6">
       <div className="mx-auto max-w-7xl">
         <header className="mb-6 max-w-3xl">
-          <h1 className="display text-3xl font-black text-gray-800 sm:text-4xl">
-            {q
-              ? t("Playgrounds near “{query}”", { query: q })
-              : t("Find a playground")}
-          </h1>
-          <p className="mt-2 text-base text-gray-700">
+          <SplitText
+            key={pageTitle}
+            tag="h1"
+            text={pageTitle}
+            textAlign="left"
+            className="display text-3xl font-bold leading-tight tracking-tight text-balance text-gray-800 sm:text-4xl lg:text-5xl"
+            delay={45}
+            duration={0.8}
+            ease="power3.out"
+            splitType="words, chars"
+            from={{ opacity: 0, y: 48, rotateX: -35 }}
+            to={{ opacity: 1, y: 0, rotateX: 0 }}
+            threshold={0.1}
+            rootMargin="-60px"
+          />
+          <p className="animate-fadeUp3 mt-3 max-w-2xl text-base leading-relaxed text-pretty text-gray-600 sm:text-lg">
             {t(
               "Compare playgrounds in the list or explore their locations on the map.",
             )}
@@ -102,7 +116,7 @@ export function PlaygroundsPage() {
             setMobileView("map");
           }}
         />
-        <details className="mb-6 rounded-2xl bg-white/60 p-4">
+        <details className="explore-filters mb-6 rounded-2xl bg-white/60 p-4">
           <summary className="min-h-11 cursor-pointer rounded-lg py-3 font-semibold text-gray-800 focus-visible:outline-2 focus-visible:outline-green-700">
             {t("Filters: address, age and facilities")}
           </summary>
@@ -196,7 +210,7 @@ export function PlaygroundsPage() {
                     {results.map((p) => (
                       <li key={p.id}>
                         <article
-                          className={`rounded-2xl border-2 bg-white/90 p-5 ${selectedId === p.id ? "border-green-700" : "border-transparent"}`}
+                          className={`explore-card rounded-2xl border-2 bg-white/90 p-5 ${selectedId === p.id ? "border-green-700" : "border-transparent"}`}
                         >
                           <h2 className="break-words text-xl font-bold text-gray-900">
                             <Link
@@ -245,7 +259,7 @@ export function PlaygroundsPage() {
                             {p.description}
                           </p>
                           <Link
-                            className="mt-4 inline-flex min-h-11 items-center rounded-full bg-gray-900 px-5 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700"
+                            className="explore-detail-link mt-4 inline-flex min-h-11 items-center rounded-full bg-gray-900 px-5 text-sm font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700"
                             to="/playgrounds/$playgroundId"
                             params={{ playgroundId: p.id }}
                             aria-label={t("View details for {name}", {

@@ -1,0 +1,93 @@
+/* Scoped to creation: the Back button and existing edit form keep their styles. */
+.spot-create-page .playground-editor {
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border: 0;
+  border-radius: var(--spot-radius-panel);
+  background: var(--spot-surface);
+  color: var(--spot-ink);
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.spot-create-page .playground-editor > [role="status"] {
+  margin-bottom: var(--spot-space-large);
+  padding: var(--spot-space-medium);
+  border-radius: var(--spot-radius-control);
+  background: var(--spot-paper);
+  color: var(--spot-muted);
+  font-weight: 400;
+  line-height: var(--spot-body-leading);
+}
+.spot-create-page .playground-editor label,
+.spot-create-page .playground-editor legend {
+  color: var(--spot-ink);
+  font-weight: 600;
+}
+.spot-create-page .playground-editor > .grid {
+  gap: var(--spot-space-medium);
+}
+.spot-create-page .playground-editor :is(input:not([type="checkbox"]), select, textarea) {
+  min-height: var(--spot-control-height);
+  border: 1px solid var(--spot-border);
+  border-radius: var(--spot-radius-control);
+  background: var(--spot-control-surface);
+  color: var(--spot-ink);
+  box-shadow: none;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: var(--spot-body-leading);
+}
+.spot-create-page .playground-editor :is(input, select, textarea):focus-visible {
+  outline: 2px solid var(--spot-focus);
+  outline-offset: 3px;
+  box-shadow: none;
+}
+.spot-create-page .playground-editor [aria-invalid="true"] {
+  border-color: #b91c1c;
+}
+.spot-create-page .playground-editor input[type="checkbox"] {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+  accent-color: var(--spot-brand);
+}
+.spot-create-page .playground-editor fieldset label {
+  min-height: var(--spot-control-height);
+  border: 1px solid var(--spot-border);
+  border-radius: var(--spot-radius-control);
+  background: var(--spot-control-surface);
+}
+.spot-create-page .playground-editor fieldset label:has(input:checked) {
+  border-color: var(--spot-brand);
+  background: var(--spot-selected-surface);
+}
+.spot-create-page .playground-editor > :is(fieldset, section) {
+  margin-top: var(--spot-space-large);
+}
+.spot-create-page .playground-editor section h2 {
+  color: var(--spot-ink);
+  font-weight: 700;
+  letter-spacing: var(--spot-heading-tracking);
+}
+.spot-create-page .playground-editor section > p {
+  margin-block: 0.75rem var(--spot-space-medium);
+  color: var(--spot-muted);
+  font-weight: 400;
+  line-height: var(--spot-body-leading);
+}
+.spot-create-page .playground-editor > label {
+  margin-top: var(--spot-space-large);
+  min-height: var(--spot-control-height);
+  background: var(--spot-paper);
+  border-radius: var(--spot-radius-control);
+}
+.spot-create-page .playground-editor button[type="submit"] {
+  margin-top: var(--spot-space-medium);
+  min-height: var(--spot-control-height);
+  padding-inline: var(--spot-space-medium);
+}
+html[data-theme="dark"] .spot-create-page .playground-editor {
+  box-shadow: none !important;
+}
+html[data-theme="dark"] .spot-create-page .playground-editor [aria-invalid="true"] {
+  border-color: #fca5a5;
+}

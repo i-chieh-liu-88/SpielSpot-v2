@@ -9,10 +9,9 @@ export function CtaSection() {
 
   return (
     <section
-      className="relative overflow-hidden bg-grass px-6 py-24"
+      className="spot-cta relative overflow-hidden px-6 py-24"
       aria-labelledby="cta-heading"
     >
-      <div className="dot-grid absolute inset-0 opacity-20" />
       <img
         className="animate-floatY absolute left-[5%] top-10 hidden h-30 w-30 select-none object-contain md:block"
         src={rainbowImage}
@@ -38,7 +37,6 @@ export function CtaSection() {
         <div className="flex flex-col justify-center gap-4 sm:flex-row">
           <Button
             type="button"
-            className="text-white"
             size="lg"
             onClick={() => navigate({ to: "/playgrounds" })}
           >
@@ -46,7 +44,7 @@ export function CtaSection() {
           </Button>
           <Button
             type="button"
-            className="text-white"
+            variant="secondary"
             size="lg"
             onClick={() => {
               window.location.hash = "top";

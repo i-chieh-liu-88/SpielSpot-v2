@@ -10,8 +10,7 @@ export function ReviewsSection() {
   const { t } = useLanguage()
 
   return (
-    <section id="reviews" className="grass-bg relative scroll-mt-24 overflow-hidden px-6 py-24" aria-labelledby="reviews-heading">
-      <div className="dot-grid absolute inset-0 opacity-20" />
+    <section id="reviews" className="spot-home-section spot-reviews relative scroll-mt-24 overflow-hidden px-6 py-24" aria-labelledby="reviews-heading">
       <div className="relative mx-auto max-w-5xl">
         <SectionHeading id="reviews-heading" title={t("Trusted by families")} />
         <div className="grid gap-6 md:grid-cols-3">{reviews.map((review, index) => <div className={index === 1 ? 'md:mt-5' : ''} key={review.name}><ReviewCard review={review} /></div>)}</div>

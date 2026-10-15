@@ -103,7 +103,7 @@ export function MapLocationSearch({ onLocationFound }: MapLocationSearchProps) {
 
   return (
     <section
-      className="mb-5 rounded-3xl border border-white/60 bg-white/45 p-4 shadow-lg backdrop-blur-xl sm:p-5"
+      className="map-location-search mb-5 rounded-3xl border border-white/60 bg-white/45 p-4 shadow-lg backdrop-blur-xl sm:p-5"
       aria-labelledby="map-location-heading"
     >
       <div className="mb-3">

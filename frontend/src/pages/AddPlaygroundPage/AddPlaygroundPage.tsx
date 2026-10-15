@@ -6,6 +6,7 @@ import { LoadingSpinner } from "../../components/atoms/LoadingSpinner";
 import { PlaygroundForm } from "../../components/organisms/PlaygroundForm/PlaygroundForm";
 import { isClerkConfigured } from "../../config/clerk";
 import { useLanguage } from "../../providers/LanguageProvider";
+import { SplitText } from "../../components/atoms/SplitText";
 
 function AddPlaygroundContent() {
   const navigate = useNavigate();
@@ -65,7 +66,7 @@ export function AddPlaygroundPage() {
   const { t } = useLanguage();
 
   return (
-    <section className="grass-bg relative min-h-screen overflow-hidden px-4 py-10 sm:px-6 sm:py-12">
+    <section className="spot-create-page grass-bg relative min-h-screen overflow-hidden px-4 py-10 sm:px-6 sm:py-12">
       <div className="dot-grid absolute inset-0 opacity-20" />
       <div className="relative mx-auto max-w-4xl">
         <Button
@@ -77,10 +78,22 @@ export function AddPlaygroundPage() {
           {t("Back to playgrounds")}
         </Button>
         <header className="mb-8 max-w-3xl text-left">
-          <h1 className="display text-3xl font-bold leading-tight tracking-tight text-balance text-gray-800 sm:text-4xl lg:text-5xl">
-            {t("Add a playground")}
-          </h1>
-          <p className="mt-3 max-w-2xl text-base leading-relaxed text-pretty text-gray-600 sm:text-lg">
+          <SplitText
+            key={t("Add a playground")}
+            tag="h1"
+            text={t("Add a playground")}
+            textAlign="left"
+            className="display text-3xl font-bold leading-tight tracking-tight text-balance text-gray-800 sm:text-4xl lg:text-5xl"
+            delay={45}
+            duration={0.8}
+            ease="power3.out"
+            splitType="words, chars"
+            from={{ opacity: 0, y: 48, rotateX: -35 }}
+            to={{ opacity: 1, y: 0, rotateX: 0 }}
+            threshold={0.1}
+            rootMargin="-60px"
+          />
+          <p className="animate-fadeUp3 mt-3 max-w-2xl text-base leading-relaxed text-pretty text-gray-600 sm:text-lg">
             {t(
               "Pin a place you discovered, upload a photo, and help nearby families find it.",
             )}

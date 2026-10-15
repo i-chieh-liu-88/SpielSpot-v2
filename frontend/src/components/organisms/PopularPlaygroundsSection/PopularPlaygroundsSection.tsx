@@ -37,7 +37,7 @@ export function PopularPlaygroundsSection({
   return (
     <section
       id="playgrounds"
-      className="scroll-mt-24 bg-white px-6 py-24"
+      className="spot-home-section spot-popular scroll-mt-24 px-6 py-24"
       aria-labelledby="playgrounds-heading"
     >
       <div className="mx-auto max-w-6xl">
@@ -64,7 +64,7 @@ export function PopularPlaygroundsSection({
             aria-label={t("Popular playground marquee")}
           >
             <Marquee
-              className="py-8"
+              className="playground-card-marquee py-8"
               direction="left"
               speed={30}
               gap="1.25rem"
@@ -73,7 +73,7 @@ export function PopularPlaygroundsSection({
             >
               {popularPlaygrounds.map((playground) => (
                 <Link
-                  className="block h-[23rem] w-[280px] rounded-3xl outline-none focus-visible:ring-4 focus-visible:ring-green-500 focus-visible:ring-offset-4 [&>article]:h-full [&_h3]:line-clamp-2 [&_ul]:max-h-16 [&_ul]:overflow-hidden sm:w-[300px]"
+                  className="playground-card-link block h-[23rem] w-[280px] rounded-3xl [&>article]:h-full [&_h3]:line-clamp-2 [&_ul]:max-h-16 [&_ul]:overflow-hidden sm:w-[300px]"
                   to="/playgrounds/$playgroundId"
                   params={{ playgroundId: playground.id }}
                   key={playground.id}

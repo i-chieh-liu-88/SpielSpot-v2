@@ -1,32 +1,42 @@
 import StarOutlined from "@mui/icons-material/StarOutlined";
+import ImageOutlined from "@mui/icons-material/ImageOutlined";
+import { useState } from "react";
 import type { Playground } from "../../../types/content";
 import { useLanguage } from "../../../providers/LanguageProvider";
+import "./PlaygroundCard.css";
 
 export function PlaygroundCard({ playground }: { playground: Playground }) {
   const { t } = useLanguage();
+  const [failedImage, setFailedImage] = useState<string>();
+  const hasImage = Boolean(playground.image) && failedImage !== playground.image;
+  const rating = Number(playground.rating);
+  const hasRating = Number.isFinite(rating) && rating >= 1 && rating <= 5;
 
   return (
-    <article className="card-hover overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm">
-      <div
-        className={`relative flex h-44 items-end bg-linear-to-br ${playground.gradient} p-5`}
-      >
-        <img
-          className="animate-floatY absolute right-4 top-4 h-30 w-30 select-none object-contain"
+    <article className="playground-card overflow-hidden">
+      <div className="playground-card-media">
+        {hasImage ? <img
+          className="playground-card-image"
           src={playground.image}
           alt=""
-        />
-        <span className="rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-gray-700">
+          onError={() => setFailedImage(playground.image)}
+        /> : <div className="playground-card-placeholder">
+          <ImageOutlined aria-hidden="true" />
+          <span>{t("Photo unavailable")}</span>
+        </div>}
+        {playground.distance.trim() && <span className="playground-card-distance">
           {t("{distance} away", { distance: playground.distance })}
-        </span>
+        </span>}
       </div>
       <div className="p-6">
         <div className="mb-2 flex items-start justify-between gap-3">
           <h3 className="text-lg font-extrabold text-gray-800">
             {playground.name}
           </h3>
-          <span className="inline-flex items-center gap-0.5 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-800">
-            <StarOutlined className="text-sm" aria-hidden="true" />{" "}
-            {playground.rating}
+          <span className="playground-card-rating" aria-label={hasRating ? t("{rating} out of 5 stars", { rating }) : t("Not rated")}>
+            {hasRating && <StarOutlined aria-hidden="true" />}
+            <span>{hasRating ? rating : t("Not rated")}</span>
+            {hasRating && <span className="playground-card-rating-scale" aria-hidden="true">/5</span>}
           </span>
         </div>
         <p className="mb-4 text-sm font-semibold text-gray-400">
