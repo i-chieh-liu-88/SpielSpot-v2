@@ -54,7 +54,18 @@ export async function savePhoto(req, res, next) {
   }
   let uploaded;
   try { uploaded = await uploadPhoto(buffer); }
-  catch { return res.status(502).json({ success: false, error: "Could not upload the photo. Please try again." }); }
+  catch (error) {
+    // Log only a fixed category and status; provider messages can contain credentials.
+    const message = String(error?.message ?? "");
+    const category = /signature/i.test(message) ? "signature_rejected"
+      : /api.?key/i.test(message) ? "api_key_rejected"
+      : /cloud.?name/i.test(message) ? "cloud_name_rejected"
+      : /timeout|timed out/i.test(message) ? "provider_timeout" : "provider_error";
+    console.warn("Playground photo provider failure", {
+      category, status: Number(error?.http_code) || 0,
+    });
+    return res.status(502).json({ success: false, error: "Could not upload the photo. Please try again." });
+  }
   try {
     // Atomic replacement returns the previous image, including during concurrent uploads.
     const previous = await Playground.findOneAndUpdate(

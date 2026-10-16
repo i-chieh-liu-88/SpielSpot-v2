@@ -25,7 +25,11 @@ const router = express.Router();
 router.get("/", validateQuery(playgroundQuerySchema), getPlaygrounds);
 router.get("/:id", getPlaygroundById);
 router.post("/", requireLogin, validate(playgroundSchema), createPlayground);
-router.post("/:id/photo", requireLogin, authorizePhoto, acceptPhoto, savePhoto);
+router.post("/:id/photo", (req, res, next) => {
+  // Record status only: no tokens, user data, file contents or provider credentials.
+  res.on("finish", () => console.info("Playground photo response", res.statusCode));
+  next();
+}, requireLogin, authorizePhoto, acceptPhoto, savePhoto);
 router.patch(
   "/:id",
   requireLogin,
