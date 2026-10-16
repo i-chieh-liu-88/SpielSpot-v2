@@ -215,10 +215,12 @@ for deployment. Set Render's `CLIENT_URL` to the Netlify frontend origin.
 
 ## Known backend limits
 
-Local October 16 validation update: GET filters now validate scalar types,
+October 16 validation update, deployed on Render as `e2cb200`: GET filters validate scalar types,
 lengths and tag counts, and escape location regex symbols. Review POST/PATCH
-ratings must be strings 1 to 5. All 76 backend tests passed; these changes still
-need commit, deployment and live verification. See the API examples for limits.
+ratings must be strings 1 to 5. All 76 backend tests passed. Live GET checks
+confirmed literal search, normal filtering and 400 for duplicate/oversized
+queries. Authenticated rating POST/PATCH live checks remain pending.
+See the API examples for limits.
 
 - Clerk uses a development instance. Production setup needs separate domain
   and key configuration; do not replace only one side's keys.

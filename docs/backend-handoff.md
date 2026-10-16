@@ -4,7 +4,7 @@
 
 # Frontend integration boundary
 
-## Input validation update (local, October 16)
+## Input validation update (deployed October 16)
 
 - Playground GET filters accept only known keys with single string values.
   After trimming: location is at most 200 characters, ageRange 80, and tags
@@ -15,7 +15,11 @@
   does not require omitted ratings, so text-only edits remain supported.
 - All 76 backend tests passed, including invalid queries rejected before model
   access, literal search, boundary values, rating failures and successful writes.
-  These are mocked API tests. This update is not yet committed or deployed.
+  These are mocked API tests. Render deployed `e2cb200`; live health returned
+  200, ordinary filters and literal regex-symbol searches returned 200, and
+  duplicate/oversized location queries returned 400. The live frontend filtered
+  Dresden to 6 records and Reset restored 8. Authenticated rating POST/PATCH
+  live checks remain pending. No data was modified by these GET checks.
 
 ## Setup and verification review (October 16)
 

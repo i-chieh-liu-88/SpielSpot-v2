@@ -16,15 +16,15 @@ Deadline: October 19, 2026, 23:59 Europe/Berlin.
 | Authentication and ownership | Clerk, requireLogin, ownerId/authorId checks | Automated tests and selected live checks |
 | Related-data deletion protection | Owner DELETE with reviews returns 409 | Deployed af86219; user reported 409 and both records retained |
 | Body validation | Zod schemas, string trimming, unknown-field stripping | Implemented/tested |
-| Query validation | Zod checks scalar filters, lengths and tag counts; location regex symbols are escaped | Implemented/tested locally Oct 16; not deployed |
+| Query validation | Zod checks scalar filters, lengths and tag counts; location regex symbols are escaped | Deployed e2cb200; selected live GET checks passed Oct 16 |
 | CORS, headers, rate limit | app.js: configured origins, Helmet, global 100 requests/15 minutes | Implemented; deployment proxy/IP behavior needs review |
 | Safe errors | JSON 400/401/403/404/409/429/500; generic unexpected errors | Tests and selected live evidence |
 | Automated tests | 42 backend tests and 64 frontend tests passed Oct 16 | Backend models and Clerk mocked; frontend service tests need an API |
-| Setup and configuration | README plus frontend/.env.example and backend/.env.example | Updated locally, not committed |
+| Setup and configuration | README plus frontend/.env.example and backend/.env.example | Committed and pushed in e2cb200 |
 | Independent installation | Clean copy of a861ef4 installed; tests and frontend build passed | Existing local API supplied frontend service-test data |
 | Backend URL and HTTPS | https://spielspot.onrender.com/health returned 200 Oct 16 | API process check, not full DB health |
-| GitHub repository access | Anonymous page request to https://github.com/i-chieh-liu-88/SpielSpot-v2 returned 200 Oct 16 | Accessible; final local docs still need commit/push |
-| Contributor names | README identifies I-Chieh Liu; user confirmed individual project | Added locally |
+| GitHub repository access | Anonymous page request to https://github.com/i-chieh-liu-88/SpielSpot-v2 returned 200 Oct 16 | Accessible; e2cb200 pushed |
+| Contributor names | README identifies I-Chieh Liu; user confirmed individual project | Committed in e2cb200 |
 | Daily Slack DMs | Brief requires daily messages, including weekends | User must confirm sent-message history; drafts are not proof of delivery |
 | Share final links with instructor | Repository and deployed backend URLs | Pending user submission; no Slack sent by this maintenance |
 
@@ -36,8 +36,8 @@ Deadline: October 19, 2026, 23:59 Europe/Berlin.
   Concurrent review creation may leave an orphaned review.
 - The October 16 local changes validate Review ratings as strings 1 to 5 on
   POST and PATCH, and validate filter queries. Backend tests passed 76 cases.
-  These changes still need commit, deployment and live checks. Production
-  IP/rate-limit behavior remains a review item.
+  Render deployed e2cb200 and selected live query checks passed. Authenticated
+  rating POST/PATCH live checks and production IP/rate-limit review remain pending.
 - October 16 npm audit: 19 moderate findings in backend test dependencies,
   zero with --omit=dev. No forced dependency downgrade was applied.
 - Photos are local previews; there is no server upload or storage endpoint.
