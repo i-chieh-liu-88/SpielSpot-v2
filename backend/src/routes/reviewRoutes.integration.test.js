@@ -32,6 +32,46 @@ const validReviewBody = {
 };
 let deleteOne;
 
+describe("review rating validation on POST and PATCH", () => {
+  // 兩個欄位、兩種寫入路由都必須拒絕非法評分，且不能進入資料庫操作。
+  test.each(["0", "6", "3.5", "bad", "", 3, null, ["3"], { value: "3" }])(
+    "rejects rating %j on both write routes", async (value) => {
+      for (const field of ["safetyRating", "overallRating"]) {
+        await request(app).post(`/api/playgrounds/${playgroundId}/reviews`)
+          .send({ ...validReviewBody, [field]: value }).expect(400);
+        await request(app).patch(`/api/reviews/${reviewId}`)
+          .send({ [field]: value }).expect(400);
+      }
+      expect(Playground.findById).not.toHaveBeenCalled();
+      expect(Review.create).not.toHaveBeenCalled();
+      expect(Review.findById).not.toHaveBeenCalled();
+    },
+  );
+
+  test.each(["1", "2", "3", "4", "5", " 3 "])("accepts string rating %s", async (value) => {
+    Review.create.mockResolvedValue({ _id: reviewId });
+    await request(app).post(`/api/playgrounds/${playgroundId}/reviews`)
+      .send({ ...validReviewBody, safetyRating: value, overallRating: value }).expect(201);
+    expect(Review.create).toHaveBeenCalledWith(expect.objectContaining({
+      safetyRating: value.trim(), overallRating: value.trim(),
+    }));
+    const fake = { authorId: "user-author", save: jest.fn().mockResolvedValue(true) };
+    Review.findById.mockResolvedValue(fake);
+    await request(app).patch(`/api/reviews/${reviewId}`)
+      .send({ safetyRating: value, overallRating: value }).expect(200);
+    expect(fake.safetyRating).toBe(value.trim());
+    expect(fake.overallRating).toBe(value.trim());
+  });
+
+  test("PATCH can still update text without supplying ratings", async () => {
+    const fake = { authorId: "user-author", overallRating: "4", save: jest.fn().mockResolvedValue(true) };
+    Review.findById.mockResolvedValue(fake);
+    await request(app).patch(`/api/reviews/${reviewId}`).send({ review: "Updated text" }).expect(200);
+    expect(fake.overallRating).toBe("4");
+    expect(fake.save).toHaveBeenCalledTimes(1);
+  });
+});
+
 beforeEach(() => {
   jest.resetAllMocks();
   getAuth.mockReturnValue({ userId: "user-author" });

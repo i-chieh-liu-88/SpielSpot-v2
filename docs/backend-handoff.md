@@ -4,7 +4,43 @@
 
 # Frontend integration boundary
 
-## Playground deletion policy (local update, October 15)
+## Input validation update (local, October 16)
+
+- Playground GET filters accept only known keys with single string values.
+  After trimming: location is at most 200 characters, ageRange 80, and tags
+  1000 total with at most 10 nonempty tags of 80 characters each. Empty filters
+  restore the full list. Location search treats regex syntax as literal text.
+- Review POST and PATCH accept safetyRating and overallRating only as strings
+  1 to 5 after trimming. Numeric JSON values and fractions return 400. PATCH
+  does not require omitted ratings, so text-only edits remain supported.
+- All 76 backend tests passed, including invalid queries rejected before model
+  access, literal search, boundary values, rating failures and successful writes.
+  These are mocked API tests. This update is not yet committed or deployed.
+
+## Setup and verification review (October 16)
+
+- A clean temporary copy of committed source `a861ef4`, without local secrets
+  or existing node_modules, installed both dependency sets. Parsed frontend and
+  backend lockfiles remained identical to the repository versions. Backend 42
+  tests, frontend 64 tests and production build passed in that copy. Frontend
+  service tests used the already-running local API; a fresh Atlas/Clerk setup
+  was not tested. The working checkout also passed lint and 64 frontend tests.
+- On Windows, use the full folder path when running Vite. The temporary
+  `DCI-ST~1` alias caused build and setup-file resolution errors; rerunning from
+  the canonical full path passed. The existing chunk-size warning remains.
+- Use Node.js 22.12 or newer. From the repository root, install with
+  `npm --prefix frontend install` and `npm --prefix backend install`.
+- Copy each folder's `.env.example` to its local environment file and supply
+  your own values. Frontend variables are public; never put a Clerk secret key
+  or MongoDB URI there. README lists start and verification commands.
+- Backend route tests mock Clerk and database models. Frontend playground
+  service tests require a running, populated API; the full suite is not offline.
+- October 16 npm audit reported 19 moderate findings in the backend Jest dev
+  dependency tree and zero with `--omit=dev`. No forced upgrade was applied.
+- Clerk still uses development keys. Review creation and playground deletion
+  still have a concurrency gap; the related-data check is not a transaction.
+
+## Playground deletion policy (deployed October 15)
 
 - A signed-in owner can delete a playground only when no reviews reference it.
 - Related reviews cause `409` with `Cannot delete a playground with reviews`.
@@ -14,8 +50,12 @@
   `ownerId` cannot grant deletion permission.
 - Local mocked route tests cover owner success, signed-out 401, non-owner and
   spoofed-owner 403, missing playground 404, related-review 409 and lookup failure.
-  Deployment and real-database verification remain pending. The lookup and
-  deletion are separate operations, so concurrent review creation remains a gap.
+  Render deployed `af86219` on October 15. Assistant live checks confirmed
+  health/read 200 and signed-out DELETE 401. The user reported owner DELETE 409,
+  confirmed both records remained, and reported non-owner DELETE 403.
+  The lookup and deletion are separate operations, so concurrent review creation
+  remains a gap. A successful deletion with no reviews has mocked-test coverage;
+  it has not been verified on live data in the October 15 checks.
 
 ## Local browsing UI update (2026-10-14)
 
@@ -36,8 +76,8 @@
   mobile switching and no horizontal overflow at 390 px. This is browser viewport
   testing, not a physical touch-device or complete screen-reader audit.
 - Lint, all 64 frontend tests across 21 files, and build passed. The existing
-  chunk-size warning remains. These browsing and form accessibility updates are
-  local and have not been committed or deployed.
+  chunk-size warning remains. The functional browsing and form updates reached
+  the live frontend on October 15.
 
 Playground services now call the backend API. Clerk authentication is retained.
 Old Supabase configuration, migrations and live data are not included.
@@ -68,7 +108,9 @@ visit or refresh of `/playgrounds/:id` load the client-side route.
   `CreatePlaygroundInput` in `services/playgrounds.ts`. It posts validated details
   to `/api/playgrounds`; latitude, longitude and safety rating are numbers.
   The backend assigns `ownerId`. Photos are local previews and are not sent.
-  Playground edit-mode saving remains disabled. The creation UI is not deployed.
+  Playground edit-mode saving remains disabled. Live creation, detail navigation
+  and refresh retrieval passed on October 15; the test record remained readable
+  after the backend redeployment.
 - Review pages allow submission. The review service posts to
   `/api/playgrounds/:id/reviews` with a Clerk bearer token. Open the form from a
   playground detail page to supply its ID. Missing IDs or tokens prevent saving;

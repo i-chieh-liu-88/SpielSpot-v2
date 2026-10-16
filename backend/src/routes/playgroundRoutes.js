@@ -13,14 +13,15 @@ import {
   createReview,
 } from "../controllers/reviewController.js";
 //ZOD VALIDATION
-import { validate } from "../middleware/validate.js";
+import { validate, validateQuery } from "../middleware/validate.js";
+import { playgroundQuerySchema } from "../validators/playgroundQueryValidator.js";
 import { playgroundSchema } from "../validators/playgroundValidator.js";
 import { reviewSchema } from "../validators/reviewValidator.js";
 
 const router = express.Router();
 
 //PLAYGROUND ROUTES
-router.get("/", getPlaygrounds);
+router.get("/", validateQuery(playgroundQuerySchema), getPlaygrounds);
 router.get("/:id", getPlaygroundById);
 router.post("/", requireLogin, validate(playgroundSchema), createPlayground);
 router.patch(

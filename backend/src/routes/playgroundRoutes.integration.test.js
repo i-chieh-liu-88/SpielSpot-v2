@@ -28,6 +28,56 @@ const validBody = {
   longitude: 7.01,
 };
 
+describe("GET playground query validation", () => {
+  beforeEach(() => Playground.find.mockResolvedValue([]));
+
+  // 特殊字元必須當文字搜尋，不能讓使用者指定 regex 或造成非法 regex。
+  test.each(["Dresden (Nord)", "[", ".*", "a+b?", "\\path", "^home$"])(
+    "treats location %s as literal text", async (location) => {
+      await request(app).get("/api/playgrounds").query({ location }).expect(200);
+      const pattern = Playground.find.mock.calls[0][0].location.$regex;
+      const regex = new RegExp(pattern, "i");
+      expect(regex.test(`prefix ${location} suffix`)).toBe(true);
+      expect(regex.test("unrelated address")).toBe(false);
+    },
+  );
+
+  test("trims filters and keeps age and any-tag matching", async () => {
+    await request(app).get("/api/playgrounds")
+      .query({ location: " Dresden ", ageRange: " 3-8 ", tags: " park, outdoor, " }).expect(200);
+    expect(Playground.find).toHaveBeenCalledWith({
+      location: { $regex: "Dresden", $options: "i" },
+      ageRange: "3-8", tags: { $in: ["park", "outdoor"] },
+    });
+  });
+
+  test("empty filters restore the full list", async () => {
+    await request(app).get("/api/playgrounds").query({ location: " ", ageRange: "", tags: "," }).expect(200);
+    expect(Playground.find).toHaveBeenCalledWith({});
+  });
+
+  // 型別、長度、數量不合規則時，在存取 model 前回傳 400。
+  test.each([
+    { location: "x".repeat(201) }, { ageRange: "x".repeat(81) },
+    { tags: "x".repeat(1001) }, { tags: "x".repeat(81) },
+    { tags: Array.from({ length: 11 }, (_, i) => `tag${i}`).join(",") },
+    { location: ["Dresden", "Essen"] }, { ageRange: ["3-8", "All ages"] },
+    { tags: ["park", "outdoor"] }, { "location[$ne]": "" },
+  ])("rejects invalid query %j without database access", async (query) => {
+    const res = await request(app).get("/api/playgrounds").query(query).expect(400);
+    expect(res.body.success).toBe(false);
+    expect(Playground.find).not.toHaveBeenCalled();
+  });
+
+  test("accepts the documented length and tag-count boundaries", async () => {
+    await request(app).get("/api/playgrounds").query({
+      location: "x".repeat(200), ageRange: "x".repeat(80),
+      tags: Array.from({ length: 10 }, () => "x".repeat(80)).join(","),
+    }).expect(200);
+    expect(Playground.find).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe("Playground endpoints (integration)", () => {
   beforeEach(() => {
     // 預設是「沒登入」，需要登入的測試再自己覆蓋

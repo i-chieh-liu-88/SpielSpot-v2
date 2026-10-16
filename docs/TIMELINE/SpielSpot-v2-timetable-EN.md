@@ -1,8 +1,8 @@
 # SpielSpot 2.0 | Rolling work plan
 
-Updated October 15, 2026 (Europe/Berlin), using progress reports through October 14 and the October 15 scope clarification in this chat.
+Updated October 16, 2026 (Europe/Berlin), using progress reports through October 15 and the latest October 15 chat confirmations. This maintenance ran after midnight for the October 15 evening update.
 This section is the active schedule. The original plan below is historical reference only.
-The original budget is 14 weekdays at 3 hours each (42 planned hours, not actual time spent). Three working days and 9 planned hours remain from October 15. Keep weekends off and the October 19, 23:59 deadline.
+The original budget is 14 weekdays at 3 hours each (42 planned hours, not actual time spent). Two working days and 6 planned hours remain from October 16. Keep weekends off and the October 19, 23:59 deadline.
 
 ## Reported progress
 
@@ -26,21 +26,26 @@ Checkbox review: October 7, using reports through October 6. Checked baseline ta
 - Oct 14 local UI work: browsing now has a desktop list/map layout, mobile List/Map switching, explicit Search this area, compact buttons and no mouse-wheel map zoom. Field errors identify inputs and focus the first invalid field. Empty coordinates no longer create a map marker. These later changes remain uncommitted and undeployed.
 - Oct 14 checks: lint, 64 frontend tests across 21 files and the final production build passed. Local browser checks covered development and production preview, filtering/reset, mobile view switching and 390 px overflow. No complete WCAG audit or physical touch-device test was performed. Backend tests were not rerun during this work. Photos still have no upload or storage.
 
-Sources: dated files in [DAILY PROGRESS](../DAILY%20PROGRESS/) through October 14, including the latest report and October 13 context, plus the latest chat evidence distinguishing local checks, commit/deployment and live verification. The user clarified that refresh checks were local, not live. This planning maintenance did not run tests or deploy changes.
+- Oct 15 implementation and checks: the [daily report](../DAILY%20PROGRESS/2026-10-15-progress.md) records live creation and refresh retrieval, deletion protection, 42 passing backend tests, 64 passing frontend tests, lint and build. Backend route tests mock Clerk and database models; they do not independently verify Atlas behavior. A simulated review-lookup failure returned 500 without deleting the playground.
+- Oct 15 deployment and live checks: frontend commit `7923673` was pushed and its updated assets appeared on Netlify. Backend commit `af86219` was pushed, then manually deployed on Render; the assistant observed Deploy succeeded / Live and MongoDB connected. Live health and retrieval of the previously created test playground returned 200 after deployment. A signed-out DELETE returned 401. The user reported owner DELETE 409 with related reviews, confirmed both records remained, and reported non-owner DELETE 403. These user-run checks are distinct from assistant-run checks. The October 15 functional tasks are complete within this tested scope.
+- Oct 15 remaining limits: review lookup and deletion are separate operations, leaving a concurrent-create/delete race. Clerk still uses development keys. Render build output reported 19 moderate dependency vulnerabilities; their scope and remediation remain unassessed. Real photo upload/storage remains after submission. These limits do not imply the completed live workflows failed.
+
+Sources: dated files in [DAILY PROGRESS](../DAILY%20PROGRESS/) through October 15, with October 14 context, plus October 15 chat evidence distinguishing local tests, deployments, assistant-run checks and user-reported results. October 14 refresh checks were local; October 15 added live verification. This planning maintenance did not run tests or deploy changes.
 
 ## Active daily schedule
 
-Each active row contains three tasks budgeted at 60 minutes each (3 hours per workday). October 14 completion is recorded above. Remaining tasks stay pending until supported by evidence; budgeted time is not actual time spent. No project work is scheduled for October 17-18.
+Each active row contains three tasks budgeted at 60 minutes each (3 hours per workday). October 15 completion is recorded above; its completed row has been removed from the active schedule. Remaining tasks stay pending until supported by evidence; budgeted time is not actual time spent. No project work is scheduled for October 17-18.
 
 | Date | Task 1 | Task 2 | Task 3 |
 | --- | --- | --- | --- |
-| Oct 15 | Review required functional changes and staged files; commit/push only the intended scope, deploy required frontend fixes and confirm its commit (60 min) | Verify live Clerk-authenticated playground creation, detail navigation, refresh retrieval and failure feedback; keep photos as preview only and record results (60 min) | Define/test playground-deletion behavior for related reviews; check required ownership and spoofing cases and fix blockers (60 min) |
-| Oct 16 | Verify clean installation and lockfiles from README; run required frontend/backend checks for the final changes (60 min) | Rehearse the architecture, models, permissions, tests and API demo (60 min) | Reconcile brief evidence and handoff notes; check submission files, repository access and live URLs (60 min) |
-| Oct 19 | Run final live checks | Submit and confirm success | Reserve time for submission issues and final report |
+| Oct 16 | Verify clean installation and lockfiles from README; run final frontend/backend checks and triage dependency warnings, Clerk setup and the concurrency gap as fixes or documented limits (60 min) | Rehearse the architecture, models, permissions, tests and API demo (60 min) | Reconcile brief evidence and handoff notes; check submission files, repository access and live URLs (60 min) |
+| Oct 19 | Run final live checks (60 min) | Submit and confirm success (60 min) | Reserve time for submission issues and final report (60 min) |
 
 ## Adjustment rules and changes
 
-- October 15 scope clarification: follow the existing backend-focused plan. Optional visual polish, design-token styling and decorative motion are personal extras; exclude them from active tasks and teacher-facing plans and progress reports. Do not undo this work or make its completion a submission requirement. Retain required frontend API integration, validation, error handling and live workflow checks. Prioritize backend behavior, authorization, related-data handling, tests and submission evidence.
+- October 16 rollover: October 15 functional deployment, live creation/retrieval and deletion-response checks are complete. Follow the latest report by retaining clean installation, final checks, backend demo preparation and submission evidence on October 16. Triage the recorded dependency warnings, development-key setup and concurrency limit within Task 1; do not claim remediation or expand the three-hour budget. If a required blocker needs more time, replace rehearsal time first and record what remains. Keep October 17-18 free and the October 19, 23:59 deadline. Optional visual audit findings are not added to the teacher-facing schedule.
+
+- October 15 scope clarification: follow the existing backend-focused plan. Optional visual polish, design-token styling and decorative motion are personal extras; exclude them from active tasks and teacher-facing plans and progress reports. The user clarified that this optional work may still be committed and deployed with other changes; this is a reporting scope choice, not a deployment restriction. Do not undo this work or make its completion a submission requirement. Retain required frontend API integration, validation, error handling and live workflow checks. Prioritize backend behavior, authorization, related-data handling, tests and submission evidence.
 
 - October 7 scope update: include frontend UI and UX work that exposes the new backend features. Backend PATCH implementation does not mean review editing is available in the UI.
 - October 13 rollover: frontend deployment and core live checks are complete. Option B adds playground creation/saving on October 14, followed by tests and live verification on October 15. Move relationship/ownership gaps and clean installation to October 15. Replace optional documentation polish and extended Atlas index/export/recovery work to keep the three-hour daily budget. Retain required database access checks during setup/deployment and preserve October 16 demo preparation and October 19 submission time. If creation takes longer, use October 15's time before optional polish; do not add weekends or photo upload before submission.

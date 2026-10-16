@@ -12,4 +12,16 @@ export function validate(schema) {
   };
 }
 
+export function validateQuery(schema) {
+  return (req, res, next) => {
+    const result = schema.safeParse(req.query);
+    if (!result.success) {
+      return res.status(400).json({ success: false, error: result.error.issues[0].message });
+    }
+    // Express 5 的 req.query 是 getter，另存結果而非直接覆寫。
+    req.validatedQuery = result.data;
+    next();
+  };
+}
+
 //寫成這種「接受 schema、回傳 middleware」的形式，之後任何 route 想加驗證，只要傳不同 schema 進去就能重複使用，不用每個 entity 各寫一次判斷邏輯。

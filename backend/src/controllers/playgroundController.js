@@ -6,11 +6,12 @@ import Review from "../models/Review.js";
 /* ----------------------------------- GET ---------------------------------- */
 export async function getPlaygrounds(req, res, next) {
   try {
-    const { location, ageRange, tags } = req.query;
+    const { location, ageRange, tags } = req.validatedQuery ?? req.query;
     const filter = {};
 
     if (location) {
-      filter.location = { $regex: location, $options: "i" }; // 不分大小寫、部分比對
+      // 保留不分大小寫的部分比對，但把正規表示式符號當一般文字。
+      filter.location = { $regex: location.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), $options: "i" };
     }
     if (ageRange) {
       filter.ageRange = ageRange; // 精確比對
