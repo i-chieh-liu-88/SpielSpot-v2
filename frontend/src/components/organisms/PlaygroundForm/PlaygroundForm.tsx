@@ -231,8 +231,9 @@ export function PlaygroundForm({
         try {
           const image = await uploadPlaygroundPhoto(savedPlayground.id, photo, token);
           savedPlayground = { ...savedPlayground, image };
-        } catch {
-          setError(t("Playground details are saved, but the photo upload failed. Retry the photo or continue without it."));
+        } catch (uploadError) {
+          const reason = uploadError instanceof Error ? t(uploadError.message) : "";
+          setError(`${t("Playground details are saved, but the photo upload failed. Retry the photo or continue without it.")}${reason ? ` ${reason}` : ""}`);
           return;
         }
       }

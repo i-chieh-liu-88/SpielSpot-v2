@@ -45,7 +45,7 @@ describe("playground preview form", () => {
     const file = new File(["image"], "park.png", { type: "image/png" });
     fireEvent.change(screen.getByLabelText("Upload playground photo"), { target: { files: [file] } });
     fireEvent.click(screen.getByRole("button", { name: "Add playground" }));
-    await screen.findByText("Playground details are saved, but the photo upload failed. Retry the photo or continue without it.");
+    await screen.findByText(/Playground details are saved, but the photo upload failed/);
     expect(onSaved).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "Retry photo upload" }));
     await waitFor(() => expect(onSaved).toHaveBeenCalledWith(expect.objectContaining({ image: "https://res.cloudinary.com/demo/park.webp" }), true));
