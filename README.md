@@ -261,3 +261,19 @@ attempt to remove the newly uploaded asset.
 
 Verified locally: 84 backend tests, 67 frontend tests, lint and production build.
 A generated Cloudinary image uploaded and was deleted successfully. Production preview file selection showed the selected image. Signed-in creation and refresh retrieval passed on localhost:5173 for test record 6ad1f17fc2be5443c729bf3d. The same photo loaded in localhost:4173 production preview. Live deployment checks remain pending.
+
+### October 16 live photo verification
+
+The photo feature is deployed: Render runs 8639af1 and the Netlify frontend
+includes the photo flow and upload error reasons. Initial live uploads failed
+with Cloudinary signature rejection (provider 401, API 502). After the user
+corrected Render credentials and redeployed, retrying the existing saved record
+succeeded without creating another playground.
+
+Verified on https://spielspot.netlify.app/playgrounds/6ad212c1ab82eabf8524899b:
+the Cloudinary image loaded before and after browser refresh. The record is
+named TEST Oct 16 Photo Credentials Retest. Its green image is generated test
+data, not a real playground photo. The test record remains in the database.
+This supersedes the pending live deployment status in the local photo update.
+Live image replacement and photo cleanup on playground deletion are not yet
+verified; their implementation and automated checks are separate evidence.
