@@ -46,11 +46,9 @@ export function CtaSection() {
             type="button"
             variant="secondary"
             size="lg"
-            onClick={() => {
-              window.location.hash = "top";
-            }}
+            onClick={() => navigate({ to: "/playgrounds/new" })}
           >
-            {t("Get the App")}
+            {t("Add a Playground")}
           </Button>
         </div>
       </div>

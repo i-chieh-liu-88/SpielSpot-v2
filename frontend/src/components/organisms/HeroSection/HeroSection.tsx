@@ -85,7 +85,7 @@ export function HeroSection() {
         </SplitText>
         <p className="animate-fadeUp3 mx-auto mt-8 max-w-xl text-m font-light leading-relaxed text-gray-800 md:text-xl">
           {t(
-            "Discover safe, fun, age-appropriate playgrounds right around the corner, rated by parents in your community.",
+            "Find playgrounds, compare facilities and ages, and read parent reviews before you go.",
           )}
         </p>
         <div className="animate-fadeUp4 mt-10">

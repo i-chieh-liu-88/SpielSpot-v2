@@ -607,3 +607,7 @@ html:not([data-theme="dark"]) :is(input, textarea, select):focus-visible {
   outline: 2px solid var(--spot-focus);
   outline-offset: 3px;
 }
+
+@media (max-width: 540px) {
+  .spot-cta .beui-button { width: fit-content; max-width: 100%; align-self: center; }
+}

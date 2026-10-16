@@ -12,6 +12,8 @@ const playgroundSchema = new mongoose.Schema(
     safetyRating: { type: Number, min: 1, max: 5 },
     tags: { type: [String], default: [] },
     ownerId: { type: String, required: true },
+    imageUrl: { type: String },
+    imagePublicId: { type: String, select: false },
   },
   { timestamps: true },
 );

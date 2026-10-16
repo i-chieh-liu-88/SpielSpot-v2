@@ -15,19 +15,16 @@ export function Footer() {
       </p>
       <nav
         className="flex flex-wrap justify-center gap-6 text-sm font-medium text-gray-400"
-        aria-label={t("Legal")}
+        aria-label={t("Footer navigation")}
       >
-        <a className="transition-colors hover:text-white" href="#top">
-          {t("Privacy")}
-        </a>
-        <a className="transition-colors hover:text-white" href="#top">
-          {t("Terms")}
-        </a>
+        <Link className="transition-colors hover:text-white" to="/playgrounds">
+          {t("Find a Playground")}
+        </Link>
         <a
           className="transition-colors hover:text-white"
-          href="mailto:hello@spielspot.example"
+          href="https://github.com/i-chieh-liu-88/SpielSpot-v2"
         >
-          {t("Contact")}
+          {t("Project on GitHub")}
         </a>
         <Link
           className="transition-colors hover:text-white"
@@ -37,7 +34,7 @@ export function Footer() {
         </Link>
       </nav>
       <p className="mt-8 text-xs text-gray-600">
-        {t("© 2026 PlaySpot. All rights reserved.")}
+        {t("© 2026 SpielSpot. All rights reserved.")}
       </p>
     </footer>
   );

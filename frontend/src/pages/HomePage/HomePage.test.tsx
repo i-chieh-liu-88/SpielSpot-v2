@@ -153,6 +153,26 @@ describe("SpielSpot home page", () => {
     });
   });
 
+  it("labels sample reviews and removes unavailable download and legal actions", async () => {
+    render(<App />);
+    await screen.findByRole("heading", { level: 1 });
+    expect(screen.getByRole("heading", { name: "Example parent reviews" })).toBeInTheDocument();
+    expect(screen.getByText(/Illustrative examples, not reviews from real users/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Get the App" })).not.toBeInTheDocument();
+    const footer = screen.getByRole("contentinfo", { name: "Footer" });
+    expect(within(footer).queryByRole("link", { name: "Privacy" })).not.toBeInTheDocument();
+    expect(within(footer).queryByRole("link", { name: "Terms" })).not.toBeInTheDocument();
+    expect(within(footer).getByRole("link", { name: "Project on GitHub" })).toHaveAttribute("href", "https://github.com/i-chieh-liu-88/SpielSpot-v2");
+  });
+
+  it("opens the actual add form from the final contribution action", async () => {
+    render(<App />);
+    await screen.findByRole("heading", { level: 1 });
+    const finalCta = screen.getByRole("region", { name: "Ready for your next adventure?" });
+    fireEvent.click(within(finalCta).getByRole("button", { name: "Add a Playground" }));
+    await waitFor(() => expect(router.state.location.pathname).toBe("/playgrounds/new"));
+  });
+
   it("uses the shared button component for the map CTA", async () => {
     render(<App />);
     await screen.findByRole("heading", { level: 1 });

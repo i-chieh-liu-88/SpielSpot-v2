@@ -1,6 +1,7 @@
 import { getAuth } from "@clerk/express";
 import Playground from "../models/Playground.js";
 import Review from "../models/Review.js";
+import { removePhoto } from "../services/photoStorage.js";
 
 /* ----------------------------------- GET ---------------------------------- */
 /* ----------------------------------- GET ---------------------------------- */
@@ -99,7 +100,7 @@ export async function updatePlayground(req, res, next) {
 export async function deletePlayground(req, res, next) {
   try {
     const { userId } = getAuth(req);
-    const playground = await Playground.findById(req.params.id);
+    const playground = await Playground.findById(req.params.id, "+imagePublicId");
 
     if (!playground) {
       return res
@@ -127,6 +128,9 @@ export async function deletePlayground(req, res, next) {
     // 只有確認沒有評論才刪除；查詢若拋出錯誤，會直接進入 catch。
     // 注意：查詢與刪除不是 transaction，尚未防止兩者之間新增評論的情況。
     await playground.deleteOne();
+    if (playground.imagePublicId) {
+      await removePhoto(playground.imagePublicId).catch(() => console.warn("Deleted playground photo cleanup failed"));
+    }
     res.json({ success: true, data: null });
   } catch (err) {
     next(err);

@@ -1,4 +1,5 @@
 import express from "express";
+import { authorizePhoto, acceptPhoto, savePhoto } from "../controllers/playgroundPhotoController.js";
 import { getAuth } from "@clerk/express";
 import { requireLogin } from "../middleware/requireLogin.js";
 import {
@@ -24,6 +25,7 @@ const router = express.Router();
 router.get("/", validateQuery(playgroundQuerySchema), getPlaygrounds);
 router.get("/:id", getPlaygroundById);
 router.post("/", requireLogin, validate(playgroundSchema), createPlayground);
+router.post("/:id/photo", requireLogin, authorizePhoto, acceptPhoto, savePhoto);
 router.patch(
   "/:id",
   requireLogin,

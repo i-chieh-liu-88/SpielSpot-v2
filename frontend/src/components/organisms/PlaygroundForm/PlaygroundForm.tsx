@@ -16,7 +16,7 @@ import { LocationPickerMap } from "../../molecules/LocationPickerMap/LocationPic
 import { playgroundEditorSchema } from "./PlaygroundForm.schema";
 import { useLanguage } from "../../../providers/LanguageProvider";
 import { useAuth } from "@clerk/clerk-react";
-import { createPlayground } from "../../../services/playgrounds";
+import { createPlayground, uploadPlaygroundPhoto } from "../../../services/playgrounds";
 
 const facilityOptions = [
   "Fenced",
@@ -98,6 +98,7 @@ export function PlaygroundForm({
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [form, setForm] = useState(() => getInitialState(playground));
   const [photo, setPhoto] = useState<File>();
+  const [savedDetails, setSavedDetails] = useState<Playground>();
   const [writeReview, setWriteReview] = useState(mode === "create");
   const [error, setError] = useState<string>();
   const [isSaving, setIsSaving] = useState(false); //控制按鈕和提示
@@ -147,6 +148,7 @@ export function PlaygroundForm({
   }
 
   function chooseCoordinates(coordinates: [number, number]) {
+    if (isSaving || savedDetails) return;
     setFieldErrors((current) => ({
       ...current,
       latitude: undefined,
@@ -222,7 +224,18 @@ export function PlaygroundForm({
         return;
       }
 
-      const savedPlayground = await createPlayground(result.data, token);
+      // Retain the created ID so a failed photo retry never creates another listing.
+      let savedPlayground = savedDetails ?? await createPlayground(result.data, token);
+      setSavedDetails(savedPlayground);
+      if (photo) {
+        try {
+          const image = await uploadPlaygroundPhoto(savedPlayground.id, photo, token);
+          savedPlayground = { ...savedPlayground, image };
+        } catch {
+          setError(t("Playground details are saved, but the photo upload failed. Retry the photo or continue without it."));
+          return;
+        }
+      }
       onSaved(savedPlayground, writeReview);
     } catch {
       setError(
@@ -258,10 +271,9 @@ export function PlaygroundForm({
       noValidate
     >
       <p className="mb-6 font-semibold" role="status">
-        {/* 遊樂場資料可以儲存，照片目前只供預覽，不會上傳 */}
         {mode === "create"
           ? t(
-              "Playground details can be saved. Photos are preview only and will not be uploaded.",
+              "Add playground details and an optional photo. Only upload photos you have permission to share.",
             )
           : t("Preview only. Your changes will not be saved.")}
       </p>
@@ -274,6 +286,7 @@ export function PlaygroundForm({
         </p>
       )}
 
+      <fieldset disabled={isSaving || Boolean(savedDetails)} className="min-w-0">
       <div className="grid gap-6 md:grid-cols-2">
         <div className="font-bold text-gray-700">
           <label htmlFor={`${formId}-name`}>{t("Playground name")}</label>
@@ -449,6 +462,7 @@ export function PlaygroundForm({
         </div>
       </section>
 
+      </fieldset>
       <section className="mt-8" aria-labelledby="photo-heading">
         <h2
           id="photo-heading"
@@ -470,6 +484,7 @@ export function PlaygroundForm({
           aria-label={t("Upload playground photo")}
           className={`${fieldClass} file:mr-4 file:rounded-full file:border-0 file:bg-green-100 file:px-4 file:py-2 file:font-bold file:text-green-800`}
           type="file"
+          disabled={isSaving || mode !== "create"}
           accept="image/jpeg,image/png,image/webp"
           onChange={choosePhoto}
         />
@@ -493,9 +508,14 @@ export function PlaygroundForm({
         {isSaving
           ? t("Saving...")
           : mode === "create"
-            ? t("Add playground")
+            ? t(savedDetails ? "Retry photo upload" : "Add playground")
             : t("Save changes")}
       </Button>
+      {savedDetails && !isSaving && (
+        <Button type="button" className="mt-4 sm:ml-4" onClick={() => onSaved(savedDetails, writeReview)}>
+          {t("Continue without photo")}
+        </Button>
+      )}
     </form>
   );
 }

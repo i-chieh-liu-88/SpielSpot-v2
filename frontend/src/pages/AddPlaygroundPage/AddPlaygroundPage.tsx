@@ -95,7 +95,7 @@ export function AddPlaygroundPage() {
           />
           <p className="animate-fadeUp3 mt-3 max-w-2xl text-base leading-relaxed text-pretty text-gray-600 sm:text-lg">
             {t(
-              "Pin a place you discovered, upload a photo, and help nearby families find it.",
+              "Pin a place you discovered and share its details with nearby families.",
             )}
           </p>
         </header>

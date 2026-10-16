@@ -20,14 +20,14 @@ export const steps = [
     image: mapImage,
     title: "Explore your options",
     description:
-      "Compare nearby playgrounds by facilities, ages, safety, and parent ratings.",
+      "Compare listed facilities, age ranges, safety ratings, and parent reviews.",
   },
   {
     number: "03",
     image: ferryWheelImage,
     title: "Go play!",
     description:
-      "Pick the right spot, get directions, and make a brilliant day of it.",
+      "Open a playground page, check its details, and plan your visit.",
   },
 ] as const;
 
@@ -36,42 +36,42 @@ export const features: Feature[] = [
     icon: "location",
     title: "Location Search",
     description:
-      "Find great playgrounds by street, postcode, or your live location.",
+      "Move the map to an address or your location, then search the area.",
     tone: "bg-green-100",
   },
   {
     icon: "filters",
     title: "Smart Filters",
     description:
-      "Narrow results by age, equipment, accessibility, distance, and rating.",
+      "Filter listed playgrounds by address, age range, and facilities.",
     tone: "bg-sky-100",
   },
   {
     icon: "map",
     title: "Interactive Map",
     description:
-      "See nearby spots at a glance with practical travel distances.",
+      "See playground locations and choose which map area to search.",
     tone: "bg-amber-100",
   },
   {
     icon: "safety",
     title: "Safety Ratings",
     description:
-      "Check fencing, surfaces, lighting, and equipment before you leave.",
+      "Read submitted safety ratings and reviews. Details are community contributions, not safety inspections.",
     tone: "bg-red-100",
   },
   {
     icon: "age",
     title: "Age Suitability",
     description:
-      "Quickly discover spaces that work for toddlers through big kids.",
+      "Compare the age ranges provided in playground listings.",
     tone: "bg-purple-100",
   },
   {
     icon: "accessibility",
     title: "Accessibility Info",
     description:
-      "Know where to find ramps, adaptive swings, and smooth pathways.",
+      "Look for listed accessibility facilities and check reviews for more detail.",
     tone: "bg-teal-100",
   },
 ];
@@ -654,7 +654,7 @@ export const reviews: Review[] = [
   },
   {
     quote:
-      "Recent photos and honest local reviews make planning an outing so much easier when we visit a new city.",
+      "Reading about the facilities helps me decide what to check before visiting a new playground.",
     name: "Laura B.",
     detail: "Mum of 3 · Munich",
     initials: "LB",

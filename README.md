@@ -98,8 +98,7 @@ live checks reported on October 13. The frontend uses `VITE_API_BASE_URL` or
 The local Add playground form now sends `POST /api/playgrounds` with a Clerk
 bearer token. It validates input, blocks duplicate submissions while saving,
 keeps input after a failed save, and opens the detail page or review form after
-success. The backend assigns `ownerId` from the authenticated user. Photos are
-local previews only and are not uploaded. Playground edit-mode saving remains
+success. The backend assigns `ownerId` from the authenticated user. The local creation flow now uploads an optional photo to Cloudinary. Playground edit-mode saving remains
 disabled. Live creation and refresh retrieval passed on October 15.
 
 The playground list sends location, age range and tag filters to the API.
@@ -230,3 +229,35 @@ See the API examples for limits.
   development dependency tree and zero with `--omit=dev`. This is a dependency
   report, not a full security audit. Do not force the suggested major Jest
   downgrade without checking compatibility.
+
+## October 16 photo upload update (local, not deployed)
+
+The creation form now supports one optional Cloudinary photo. This supersedes
+older preview-only notes for local creation. General edit saving is still disabled.
+
+Set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET privately
+in backend/.env and restart the backend. Never put the API secret in frontend
+variables or Git. Set these same variables privately on Render before deployment.
+
+POST /api/playgrounds/:id/photo accepts multipart form data with one photo field.
+Clerk authentication and ownership checks run before file processing. Only JPEG,
+PNG and WebP up to 5 MB and 25 megapixels are accepted. The backend decodes the
+bytes, removes metadata and converts the image to WebP within 1600 by 1600 pixels.
+MongoDB stores imageUrl and a hidden imagePublicId. Uploaded images are public.
+Only upload photos that may be shared publicly.
+
+The frontend first creates the details, then uploads the photo. If photo upload
+fails, it retains the created ID and retries without another creation request.
+Details stay locked after creation; users may continue without the photo.
+Replacement and deletion attempt cloud cleanup. Cleanup failures log a generic
+warning and can leave unused assets requiring manual cleanup. Cloud and MongoDB
+operations do not share a transaction. An ambiguous network failure during
+creation still needs manual checking before retrying.
+
+Responses: 400 invalid file or ID, 401 signed out, 403 not the owner, 404 missing
+playground, 409 playground changed during upload, 502 provider failure, 503 missing
+storage configuration, 500 database failure. Database save failures trigger an
+attempt to remove the newly uploaded asset.
+
+Verified locally: 84 backend tests, 67 frontend tests, lint and production build.
+A generated Cloudinary image uploaded and was deleted successfully. Production preview file selection showed the selected image. Signed-in creation and refresh retrieval passed on localhost:5173 for test record 6ad1f17fc2be5443c729bf3d. The same photo loaded in localhost:4173 production preview. Live deployment checks remain pending.

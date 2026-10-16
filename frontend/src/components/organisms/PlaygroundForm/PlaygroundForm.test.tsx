@@ -8,7 +8,7 @@ import {
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PlaygroundForm } from "./PlaygroundForm";
 import { playgrounds } from "../../../data/homeContent";
-import { createPlayground } from "../../../services/playgrounds";
+import { createPlayground, uploadPlaygroundPhoto } from "../../../services/playgrounds";
 
 vi.mock("@clerk/clerk-react", () => ({
   useAuth: () => ({
@@ -18,6 +18,7 @@ vi.mock("@clerk/clerk-react", () => ({
 
 vi.mock("../../../services/playgrounds", () => ({
   createPlayground: vi.fn(),
+  uploadPlaygroundPhoto: vi.fn(),
 }));
 
 vi.mock("../../molecules/LocationPickerMap/LocationPickerMap", () => ({
@@ -29,6 +30,29 @@ vi.mock("../../molecules/LocationPickerMap/LocationPickerMap", () => ({
 }));
 
 describe("playground preview form", () => {
+  it("retries a failed photo without creating a duplicate playground", async () => {
+    vi.mocked(createPlayground).mockReset().mockResolvedValue(playgrounds[0]);
+    vi.mocked(uploadPlaygroundPhoto).mockReset().mockRejectedValueOnce(new Error("offline"))
+      .mockResolvedValueOnce("https://res.cloudinary.com/demo/park.webp");
+    vi.stubGlobal("URL", Object.assign(URL, { createObjectURL: vi.fn(() => "blob:preview"), revokeObjectURL: vi.fn() }));
+    const onSaved = vi.fn();
+    render(<PlaygroundForm mode="create" onSaved={onSaved} />);
+    for (const [label, value] of Object.entries({
+      "Playground name": "Test park", "City or neighbourhood": "Dresden", Postcode: "01159",
+      Latitude: "51.03", Longitude: "13.68", Description: "A playground description long enough for validation.",
+    })) fireEvent.change(screen.getByLabelText(label), { target: { value } });
+    fireEvent.click(screen.getByRole("checkbox", { name: "Climbing" }));
+    const file = new File(["image"], "park.png", { type: "image/png" });
+    fireEvent.change(screen.getByLabelText("Upload playground photo"), { target: { files: [file] } });
+    fireEvent.click(screen.getByRole("button", { name: "Add playground" }));
+    await screen.findByText("Playground details are saved, but the photo upload failed. Retry the photo or continue without it.");
+    expect(onSaved).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Retry photo upload" }));
+    await waitFor(() => expect(onSaved).toHaveBeenCalledWith(expect.objectContaining({ image: "https://res.cloudinary.com/demo/park.webp" }), true));
+    expect(createPlayground).toHaveBeenCalledTimes(1);
+    expect(uploadPlaygroundPhoto).toHaveBeenCalledTimes(2);
+    vi.unstubAllGlobals();
+  });
   afterEach(cleanup);
   it("identifies invalid fields and focuses the first one without submitting", () => {
     vi.mocked(createPlayground).mockReset();

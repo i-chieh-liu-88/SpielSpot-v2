@@ -31,6 +31,7 @@ type BackendPlayground = {
   safetyRating?: number;
   tags?: string[];
   ownerId: string;
+  imageUrl?: string;
 };
 
 type BackendReview = {
@@ -57,7 +58,7 @@ function toDisplayPlayground(raw: BackendPlayground): Playground {
     safetyRating: raw.safetyRating != null ? String(raw.safetyRating) : "N/A",
     ageRange: raw.ageRange ?? "",
     description: raw.description ?? "",
-    image: FALLBACK_IMAGE,
+    image: raw.imageUrl || FALLBACK_IMAGE,
     gradient: FALLBACK_GRADIENT,
     tags: raw.tags ?? [],
     reviews: [],
@@ -117,6 +118,13 @@ export async function getPlaygrounds(
 }
 
 /* ---------------------------- 傳送資料的 createPlayground function, 帶著 Clerk token 傳送資料---------------------------- */
+export async function uploadPlaygroundPhoto(id: string, photo: File, token: string): Promise<string> {
+  const body = new FormData();
+  body.append("photo", photo);
+  const result: { imageUrl: string } = await apiFetch(`/api/playgrounds/${id}/photo`, { method: "POST", body }, token);
+  return result.imageUrl;
+}
+
 export async function createPlayground(
   input: CreatePlaygroundInput,
   token: string,
