@@ -32,6 +32,7 @@ type BackendPlayground = {
   tags?: string[];
   ownerId: string;
   imageUrl?: string;
+  imageUrls?: string[];
 };
 
 type BackendReview = {
@@ -58,7 +59,8 @@ function toDisplayPlayground(raw: BackendPlayground): Playground {
     safetyRating: raw.safetyRating != null ? String(raw.safetyRating) : "N/A",
     ageRange: raw.ageRange ?? "",
     description: raw.description ?? "",
-    image: raw.imageUrl || FALLBACK_IMAGE,
+    image: raw.imageUrls?.[0] || raw.imageUrl || FALLBACK_IMAGE,
+    imageUrls: raw.imageUrls?.length ? raw.imageUrls : raw.imageUrl ? [raw.imageUrl] : [],
     gradient: FALLBACK_GRADIENT,
     tags: raw.tags ?? [],
     reviews: [],
@@ -123,6 +125,13 @@ export async function uploadPlaygroundPhoto(id: string, photo: File, token: stri
   body.append("photo", photo);
   const result: { imageUrl: string } = await apiFetch(`/api/playgrounds/${id}/photo`, { method: "POST", body }, token);
   return result.imageUrl;
+}
+
+export async function uploadPlaygroundPhotos(id: string, photos: File[], token: string): Promise<string[]> {
+  const body = new FormData();
+  photos.forEach((photo) => body.append("photos", photo));
+  const result: { imageUrls: string[] } = await apiFetch(`/api/playgrounds/${id}/photos`, { method: "POST", body }, token);
+  return result.imageUrls;
 }
 
 export async function createPlayground(

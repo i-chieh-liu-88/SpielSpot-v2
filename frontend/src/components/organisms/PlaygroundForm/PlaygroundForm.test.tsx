@@ -8,7 +8,7 @@ import {
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PlaygroundForm } from "./PlaygroundForm";
 import { playgrounds } from "../../../data/homeContent";
-import { createPlayground, uploadPlaygroundPhoto } from "../../../services/playgrounds";
+import { createPlayground, uploadPlaygroundPhotos } from "../../../services/playgrounds";
 
 vi.mock("@clerk/clerk-react", () => ({
   useAuth: () => ({
@@ -18,7 +18,7 @@ vi.mock("@clerk/clerk-react", () => ({
 
 vi.mock("../../../services/playgrounds", () => ({
   createPlayground: vi.fn(),
-  uploadPlaygroundPhoto: vi.fn(),
+  uploadPlaygroundPhotos: vi.fn(),
 }));
 
 vi.mock("../../molecules/LocationPickerMap/LocationPickerMap", () => ({
@@ -30,10 +30,25 @@ vi.mock("../../molecules/LocationPickerMap/LocationPickerMap", () => ({
 }));
 
 describe("playground preview form", () => {
+  it("limits selection to five photos and promotes the next photo when the cover is removed", () => {
+    vi.stubGlobal("URL", Object.assign(URL, { createObjectURL: vi.fn((file: File) => `blob:${file.name}`), revokeObjectURL: vi.fn() }));
+    render(<PlaygroundForm mode="create" onSaved={vi.fn()} />);
+    const input = screen.getByLabelText("Upload playground photo");
+    const files = Array.from({ length: 5 }, (_, i) => new File(["photo"], `${i}.png`, { type: "image/png" }));
+    fireEvent.change(input, { target: { files } });
+    expect(screen.getAllByAltText(/Selected photo/)).toHaveLength(5);
+    fireEvent.change(input, { target: { files: [new File(["x"], "six.png", { type: "image/png" })] } });
+    expect(screen.getByRole("alert")).toHaveTextContent("Choose up to 5 photos.");
+    expect(screen.getAllByAltText(/Selected photo/)).toHaveLength(5);
+    fireEvent.click(screen.getByRole("button", { name: "Remove photo 1" }));
+    expect(screen.getByAltText("Selected photo 1")).toHaveAttribute("src", "blob:1.png");
+    expect(screen.getAllByAltText(/Selected photo/)).toHaveLength(4);
+    vi.unstubAllGlobals();
+  });
   it("retries a failed photo without creating a duplicate playground", async () => {
     vi.mocked(createPlayground).mockReset().mockResolvedValue(playgrounds[0]);
-    vi.mocked(uploadPlaygroundPhoto).mockReset().mockRejectedValueOnce(new Error("offline"))
-      .mockResolvedValueOnce("https://res.cloudinary.com/demo/park.webp");
+    vi.mocked(uploadPlaygroundPhotos).mockReset().mockRejectedValueOnce(new Error("offline"))
+      .mockResolvedValueOnce(["https://res.cloudinary.com/demo/park.webp"]);
     vi.stubGlobal("URL", Object.assign(URL, { createObjectURL: vi.fn(() => "blob:preview"), revokeObjectURL: vi.fn() }));
     const onSaved = vi.fn();
     render(<PlaygroundForm mode="create" onSaved={onSaved} />);
@@ -45,12 +60,12 @@ describe("playground preview form", () => {
     const file = new File(["image"], "park.png", { type: "image/png" });
     fireEvent.change(screen.getByLabelText("Upload playground photo"), { target: { files: [file] } });
     fireEvent.click(screen.getByRole("button", { name: "Add playground" }));
-    await screen.findByText(/Playground details are saved, but the photo upload failed/);
+    await screen.findByText(/Playground details are saved, but the photos could not be saved/);
     expect(onSaved).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: "Retry photo upload" }));
+    fireEvent.click(screen.getByRole("button", { name: "Retry photo uploads" }));
     await waitFor(() => expect(onSaved).toHaveBeenCalledWith(expect.objectContaining({ image: "https://res.cloudinary.com/demo/park.webp" }), true));
     expect(createPlayground).toHaveBeenCalledTimes(1);
-    expect(uploadPlaygroundPhoto).toHaveBeenCalledTimes(2);
+    expect(uploadPlaygroundPhotos).toHaveBeenCalledTimes(2);
     vi.unstubAllGlobals();
   });
   afterEach(cleanup);
@@ -119,6 +134,7 @@ describe("playground preview form", () => {
     });
     expect(screen.getByLabelText("Playground name")).toHaveValue("Local edit");
     expect(screen.getByRole("button", { name: "Save changes" })).toBeDisabled();
+    expect(screen.getByAltText("Selected photo 1")).toHaveAttribute("src", playgrounds[0].image);
     fireEvent.submit(screen.getByRole("form", { name: "Edit playground" }));
     expect(onSaved).not.toHaveBeenCalled();
     expect(playgrounds[0].name).not.toBe("Local edit");

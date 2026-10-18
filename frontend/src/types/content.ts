@@ -17,6 +17,7 @@ export type Playground = {
   ageRange: string;
   description: string;
   image: string;
+  imageUrls?: string[];
   gradient: string;
   tags: string[];
   reviews: PlaygroundParentReview[];

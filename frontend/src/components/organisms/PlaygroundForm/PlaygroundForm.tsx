@@ -4,7 +4,6 @@ import PhotoCameraOutlined from "@mui/icons-material/PhotoCameraOutlined";
 import {
   useEffect,
   useId,
-  useMemo,
   useRef,
   useState,
   type ChangeEvent,
@@ -16,7 +15,7 @@ import { LocationPickerMap } from "../../molecules/LocationPickerMap/LocationPic
 import { playgroundEditorSchema } from "./PlaygroundForm.schema";
 import { useLanguage } from "../../../providers/LanguageProvider";
 import { useAuth } from "@clerk/clerk-react";
-import { createPlayground, uploadPlaygroundPhoto } from "../../../services/playgrounds";
+import { createPlayground, uploadPlaygroundPhotos } from "../../../services/playgrounds";
 
 const facilityOptions = [
   "Fenced",
@@ -63,6 +62,16 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   ) : null;
 }
 
+function PhotoPreview({ file, alt }: { file: File; alt: string }) {
+  const imageRef = useRef<HTMLImageElement>(null);
+  useEffect(() => {
+    const url = URL.createObjectURL(file);
+    if (imageRef.current) imageRef.current.src = url;
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+  return <img ref={imageRef} alt={alt} />;
+}
+
 function getInitialState(playground?: Playground): PlaygroundFormState {
   return {
     name: playground?.name ?? "",
@@ -97,21 +106,14 @@ export function PlaygroundForm({
   const formId = useId();
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [form, setForm] = useState(() => getInitialState(playground));
-  const [photo, setPhoto] = useState<File>();
+  const [photos, setPhotos] = useState<File[]>([]);
   const [savedDetails, setSavedDetails] = useState<Playground>();
   const [writeReview, setWriteReview] = useState(mode === "create");
   const [error, setError] = useState<string>();
   const [isSaving, setIsSaving] = useState(false); //控制按鈕和提示
   const savingRef = useRef(false); //避免重複送出。確保同一時間只送出一次 request
-  const photoPreview = useMemo(
-    () => (photo ? URL.createObjectURL(photo) : playground?.image),
-    [photo, playground?.image],
-  );
-
-  useEffect(() => {
-    if (!photo || !photoPreview) return;
-    return () => URL.revokeObjectURL(photoPreview);
-  }, [photo, photoPreview]);
+  const existingPhotos = playground?.imageUrls?.length ? playground.imageUrls
+    : playground?.image ? [playground.image] : [];
 
   function errorId(field: keyof PlaygroundFormState) {
     return `${formId}-${field}-error`;
@@ -163,19 +165,19 @@ export function PlaygroundForm({
   }
 
   function choosePhoto(event: ChangeEvent<HTMLInputElement>) {
-    const nextPhoto = event.target.files?.[0];
-    if (!nextPhoto) return;
-
-    if (!["image/jpeg", "image/png", "image/webp"].includes(nextPhoto.type)) {
-      setError(t("Choose a JPEG, PNG, or WebP image."));
-      return;
+    const selected = Array.from(event.target.files ?? []);
+    event.target.value = "";
+    if (!selected.length) return;
+    if (photos.length + selected.length > 5) {
+      setError(t("Choose up to 5 photos.")); return;
     }
-    if (nextPhoto.size > 5 * 1024 * 1024) {
-      setError(t("The playground photo must be 5 MB or smaller."));
-      return;
+    if (selected.some((file) => !["image/jpeg", "image/png", "image/webp"].includes(file.type))) {
+      setError(t("Choose a JPEG, PNG, or WebP image.")); return;
     }
-
-    setPhoto(nextPhoto);
+    if (selected.some((file) => file.size > 5 * 1024 * 1024)) {
+      setError(t("Each playground photo must be 5 MB or smaller.")); return;
+    }
+    setPhotos((current) => [...current, ...selected]);
     setError(undefined);
   }
 
@@ -227,13 +229,13 @@ export function PlaygroundForm({
       // Retain the created ID so a failed photo retry never creates another listing.
       let savedPlayground = savedDetails ?? await createPlayground(result.data, token);
       setSavedDetails(savedPlayground);
-      if (photo) {
+      if (photos.length) {
         try {
-          const image = await uploadPlaygroundPhoto(savedPlayground.id, photo, token);
-          savedPlayground = { ...savedPlayground, image };
+          const imageUrls = await uploadPlaygroundPhotos(savedPlayground.id, photos, token);
+          savedPlayground = { ...savedPlayground, image: imageUrls[0], imageUrls };
         } catch (uploadError) {
           const reason = uploadError instanceof Error ? t(uploadError.message) : "";
-          setError(`${t("Playground details are saved, but the photo upload failed. Retry the photo or continue without it.")}${reason ? ` ${reason}` : ""}`);
+          setError(`${t("Playground details are saved, but the photos could not be saved. Retry the photos or continue without them.")}${reason ? ` ${reason}` : ""}`);
           return;
         }
       }
@@ -274,7 +276,7 @@ export function PlaygroundForm({
       <p className="mb-6 font-semibold" role="status">
         {mode === "create"
           ? t(
-              "Add playground details and an optional photo. Only upload photos you have permission to share.",
+              "Add playground details and up to 5 optional photos. Only upload photos you have permission to share.",
             )
           : t("Preview only. Your changes will not be saved.")}
       </p>
@@ -472,18 +474,31 @@ export function PlaygroundForm({
           <PhotoCameraOutlined aria-hidden="true" /> {t("Playground photo")}
         </h2>
         <p className="mt-1 text-sm font-semibold text-gray-600">
-          {t("JPEG, PNG, or WebP · maximum 5 MB")}
+          {t("JPEG, PNG, or WebP · maximum 5 MB per photo")}
         </p>
-        {photoPreview && (
-          <img
-            className="mt-4 h-56 w-full rounded-3xl object-cover"
-            src={photoPreview}
-            alt={t("Playground upload preview")}
-          />
-        )}
+        <p className="mt-2 text-sm" role="status">{t("{count} of 5 photos selected. The first photo is the cover.", { count: photos.length })}</p>
+        {photos.length > 0 && <ul className="spot-photo-previews">
+          {photos.map((file, index) => <li key={`${file.name}-${file.lastModified}-${index}`}>
+            <PhotoPreview file={file} alt={t("Selected photo {number}", { number: index + 1 })} />
+            <div className="spot-photo-preview-actions">
+              <span>{index === 0 ? t("Cover photo") : t("Photo {number}", { number: index + 1 })}</span>
+              <button type="button" disabled={isSaving} aria-label={t("Remove photo {number}", { number: index + 1 })}
+                onClick={() => { setPhotos((current) => current.filter((_, i) => i !== index)); setError(undefined); }}>
+                {t("Remove")}
+              </button>
+            </div>
+          </li>)}
+        </ul>}
+        {mode === "edit" && photos.length === 0 && <ul className="spot-photo-previews">
+          {existingPhotos.map((url, index) => <li key={`${url}-${index}`}>
+            <img src={url} alt={t("Selected photo {number}", { number: index + 1 })} />
+            <span>{index === 0 ? t("Cover photo") : t("Photo {number}", { number: index + 1 })}</span>
+          </li>)}
+        </ul>}
         <input
           aria-label={t("Upload playground photo")}
           className={`${fieldClass} file:mr-4 file:rounded-full file:border-0 file:bg-green-100 file:px-4 file:py-2 file:font-bold file:text-green-800`}
+          multiple
           type="file"
           disabled={isSaving || mode !== "create"}
           accept="image/jpeg,image/png,image/webp"
@@ -509,12 +524,12 @@ export function PlaygroundForm({
         {isSaving
           ? t("Saving...")
           : mode === "create"
-            ? t(savedDetails ? "Retry photo upload" : "Add playground")
+            ? t(savedDetails ? "Retry photo uploads" : "Add playground")
             : t("Save changes")}
       </Button>
       {savedDetails && !isSaving && (
         <Button type="button" className="mt-4 sm:ml-4" onClick={() => onSaved(savedDetails, writeReview)}>
-          {t("Continue without photo")}
+          {t("Continue without photos")}
         </Button>
       )}
     </form>

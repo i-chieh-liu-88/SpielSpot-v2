@@ -11,6 +11,7 @@ import { isClerkConfigured } from "../../config/clerk";
 import { useLanguage } from "../../providers/LanguageProvider";
 import { useState } from "react";
 import { updateReview } from "../../services/reviews";
+import { PlaygroundGallery } from "../../components/molecules/PlaygroundGallery/PlaygroundGallery";
 
 function AuthenticatedEditButton({
   ownerId,
@@ -195,15 +196,10 @@ export function PlaygroundDetailPage() {
         </Button>
 
         <div className="overflow-hidden rounded-3xl border border-white/60 bg-white/40 shadow-xl backdrop-blur-xl">
-          <div
-            className={`relative h-72 bg-linear-to-br ${playground.gradient} sm:h-96`}
-          >
-            <img
-              className="absolute inset-0 h-full w-full object-contain p-8"
-              src={playground.image}
-              alt=""
-            />
-            <span className="absolute bottom-5 left-5 inline-flex items-center gap-1 rounded-full bg-white/80 px-4 py-2 text-sm font-bold text-gray-700 backdrop-blur">
+          <div>
+            <PlaygroundGallery key={playground.id} name={playground.name}
+              images={playground.imageUrls?.length ? playground.imageUrls : [playground.image]} />
+            <span className="m-5 inline-flex items-center gap-1 text-sm font-bold">
               <LocationOnOutlined className="text-base" aria-hidden="true" />{" "}
               {playground.location}
             </span>
