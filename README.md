@@ -346,3 +346,18 @@ and cloud upload. No workaround was attempted. Fresh authenticated live multi-ph
 upload remains pending explicit authorization. This supersedes the pending
 deployment status above, while retaining that verification gap. Timeline edits
 were intentionally excluded from these deployment commits.
+
+### October 18 authorized live multi-photo upload
+
+After explicit user approval, the assistant submitted TEST Oct 18 Live Multi
+Photo Deployment with three generated test images through the Netlify production
+form. The Render multi-photo API saved the album and the detail page opened at
+https://spielspot.netlify.app/playgrounds/6ad4d82fae38d5b10d54471d.
+The first photo appeared as the cover. Switching to photo 3 loaded its Cloudinary
+image. After browser refresh the gallery retained three photos, and switching
+to photo 2 also loaded its image. The test record and images remain.
+
+This completes the fresh authenticated live multi-photo upload check that was
+previously pending approval. It does not establish live replacement/deletion
+cleanup or concurrent-request behavior, which remain separate verification gaps.
+No code changed for this check and no test suite was rerun.
