@@ -54,7 +54,7 @@ test("decodes and converts a photo, saves its URL and cleans the replaced photo"
   const metadata = await sharp(storage.uploadPhoto.mock.calls[0][0]).metadata();
   expect(metadata.format).toBe("webp");
   expect(Playground.findOneAndUpdate).toHaveBeenCalledWith(
-    { _id: id, ownerId: "owner" }, expect.objectContaining({ $set: expect.objectContaining({ imagePublicId: "new" }) }), expect.any(Object));
+    expect.objectContaining({ _id: id, ownerId: "owner" }), expect.objectContaining({ $set: expect.objectContaining({ imagePublicId: "new" }) }), expect.any(Object));
   expect(storage.removePhoto).toHaveBeenCalledWith("previous");
 });
 test("a provider failure does not change the database", async () => {
@@ -71,4 +71,44 @@ test("reports unavailable storage without uploading", async () => {
   storage.photoStorageReady.mockReturnValue(false);
   await send().expect(503);
   expect(storage.uploadPhoto).not.toHaveBeenCalled();
+});
+
+// 整批驗證：後面的圖片無效時，前面的有效圖片也不應上傳。
+test("validates every image before uploading any part of an album", async () => {
+  await request(app).post(`/api/playgrounds/${id}/photos`)
+    .attach("photos", image, "one.png").attach("photos", Buffer.from("invalid"), "two.png").expect(400);
+  expect(storage.uploadPhoto).not.toHaveBeenCalled();
+});
+test("accepts five photos in order and preserves the first as cover", async () => {
+  const req = request(app).post(`/api/playgrounds/${id}/photos`);
+  for (let i = 0; i < 5; i++) {
+    storage.uploadPhoto.mockResolvedValueOnce({ secure_url: `https://example.com/${i}.webp`, public_id: `new-${i}` });
+    req.attach("photos", image, `${i}.png`);
+  }
+  const response = await req.expect(200);
+  expect(response.body.data.imageUrls).toHaveLength(5);
+  expect(response.body.data.imageUrl).toBe("https://example.com/0.webp");
+  expect(Playground.findOneAndUpdate.mock.calls[0][1].$inc).toEqual({ photoRevision: 1 });
+});
+test("rejects a sixth photo before cloud uploads", async () => {
+  const req = request(app).post(`/api/playgrounds/${id}/photos`);
+  for (let i = 0; i < 6; i++) req.attach("photos", image, `${i}.png`);
+  await req.expect(400);
+  expect(storage.uploadPhoto).not.toHaveBeenCalled();
+});
+// 第二張上傳失敗時，清理第一張，且不更新現有相簿。
+test("cleans partial uploads and leaves the old album unchanged on provider failure", async () => {
+  storage.uploadPhoto.mockResolvedValueOnce({ secure_url: "https://example.com/one.webp", public_id: "partial" })
+    .mockRejectedValueOnce(new Error("provider failed"));
+  await request(app).post(`/api/playgrounds/${id}/photos`)
+    .attach("photos", image, "one.png").attach("photos", image, "two.png").expect(502);
+  expect(storage.removePhoto).toHaveBeenCalledWith("partial");
+  expect(Playground.findOneAndUpdate).not.toHaveBeenCalled();
+});
+test("rejects a stale upload and cleans new assets instead of overwriting a newer album", async () => {
+  Playground.findById.mockResolvedValue({ ownerId: "owner", photoRevision: 3 });
+  Playground.findOneAndUpdate.mockResolvedValue(null);
+  await request(app).post(`/api/playgrounds/${id}/photos`).attach("photos", image, "one.png").expect(409);
+  expect(Playground.findOneAndUpdate.mock.calls[0][0].photoRevision).toBe(3);
+  expect(storage.removePhoto).toHaveBeenCalledWith("new");
 });

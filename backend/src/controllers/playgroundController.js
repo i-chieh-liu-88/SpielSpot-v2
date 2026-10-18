@@ -100,7 +100,7 @@ export async function updatePlayground(req, res, next) {
 export async function deletePlayground(req, res, next) {
   try {
     const { userId } = getAuth(req);
-    const playground = await Playground.findById(req.params.id, "+imagePublicId");
+    const playground = await Playground.findById(req.params.id, "+imagePublicId +imagePublicIds");
 
     if (!playground) {
       return res
@@ -128,9 +128,8 @@ export async function deletePlayground(req, res, next) {
     // 只有確認沒有評論才刪除；查詢若拋出錯誤，會直接進入 catch。
     // 注意：查詢與刪除不是 transaction，尚未防止兩者之間新增評論的情況。
     await playground.deleteOne();
-    if (playground.imagePublicId) {
-      await removePhoto(playground.imagePublicId).catch(() => console.warn("Deleted playground photo cleanup failed"));
-    }
+    const photoIds = [...new Set([...(playground.imagePublicIds ?? []), playground.imagePublicId].filter(Boolean))];
+    await Promise.all(photoIds.map((id) => removePhoto(id).catch(() => console.warn("Deleted playground photo cleanup failed"))));
     res.json({ success: true, data: null });
   } catch (err) {
     next(err);

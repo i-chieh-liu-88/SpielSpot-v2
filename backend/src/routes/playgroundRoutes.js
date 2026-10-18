@@ -1,5 +1,5 @@
 import express from "express";
-import { authorizePhoto, acceptPhoto, savePhoto } from "../controllers/playgroundPhotoController.js";
+import { authorizePhoto, acceptPhoto, acceptPhotos, savePhoto } from "../controllers/playgroundPhotoController.js";
 import { getAuth } from "@clerk/express";
 import { requireLogin } from "../middleware/requireLogin.js";
 import {
@@ -30,6 +30,7 @@ router.post("/:id/photo", (req, res, next) => {
   res.on("finish", () => console.info("Playground photo response", res.statusCode));
   next();
 }, requireLogin, authorizePhoto, acceptPhoto, savePhoto);
+router.post("/:id/photos", requireLogin, authorizePhoto, acceptPhotos, savePhoto);
 router.patch(
   "/:id",
   requireLogin,
