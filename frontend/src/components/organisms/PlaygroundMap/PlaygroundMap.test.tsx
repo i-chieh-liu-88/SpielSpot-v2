@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { playgrounds } from "../../../data/homeContent";
 import { PlaygroundMap } from "./PlaygroundMap";
@@ -23,11 +23,13 @@ vi.mock("react-leaflet", () => ({
   MapContainer: ({
     children,
     scrollWheelZoom,
+    boundsOptions,
   }: {
     children: ReactNode;
     scrollWheelZoom: boolean;
+    boundsOptions: { maxZoom: number };
   }) => (
-    <div data-testid="playground-map" data-wheel-zoom={String(scrollWheelZoom)}>
+    <div data-testid="playground-map" data-wheel-zoom={String(scrollWheelZoom)} data-initial-max-zoom={boundsOptions.maxZoom}>
       {children}
     </div>
   ),
@@ -49,6 +51,7 @@ vi.mock("react-leaflet", () => ({
 
 describe("PlaygroundMap", () => {
   beforeEach(() => {
+    cleanup();
     vi.clearAllMocks();
   });
 
@@ -66,6 +69,15 @@ describe("PlaygroundMap", () => {
     );
 
     expect(onSelect).toHaveBeenCalledWith("wald-abenteuerplatz");
+  });
+
+  it("caps initial zoom for one result or multiple results sharing a point", () => {
+    const { rerender } = render(<PlaygroundMap playgrounds={[playgrounds[0]]} onSelect={vi.fn()} />);
+    expect(screen.getByTestId("playground-map")).toHaveAttribute("data-initial-max-zoom", "15");
+    expect(screen.getByRole("button", { name: "Open Wald Abenteuerplatz" })).toBeInTheDocument();
+    rerender(<PlaygroundMap playgrounds={[playgrounds[0], {...playgrounds[1], coordinates: playgrounds[0].coordinates}]} onSelect={vi.fn()} />);
+    expect(screen.getByRole("button", { name: "Zoom to 2 playgrounds" })).toBeInTheDocument();
+    expect(screen.getByTestId("playground-map")).toHaveAttribute("data-initial-max-zoom", "15");
   });
 
   it("groups nearby playgrounds and zooms into the cluster", () => {

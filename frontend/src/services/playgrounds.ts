@@ -96,6 +96,8 @@ export async function getPlayground(id: string): Promise<Playground | null> {
   }
 }
 
+const pendingPlaygroundReads = new Map<string, Promise<Playground[]>>();
+
 export async function getPlaygrounds(
   filters: PlaygroundFilters = {},
 ): Promise<Playground[]> {
@@ -112,11 +114,19 @@ export async function getPlaygrounds(
   }
 
   const query = params.toString();
-  const raw: BackendPlayground[] = await apiFetch(
-    `/api/playgrounds${query ? `?${query}` : ""}`,
-  );
-
-  return raw.map(toDisplayPlayground);
+  const path = `/api/playgrounds${query ? `?${query}` : ""}`;
+  // The list, filter options and StrictMode may request the same read together.
+  // Share only pending reads: later retries still make a fresh request.
+  let pending = pendingPlaygroundReads.get(path);
+  if (!pending) {
+    pending = apiFetch(path).then((raw: BackendPlayground[]) => raw.map(toDisplayPlayground));
+    pendingPlaygroundReads.set(path, pending);
+  }
+  try {
+    return structuredClone(await pending);
+  } finally {
+    if (pendingPlaygroundReads.get(path) === pending) pendingPlaygroundReads.delete(path);
+  }
 }
 
 /* ---------------------------- 傳送資料的 createPlayground function, 帶著 Clerk token 傳送資料---------------------------- */

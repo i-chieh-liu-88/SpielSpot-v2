@@ -133,7 +133,7 @@ a {
   transform-origin: 50% 75%;
   transition:
     transform 320ms var(--spot-motion-ease),
-    color 320ms ease-out;
+    color 2000ms ease-out 4000ms;
 }
 @media (hover: hover) and (pointer: fine) {
   #shake-headline .hero-letter {
@@ -153,6 +153,7 @@ a {
   .hero-letter:hover > .shake-letter {
     color: var(--shake-color);
     transition-duration: 180ms, 220ms;
+    transition-delay: 0ms, 0ms;
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -610,4 +611,12 @@ html:not([data-theme="dark"]) :is(input, textarea, select):focus-visible {
 
 @media (max-width: 540px) {
   .spot-cta .beui-button { width: fit-content; max-width: 100%; align-self: center; }
+}
+
+/* Keep the animated navigation accent on the accessible brand palette. */
+.nav-glass .nav-link-swap .nav-link-swap-text-accent {
+  color: var(--spot-brand) !important;
+}
+.nav-glass .nav-link-swap:focus-visible {
+  outline-color: var(--spot-focus);
 }

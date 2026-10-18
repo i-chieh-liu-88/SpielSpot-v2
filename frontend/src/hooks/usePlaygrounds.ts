@@ -16,7 +16,12 @@ type PlaygroundState = {
 };
 
 function getErrorMessage(error: unknown) {
-  if (error instanceof Error) return error.message;
+  if (error instanceof Error) {
+    if (error.message === "Too many requests, please try again later.") {
+      return "Too many requests. Please wait for the request limit to reset (up to 15 minutes). Applying or resetting filters will not clear this limit.";
+    }
+    return error.message;
+  }
 
   if (
     typeof error === "object" &&

@@ -11,6 +11,7 @@ import { isClerkConfigured } from "../../config/clerk";
 import { useLanguage } from "../../providers/LanguageProvider";
 import { useState } from "react";
 import { updateReview } from "../../services/reviews";
+import "./PlaygroundDetailPage.css";
 import { PlaygroundGallery } from "../../components/molecules/PlaygroundGallery/PlaygroundGallery";
 
 function AuthenticatedEditButton({
@@ -29,6 +30,7 @@ function AuthenticatedEditButton({
   return (
     <Button
       type="button"
+      variant="secondary"
       onClick={() =>
         navigate({
           to: "/playgrounds/$playgroundId/edit",
@@ -53,12 +55,13 @@ function ReviewEditButton({
   onEdit: () => void;
 }) {
   const { user } = useUser();
+  const { t } = useLanguage();
 
   if (!authorId || user?.id !== authorId) return null;
 
   return (
     <Button type="button" onClick={onEdit}>
-      Edit review
+      {t("Edit review")}
     </Button>
   );
 }
@@ -75,6 +78,7 @@ function ReviewSaveButton({
   reviewRating: number;
   onSaved: () => void;
 }) {
+  const { t } = useLanguage();
   const { getToken } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
@@ -114,16 +118,16 @@ function ReviewSaveButton({
   return (
     <>
       <Button type="button" onClick={handleSave} disabled={isSaving}>
-        {isSaving ? "Saving..." : "Save"}
+        {isSaving ? t("Saving...") : t("Save")}
       </Button>
-      {saveError && <p role="alert">{saveError}</p>}
+      {saveError && <p role="alert">{t(saveError)}</p>}
     </>
   );
 }
 
 export function PlaygroundDetailPage() {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { playgroundId } = useParams({ from: "/playgrounds_/$playgroundId" });
   const [refreshKey, setRefreshKey] = useState(0);
   const { playground, isLoading, error } = usePlayground(
@@ -184,8 +188,7 @@ export function PlaygroundDetailPage() {
   }
 
   return (
-    <article className="grass-bg relative min-h-screen overflow-hidden px-6 py-12">
-      <div className="dot-grid absolute inset-0 opacity-20" />
+    <article className="detail-page relative min-h-screen px-4 py-8 sm:px-6">
       <div className="relative mx-auto max-w-5xl">
         <Button
           type="button"
@@ -195,37 +198,63 @@ export function PlaygroundDetailPage() {
           {t("Back to map")}
         </Button>
 
-        <div className="overflow-hidden rounded-3xl border border-white/60 bg-white/40 shadow-xl backdrop-blur-xl">
-          <div>
-            <PlaygroundGallery key={playground.id} name={playground.name}
-              images={playground.imageUrls?.length ? playground.imageUrls : [playground.image]} />
-            <span className="m-5 inline-flex items-center gap-1 text-sm font-bold">
-              <LocationOnOutlined className="text-base" aria-hidden="true" />{" "}
-              {playground.location}
-            </span>
-          </div>
-          <div className="p-6 sm:p-9">
-            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
-              <div>
-                <h1 className="text-3xl font-bold leading-tight tracking-tight text-balance text-gray-800 sm:text-4xl">
-                  {playground.name}
-                </h1>
-              </div>
-              <span className="inline-flex items-center gap-1 self-start rounded-full bg-amber-100 px-4 py-2 font-black text-amber-800">
-                <StarOutlined aria-hidden="true" /> {playground.rating}
-              </span>
+        <div className="detail-panel">
+          <header className="detail-header">
+            <div>
+              <h1 className="text-3xl font-bold leading-tight tracking-tight text-balance sm:text-4xl">
+                {playground.name}
+              </h1>
+              <p className="detail-location">
+                <LocationOnOutlined aria-hidden="true" />
+                {playground.location}
+              </p>
+              <p className="detail-rating">
+                <StarOutlined aria-hidden="true" />
+                <strong>
+                  {playground.reviews.length
+                    ? (
+                        playground.reviews.reduce(
+                          (sum, review) => sum + review.rating,
+                          0,
+                        ) / playground.reviews.length
+                      ).toFixed(1) + " / 5"
+                    : t("Not rated")}
+                </strong>
+                <span>
+                  {t("Community rating")} ·{" "}
+                  {t("{count} reviews", { count: playground.reviews.length })}
+                </span>
+              </p>
             </div>
+
+            <OwnerEditButton
+              ownerId={playground.ownerId}
+              playgroundId={playground.id}
+            />
+          </header>
+          <PlaygroundGallery
+            key={playground.id}
+            name={playground.name}
+            images={
+              playground.imageUrls?.length
+                ? playground.imageUrls
+                : [playground.image].filter(Boolean)
+            }
+          />
+          <div className="detail-body">
             <p className="mt-5 text-lg leading-relaxed text-gray-600">
               {t(playground.description)}
             </p>
 
-            <dl className="mt-7 grid gap-4 sm:grid-cols-3">
+            <dl className="detail-facts mt-6 grid grid-cols-2 gap-4">
               <div className="rounded-2xl bg-white/45 p-4">
                 <dt className="text-xs font-bold uppercase tracking-wider text-gray-500">
                   {t("Best for")}
                 </dt>
                 <dd className="mt-1 font-black text-gray-800">
-                  {t(playground.ageRange)}
+                  {playground.ageRange
+                    ? t(playground.ageRange)
+                    : t("Not provided")}
                 </dd>
               </div>
               <div className="rounded-2xl bg-white/45 p-4">
@@ -233,15 +262,10 @@ export function PlaygroundDetailPage() {
                   {t("Safety")}
                 </dt>
                 <dd className="mt-1 font-black text-gray-800">
-                  {t(playground.safetyRating)}
-                </dd>
-              </div>
-              <div className="rounded-2xl bg-white/45 p-4">
-                <dt className="text-xs font-bold uppercase tracking-wider text-gray-500">
-                  {t("Community rating")}
-                </dt>
-                <dd className="mt-1 font-black text-gray-800">
-                  {playground.rating} / 5
+                  {Number(playground.safetyRating) >= 1 &&
+                  Number(playground.safetyRating) <= 5
+                    ? playground.safetyRating + " / 5"
+                    : t(playground.safetyRating || "Not provided")}
                 </dd>
               </div>
             </dl>
@@ -288,10 +312,6 @@ export function PlaygroundDetailPage() {
             >
               {t("Write a review")}
             </Button>
-            <OwnerEditButton
-              ownerId={playground.ownerId}
-              playgroundId={playground.id}
-            />
           </div>
 
           {/* 把成功訊息顯示在評論列表上方 */}
@@ -300,16 +320,18 @@ export function PlaygroundDetailPage() {
               role="status" //讓螢幕閱讀器也能讀出成功提示
               className="mb-4 rounded-xl bg-green-50 p-3 text-green-800"
             >
-              {saveNotice}
+              {t(saveNotice)}
             </p>
           )}
 
+          {playground.reviews.length === 0 && (
+            <p className="detail-empty">
+              {t("No reviews yet. Be the first to share your experience.")}
+            </p>
+          )}
           <div className="grid gap-5 md:grid-cols-2">
             {playground.reviews.map((review) => (
-              <figure
-                className="rounded-3xl border border-white/60 bg-white/35 p-6 shadow-lg backdrop-blur-xl"
-                key={review.id}
-              >
+              <figure className="detail-review" key={review.id}>
                 <StarRating className="text-amber-400" rating={review.rating} />
                 <blockquote className="mt-3 font-medium leading-relaxed text-gray-600">
                   “{t(review.text)}”
@@ -317,7 +339,14 @@ export function PlaygroundDetailPage() {
                 <figcaption className="mt-5 text-sm">
                   <strong className="text-gray-800">{review.author}</strong>
                   <span className="ml-2 text-gray-500">
-                    {t("Visited {date}", { date: t(review.visitedAt) })}
+                    {t("Published {date}", {
+                      date: Number.isNaN(Date.parse(review.visitedAt))
+                        ? t(review.visitedAt)
+                        : new Intl.DateTimeFormat(
+                            language === "de" ? "de-DE" : "en-GB",
+                            { day: "numeric", month: "short", year: "numeric" },
+                          ).format(new Date(review.visitedAt)),
+                    })}
                   </span>
                 </figcaption>
                 {/* 按鈕放進每則評論卡片 */}
@@ -336,9 +365,12 @@ export function PlaygroundDetailPage() {
                 {/* 先讓點擊與取消動作能運作 */}
                 {editingReviewId === review.id && (
                   <div className="mt-4">
-                    <label htmlFor={`review-text-${review.id}`}>Review</label>
+                    <label htmlFor={`review-text-${review.id}`}>
+                      {t("Review")}
+                    </label>
                     <textarea
                       id={`review-text-${review.id}`}
+                      autoFocus
                       value={editText}
                       onChange={(event) => setEditText(event.target.value)}
                       className="mt-2 w-full rounded-xl border p-3"
@@ -349,7 +381,7 @@ export function PlaygroundDetailPage() {
                       htmlFor={`review-rating-${review.id}`}
                       className="mt-4 block"
                     >
-                      Overall rating
+                      {t("Overall rating")}
                     </label>
                     <select
                       id={`review-rating-${review.id}`}
@@ -361,7 +393,7 @@ export function PlaygroundDetailPage() {
                     >
                       {[1, 2, 3, 4, 5].map((rating) => (
                         <option key={rating} value={rating}>
-                          {rating} {rating === 1 ? "star" : "stars"}
+                          {t("{rating} out of 5 stars", { rating })}
                         </option>
                       ))}
                     </select>
@@ -381,7 +413,7 @@ export function PlaygroundDetailPage() {
                       type="button"
                       onClick={() => setEditingReviewId(null)}
                     >
-                      Cancel
+                      {t("Cancel")}
                     </Button>
                   </div>
                 )}

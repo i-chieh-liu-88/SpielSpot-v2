@@ -1,15 +1,39 @@
 export const germanTranslations: Record<string, string> = {
+  "Too many requests. Please wait for the request limit to reset (up to 15 minutes). Applying or resetting filters will not clear this limit.": "Zu viele Anfragen. Bitte warte, bis das Limit zurückgesetzt wird (bis zu 15 Minuten). Filter anzuwenden oder zurückzusetzen hebt dieses Limit nicht auf.",
+  "Saving...": "Wird gespeichert...",
+  "Overall rating": "Gesamtbewertung",
+  "Review": "Bewertung",
+  "Cancel": "Abbrechen",
+  "Save": "Speichern",
+  "Edit review": "Bewertung bearbeiten",
+  "Your review has been updated.": "Deine Bewertung wurde aktualisiert.",
+  "Could not save your review. Please try again.": "Die Bewertung konnte nicht gespeichert werden. Versuche es erneut.",
+  "Could not connect to the server. Your edits are still here. Please try again.": "Keine Verbindung zum Server. Deine Eingaben bleiben erhalten. Versuche es erneut.",
+  "Please sign in to save your changes. Your edits are still here.": "Melde dich an, um deine Änderungen zu speichern. Deine Eingaben bleiben erhalten.",
+  "Review cannot be empty.": "Die Bewertung darf nicht leer sein.",
+  "No reviews yet. Be the first to share your experience.": "Noch keine Bewertungen. Teile als Erstes deine Erfahrung.",
+  "{count} reviews": "{count} Bewertungen",
+  "Published {date}": "Veröffentlicht am {date}",
+  "Playground pagination": "Seitennavigation der Spielplätze",
+  "Previous page": "Vorherige Seite",
+  "Next page": "Nächste Seite",
+  "Page {page} of {total}": "Seite {page} von {total}",
   "Choose up to 5 photos.": "Wähle höchstens 5 Fotos aus.",
-  "Each playground photo must be 5 MB or smaller.": "Jedes Foto darf höchstens 5 MB groß sein.",
-  "Add playground details and up to 5 optional photos. Only upload photos you have permission to share.": "Füge Angaben und optional bis zu 5 Fotos hinzu. Lade nur Fotos hoch, die du teilen darfst.",
-  "Playground details are saved, but the photos could not be saved. Retry the photos or continue without them.": "Die Angaben sind gespeichert, aber die Fotos konnten nicht gespeichert werden. Versuche es erneut oder fahre ohne Fotos fort.",
-  "{count} of 5 photos selected. The first photo is the cover.": "{count} von 5 Fotos ausgewählt. Das erste Foto ist das Titelbild.",
-  "JPEG, PNG, or WebP · maximum 5 MB per photo": "JPEG, PNG oder WebP · höchstens 5 MB pro Foto",
+  "Each playground photo must be 5 MB or smaller.":
+    "Jedes Foto darf höchstens 5 MB groß sein.",
+  "Add playground details and up to 5 optional photos. Only upload photos you have permission to share.":
+    "Füge Angaben und optional bis zu 5 Fotos hinzu. Lade nur Fotos hoch, die du teilen darfst.",
+  "Playground details are saved, but the photos could not be saved. Retry the photos or continue without them.":
+    "Die Angaben sind gespeichert, aber die Fotos konnten nicht gespeichert werden. Versuche es erneut oder fahre ohne Fotos fort.",
+  "{count} of 5 photos selected. The first photo is the cover.":
+    "{count} von 5 Fotos ausgewählt. Das erste Foto ist das Titelbild.",
+  "JPEG, PNG, or WebP · maximum 5 MB per photo":
+    "JPEG, PNG oder WebP · höchstens 5 MB pro Foto",
   "Selected photo {number}": "Ausgewähltes Foto {number}",
   "Photo {number}": "Foto {number}",
   "Cover photo": "Titelbild",
   "Remove photo {number}": "Foto {number} entfernen",
-  "Remove": "Entfernen",
+  Remove: "Entfernen",
   "Retry photo uploads": "Fotos erneut hochladen",
   "Continue without photos": "Ohne Fotos fortfahren",
   "Playground photos": "Spielplatzfotos",
@@ -17,74 +41,116 @@ export const germanTranslations: Record<string, string> = {
   "Photo {number} of {total}": "Foto {number} von {total}",
   "Choose a photo": "Foto auswählen",
   "Show photo {number}": "Foto {number} anzeigen",
-  "Add playground details and an optional photo. Only upload photos you have permission to share.": "Füge Angaben und optional ein Foto hinzu. Lade nur Fotos hoch, die du teilen darfst.",
-  "Playground details are saved, but the photo upload failed. Retry the photo or continue without it.": "Die Angaben sind gespeichert, aber das Foto konnte nicht hochgeladen werden. Versuche es erneut oder fahre ohne Foto fort.",
+  "Add playground details and an optional photo. Only upload photos you have permission to share.":
+    "Füge Angaben und optional ein Foto hinzu. Lade nur Fotos hoch, die du teilen darfst.",
+  "Playground details are saved, but the photo upload failed. Retry the photo or continue without it.":
+    "Die Angaben sind gespeichert, aber das Foto konnte nicht hochgeladen werden. Versuche es erneut oder fahre ohne Foto fort.",
   "Retry photo upload": "Foto erneut hochladen",
   "Continue without photo": "Ohne Foto fortfahren",
-  "Find playgrounds, compare facilities and ages, and read parent reviews before you go.": "Finde Spielplätze, vergleiche Ausstattung und Altersgruppen und lies vor deinem Besuch die Bewertungen anderer Eltern.",
-  "Pin a place you discovered and share its details with nearby families.": "Markiere einen entdeckten Spielplatz und teile seine Angaben mit Familien in der Nähe.",
-  "Start with a place. Compare the details that matter to your family.": "Beginne mit einem Ort. Vergleiche die Angaben, die für deine Familie wichtig sind.",
+  "Find playgrounds, compare facilities and ages, and read parent reviews before you go.":
+    "Finde Spielplätze, vergleiche Ausstattung und Altersgruppen und lies vor deinem Besuch die Bewertungen anderer Eltern.",
+  "Pin a place you discovered and share its details with nearby families.":
+    "Markiere einen entdeckten Spielplatz und teile seine Angaben mit Familien in der Nähe.",
+  "Start with a place. Compare the details that matter to your family.":
+    "Beginne mit einem Ort. Vergleiche die Angaben, die für deine Familie wichtig sind.",
   "Example parent reviews": "Beispielbewertungen von Eltern",
-  "Illustrative examples, not reviews from real users. Read community reviews on each playground page.": "Fiktive Beispiele, keine Bewertungen echter Nutzer. Bewertungen aus der Community findest du auf den einzelnen Spielplatzseiten.",
+  "Illustrative examples, not reviews from real users. Read community reviews on each playground page.":
+    "Fiktive Beispiele, keine Bewertungen echter Nutzer. Bewertungen aus der Community findest du auf den einzelnen Spielplatzseiten.",
   "Footer navigation": "Navigation im Fußbereich",
   "Project on GitHub": "Projekt auf GitHub",
-  "© 2026 SpielSpot. All rights reserved.": "© 2026 SpielSpot. Alle Rechte vorbehalten.",
-  "Compare listed facilities, age ranges, safety ratings, and parent reviews.": "Vergleiche angegebene Ausstattung, Altersgruppen, Sicherheitsbewertungen und Elternbewertungen.",
-  "Open a playground page, check its details, and plan your visit.": "Öffne eine Spielplatzseite, prüfe die Angaben und plane deinen Besuch.",
-  "Move the map to an address or your location, then search the area.": "Bewege die Karte zu einer Adresse oder deinem Standort und suche dann im Kartenausschnitt.",
-  "Filter listed playgrounds by address, age range, and facilities.": "Filtere eingetragene Spielplätze nach Adresse, Altersgruppe und Ausstattung.",
-  "See playground locations and choose which map area to search.": "Sieh dir Spielplatzstandorte an und wähle den Kartenausschnitt für deine Suche.",
-  "Read submitted safety ratings and reviews. Details are community contributions, not safety inspections.": "Lies eingereichte Sicherheitsbewertungen und Rezensionen. Die Angaben stammen aus der Community und sind keine Sicherheitsprüfungen.",
-  "Compare the age ranges provided in playground listings.": "Vergleiche die Altersgruppen in den Spielplatzeinträgen.",
-  "Look for listed accessibility facilities and check reviews for more detail.": "Achte auf Angaben zur Barrierefreiheit und lies Bewertungen für weitere Einzelheiten.",
-  "Reading about the facilities helps me decide what to check before visiting a new playground.": "Die Angaben zur Ausstattung helfen mir zu entscheiden, worauf ich vor dem Besuch eines neuen Spielplatzes achten sollte.",
-  "Filters: address, age and facilities": "Filter: Adresse, Alter und Ausstattung",
+  "© 2026 SpielSpot. All rights reserved.":
+    "© 2026 SpielSpot. Alle Rechte vorbehalten.",
+  "Compare listed facilities, age ranges, safety ratings, and parent reviews.":
+    "Vergleiche angegebene Ausstattung, Altersgruppen, Sicherheitsbewertungen und Elternbewertungen.",
+  "Open a playground page, check its details, and plan your visit.":
+    "Öffne eine Spielplatzseite, prüfe die Angaben und plane deinen Besuch.",
+  "Move the map to an address or your location, then search the area.":
+    "Bewege die Karte zu einer Adresse oder deinem Standort und suche dann im Kartenausschnitt.",
+  "Filter listed playgrounds by address, age range, and facilities.":
+    "Filtere eingetragene Spielplätze nach Adresse, Altersgruppe und Ausstattung.",
+  "See playground locations and choose which map area to search.":
+    "Sieh dir Spielplatzstandorte an und wähle den Kartenausschnitt für deine Suche.",
+  "Read submitted safety ratings and reviews. Details are community contributions, not safety inspections.":
+    "Lies eingereichte Sicherheitsbewertungen und Rezensionen. Die Angaben stammen aus der Community und sind keine Sicherheitsprüfungen.",
+  "Compare the age ranges provided in playground listings.":
+    "Vergleiche die Altersgruppen in den Spielplatzeinträgen.",
+  "Look for listed accessibility facilities and check reviews for more detail.":
+    "Achte auf Angaben zur Barrierefreiheit und lies Bewertungen für weitere Einzelheiten.",
+  "Reading about the facilities helps me decide what to check before visiting a new playground.":
+    "Die Angaben zur Ausstattung helfen mir zu entscheiden, worauf ich vor dem Besuch eines neuen Spielplatzes achten sollte.",
+  "Filters: address, age and facilities":
+    "Filter: Adresse, Alter und Ausstattung",
   "Move the map to an address": "Karte zu einer Adresse bewegen",
-  "This moves the map. Use the filters below to narrow playground results.": "Dies bewegt die Karte. Grenze Spielplätze mit den Filtern unten ein.",
+  "This moves the map. Use the filters below to narrow playground results.":
+    "Dies bewegt die Karte. Grenze Spielplätze mit den Filtern unten ein.",
   "Filter playgrounds": "Spielplätze filtern",
   "Filter playground addresses": "Spielplatzadressen filtern",
-  "Facilities: match any selected option": "Ausstattung: mindestens eine Auswahl passend",
+  "Facilities: match any selected option":
+    "Ausstattung: mindestens eine Auswahl passend",
   "Apply filters": "Filter anwenden",
   "Reset filters": "Filter zurücksetzen",
   "Find a playground": "Spielplatz finden",
-  "Compare playgrounds in the list or explore their locations on the map.": "Vergleiche Spielplätze in der Liste oder entdecke ihre Standorte auf der Karte.",
-  "Use Apply filters to retry with your current choices, or Reset filters to start again.": "Versuche es mit „Filter anwenden“ erneut oder beginne mit „Filter zurücksetzen“ neu.",
+  "Compare playgrounds in the list or explore their locations on the map.":
+    "Vergleiche Spielplätze in der Liste oder entdecke ihre Standorte auf der Karte.",
+  "Use Apply filters to retry with your current choices, or Reset filters to start again.":
+    "Versuche es mit „Filter anwenden“ erneut oder beginne mit „Filter zurücksetzen“ neu.",
   "{count} playgrounds found": "{count} Spielplätze gefunden",
   "Results view": "Ergebnisansicht",
-  "List": "Liste",
-  "Map": "Karte",
+  List: "Liste",
+  Map: "Karte",
   "Playground results": "Spielplatzergebnisse",
-  "Showing the area you searched.": "Ergebnisse für den ausgewählten Kartenausschnitt.",
+  "Showing the area you searched.":
+    "Ergebnisse für den ausgewählten Kartenausschnitt.",
   "Show all matching results": "Alle passenden Ergebnisse anzeigen",
   "Not provided": "Keine Angabe",
   "Playground map": "Spielplatzkarte",
   "Search this area": "In diesem Bereich suchen",
-  "Scroll to move the page. Use + and − to zoom the map. Results change only when you search this area.": "Scrolle durch die Seite. Mit + und − zoomst du die Karte. Ergebnisse ändern sich erst bei einer Suche in diesem Bereich.",
+  "Scroll to move the page. Use + and − to zoom the map. Results change only when you search this area.":
+    "Scrolle durch die Seite. Mit + und − zoomst du die Karte. Ergebnisse ändern sich erst bei einer Suche in diesem Bereich.",
 
-  "Check the highlighted fields before saving.": "Prüfe die markierten Felder vor dem Speichern.",
-  "Enter a playground name with at least 2 characters.": "Gib einen Spielplatznamen mit mindestens 2 Zeichen ein.",
-  "Keep the playground name within 100 characters.": "Der Spielplatzname darf höchstens 100 Zeichen enthalten.",
-  "Enter a city or neighbourhood with at least 2 characters.": "Gib eine Stadt oder ein Viertel mit mindestens 2 Zeichen ein.",
-  "Keep the location within 100 characters.": "Die Ortsangabe darf höchstens 100 Zeichen enthalten.",
-  "Enter a postcode with at least 3 characters.": "Gib eine Postleitzahl mit mindestens 3 Zeichen ein.",
-  "Keep the postcode within 12 characters.": "Die Postleitzahl darf höchstens 12 Zeichen enthalten.",
-  "Select a location on the map or enter a latitude.": "Wähle einen Ort auf der Karte oder gib einen Breitengrad ein.",
-  "Enter a latitude between -90 and 90.": "Gib einen Breitengrad zwischen -90 und 90 ein.",
-  "Select a location on the map or enter a longitude.": "Wähle einen Ort auf der Karte oder gib einen Längengrad ein.",
-  "Enter a longitude between -180 and 180.": "Gib einen Längengrad zwischen -180 und 180 ein.",
-  "Enter an age range with at least 3 characters.": "Gib eine Altersgruppe mit mindestens 3 Zeichen ein.",
-  "Keep the age range within 60 characters.": "Die Altersgruppe darf höchstens 60 Zeichen enthalten.",
-  "Choose a safety rating from 1 to 5.": "Wähle eine Sicherheitsbewertung von 1 bis 5.",
-  "Describe the playground in at least 20 characters.": "Beschreibe den Spielplatz mit mindestens 20 Zeichen.",
-  "Keep the description within 1000 characters.": "Die Beschreibung darf höchstens 1000 Zeichen enthalten.",
+  "Check the highlighted fields before saving.":
+    "Prüfe die markierten Felder vor dem Speichern.",
+  "Enter a playground name with at least 2 characters.":
+    "Gib einen Spielplatznamen mit mindestens 2 Zeichen ein.",
+  "Keep the playground name within 100 characters.":
+    "Der Spielplatzname darf höchstens 100 Zeichen enthalten.",
+  "Enter a city or neighbourhood with at least 2 characters.":
+    "Gib eine Stadt oder ein Viertel mit mindestens 2 Zeichen ein.",
+  "Keep the location within 100 characters.":
+    "Die Ortsangabe darf höchstens 100 Zeichen enthalten.",
+  "Enter a postcode with at least 3 characters.":
+    "Gib eine Postleitzahl mit mindestens 3 Zeichen ein.",
+  "Keep the postcode within 12 characters.":
+    "Die Postleitzahl darf höchstens 12 Zeichen enthalten.",
+  "Select a location on the map or enter a latitude.":
+    "Wähle einen Ort auf der Karte oder gib einen Breitengrad ein.",
+  "Enter a latitude between -90 and 90.":
+    "Gib einen Breitengrad zwischen -90 und 90 ein.",
+  "Select a location on the map or enter a longitude.":
+    "Wähle einen Ort auf der Karte oder gib einen Längengrad ein.",
+  "Enter a longitude between -180 and 180.":
+    "Gib einen Längengrad zwischen -180 und 180 ein.",
+  "Enter an age range with at least 3 characters.":
+    "Gib eine Altersgruppe mit mindestens 3 Zeichen ein.",
+  "Keep the age range within 60 characters.":
+    "Die Altersgruppe darf höchstens 60 Zeichen enthalten.",
+  "Choose a safety rating from 1 to 5.":
+    "Wähle eine Sicherheitsbewertung von 1 bis 5.",
+  "Describe the playground in at least 20 characters.":
+    "Beschreibe den Spielplatz mit mindestens 20 Zeichen.",
+  "Keep the description within 1000 characters.":
+    "Die Beschreibung darf höchstens 1000 Zeichen enthalten.",
   "Select at least one facility.": "Wähle mindestens eine Ausstattung aus.",
-  "Photos are preview only and will not be uploaded.": "Fotos dienen nur der Vorschau und werden nicht hochgeladen.",
-  "Preview only. Your changes will not be saved.": "Nur Vorschau. Deine Änderungen werden nicht gespeichert.",
-  "Saving is not available in this preview.": "Speichern ist in dieser Vorschau nicht verfügbar.",
-  "Features": "Funktionen",
+  "Photos are preview only and will not be uploaded.":
+    "Fotos dienen nur der Vorschau und werden nicht hochgeladen.",
+  "Preview only. Your changes will not be saved.":
+    "Nur Vorschau. Deine Änderungen werden nicht gespeichert.",
+  "Saving is not available in this preview.":
+    "Speichern ist in dieser Vorschau nicht verfügbar.",
+  Features: "Funktionen",
   "How It Works": "So funktioniert es",
-  "Playgrounds": "Spielplätze",
-  "Reviews": "Bewertungen",
+  Playgrounds: "Spielplätze",
+  Reviews: "Bewertungen",
   "Find a Playground": "Spielplatz finden",
   "Add a Playground": "Spielplatz hinzufügen",
   "Open navigation menu": "Navigationsmenü öffnen",
@@ -99,12 +165,11 @@ export const germanTranslations: Record<string, string> = {
   "Switch to dark mode": "Zum dunklen Design wechseln",
   "Switch language to German": "Sprache auf Deutsch umstellen",
   "Switch language to English": "Sprache auf Englisch umstellen",
-  "Find the Super Spiel Spot Nearby":
-    "Super Spielplätze in der Nähe",
+  "Find the Super Spiel Spot Nearby": "Super Spielplätze in der Nähe",
   "Find the": "Super",
   "Super Spiel": "Spielplätze",
-  "Spot": "in der",
-  "Nearby": "Nähe",
+  Spot: "in der",
+  Nearby: "Nähe",
   "Discover safe, fun, age-appropriate playgrounds right around the corner, rated by parents in your community.":
     "Entdecke sichere, abwechslungsreiche und altersgerechte Spielplätze ganz in deiner Nähe – bewertet von Eltern aus deiner Umgebung.",
   "Go to playgrounds": "Zu den Spielplätzen",
@@ -148,7 +213,7 @@ export const germanTranslations: Record<string, string> = {
   "{distance} away": "{distance} entfernt",
   "Photo unavailable": "Kein Foto verfügbar",
   "Not rated": "Noch nicht bewertet",
-  "Facilities": "Ausstattung",
+  Facilities: "Ausstattung",
   "What parents say": "Was Eltern sagen",
   "Trusted by families": "Von Familien empfohlen",
   "Share your playground review": "Teile deine Spielplatzbewertung",
@@ -159,11 +224,11 @@ export const germanTranslations: Record<string, string> = {
   "Get the App": "App entdecken",
   "Making every neighbourhood a playground-friendly place.":
     "Damit jedes Viertel spielplatzfreundlich wird.",
-  "Footer": "Fußzeile",
-  "Legal": "Rechtliches",
-  "Privacy": "Datenschutz",
-  "Terms": "Nutzungsbedingungen",
-  "Contact": "Kontakt",
+  Footer: "Fußzeile",
+  Legal: "Rechtliches",
+  Privacy: "Datenschutz",
+  Terms: "Nutzungsbedingungen",
+  Contact: "Kontakt",
   "© 2026 PlaySpot. All rights reserved.":
     "© 2026 PlaySpot. Alle Rechte vorbehalten.",
   "Loading playgrounds…": "Spielplätze werden geladen…",
@@ -239,7 +304,7 @@ export const germanTranslations: Record<string, string> = {
   "Playground not found": "Spielplatz nicht gefunden",
   "Playground details": "Spielplatzdetails",
   "Best for": "Geeignet für",
-  "Safety": "Sicherheit",
+  Safety: "Sicherheit",
   "Community rating": "Bewertung der Community",
   "Community voices": "Stimmen aus der Community",
   "Parent reviews": "Elternbewertungen",
@@ -273,34 +338,32 @@ export const germanTranslations: Record<string, string> = {
     "Nur das Community-Mitglied, das diesen Spielplatz hinzugefügt hat, kann ihn bearbeiten.",
   "Configure Clerk authentication to edit playgrounds.":
     "Konfiguriere die Clerk-Authentifizierung, um Spielplätze zu bearbeiten.",
-  "Previous": "Zurück",
-  "Next": "Weiter",
+  Previous: "Zurück",
+  Next: "Weiter",
   "Playground results pages": "Seiten der Spielplatzergebnisse",
   "Page {number}": "Seite {number}",
   "Playground name": "Name des Spielplatzes",
   "City or neighbourhood": "Stadt oder Viertel",
-  "Postcode": "Postleitzahl",
+  Postcode: "Postleitzahl",
   "Best suited ages": "Geeignetes Alter",
   "Best suited age": "Geeignetes Alter",
   "Ages 2–12": "2–12 Jahre",
   "Safety rating": "Sicherheitsbewertung",
-  "Description": "Beschreibung",
+  Description: "Beschreibung",
   "Pin the location": "Standort markieren",
   "Click the exact position on the map or enter the coordinates.":
     "Klicke auf die genaue Position auf der Karte oder gib die Koordinaten ein.",
-  "Latitude": "Breitengrad",
-  "Longitude": "Längengrad",
+  Latitude: "Breitengrad",
+  Longitude: "Längengrad",
   "Playground photo": "Spielplatzfoto",
-  "JPEG, PNG, or WebP · maximum 5 MB":
-    "JPEG, PNG oder WebP · maximal 5 MB",
+  "JPEG, PNG, or WebP · maximum 5 MB": "JPEG, PNG oder WebP · maximal 5 MB",
   "Playground upload preview": "Vorschau des Spielplatzfotos",
   "Upload playground photo": "Spielplatzfoto hochladen",
   "Write a review after saving": "Nach dem Speichern eine Bewertung schreiben",
   "Saving playground…": "Spielplatz wird gespeichert…",
   "Add playground": "Spielplatz hinzufügen",
   "Save changes": "Änderungen speichern",
-  "Choose a JPEG, PNG, or WebP image.":
-    "Wähle ein JPEG-, PNG- oder WebP-Bild.",
+  "Choose a JPEG, PNG, or WebP image.": "Wähle ein JPEG-, PNG- oder WebP-Bild.",
   "The playground photo must be 5 MB or smaller.":
     "Das Spielplatzfoto darf höchstens 5 MB groß sein.",
   "Check the form fields.": "Überprüfe die Formularfelder.",
@@ -313,7 +376,8 @@ export const germanTranslations: Record<string, string> = {
   "Playground review": "Spielplatzbewertung",
   "Please fix the highlighted fields before submitting.":
     "Bitte korrigiere die markierten Felder vor dem Absenden.",
-  "Could not save your review": "Deine Bewertung konnte nicht gespeichert werden",
+  "Could not save your review":
+    "Deine Bewertung konnte nicht gespeichert werden",
   "Unable to save your review. Please try again.":
     "Deine Bewertung konnte nicht gespeichert werden. Bitte versuche es erneut.",
   "e.g. Wald Abenteuerplatz": "z. B. Wald-Abenteuerplatz",
@@ -338,8 +402,8 @@ export const germanTranslations: Record<string, string> = {
   "4 stars": "4 Sterne",
   "5 stars": "5 Sterne",
   "Would you recommend it?": "Würdest du den Spielplatz empfehlen?",
-  "Yes": "Ja",
-  "No": "Nein",
+  Yes: "Ja",
+  No: "Nein",
   "Tell other parents about your visit":
     "Erzähle anderen Eltern von deinem Besuch",
   "How were the equipment, safety, cleanliness, shade, and facilities?":
@@ -371,38 +435,38 @@ export const germanTranslations: Record<string, string> = {
     "Die Bewertung darf höchstens 1.000 Zeichen lang sein",
   "Name must be 60 characters or less":
     "Der Name darf höchstens 60 Zeichen lang sein",
-  "Fenced": "Eingezäunt",
-  "Shade": "Schatten",
-  "Accessible": "Barrierefrei",
-  "Toilets": "Toiletten",
+  Fenced: "Eingezäunt",
+  Shade: "Schatten",
+  Accessible: "Barrierefrei",
+  Toilets: "Toiletten",
   "Water play": "Wasserspiel",
   "Picnic area": "Picknickbereich",
-  "Climbing": "Klettern",
+  Climbing: "Klettern",
   "Sand play": "Sandspiel",
-  "Swings": "Schaukeln",
-  "Slides": "Rutschen",
+  Swings: "Schaukeln",
+  Slides: "Rutschen",
   "Soft surface": "Weicher Bodenbelag",
   "Toddler area": "Kleinkindbereich",
   "Animal theme": "Tier-Thema",
   "Balance course": "Balancierparcours",
-  "Riverside": "Am Fluss",
+  Riverside: "Am Fluss",
   "Cycling routes": "Radwege",
-  "Benches": "Bänke",
+  Benches: "Bänke",
   "Open lawn": "Offene Wiese",
   "Rope course": "Seilparcours",
-  "Lakeside": "Am See",
+  Lakeside: "Am See",
   "Nature play": "Naturspiel",
   "Ball games": "Ballspiele",
   "Sports area": "Sportbereich",
   "Ship theme": "Schiff-Thema",
   "Public transport": "Öffentlicher Nahverkehr",
-  "Woodland": "Waldgebiet",
+  Woodland: "Waldgebiet",
   "Walking paths": "Spazierwege",
   "{rating} out of 5 stars": "{rating} von 5 Sternen",
   "SpielSpot home": "SpielSpot Startseite",
   "Playground search": "Spielplatzsuche",
   "City, postcode, or neighbourhood": "Stadt, Postleitzahl oder Viertel",
-  "Search": "Suchen",
+  Search: "Suchen",
   "Anonymous parent": "Anonymes Elternteil",
   "Community added": "Von der Community hinzugefügt",
   "Primary navigation": "Hauptnavigation",
@@ -411,7 +475,7 @@ export const germanTranslations: Record<string, string> = {
   "Playground actions": "Spielplatzaktionen",
   "Mobile navigation links": "Links der mobilen Navigation",
   "Dismiss menu": "Menü schließen",
-  "Menu": "Menü",
+  Menu: "Menü",
   "SpielSpot — Find Playgrounds Near You":
     "SpielSpot — Finde Spielplätze in deiner Nähe",
   "SpielSpot has completely changed our weekends. I can finally check whether a playground is fenced before we set off.":
@@ -424,4 +488,3 @@ export const germanTranslations: Record<string, string> = {
   "Dad of 1 · Hamburg": "Vater von 1 Kind · Hamburg",
   "Mum of 3 · Munich": "Mutter von 3 Kindern · München",
 };
-

@@ -11,6 +11,7 @@ import { PlaygroundsPage } from "./PlaygroundsPage";
 
 const mocks = vi.hoisted(() => ({
   navigate: vi.fn(),
+  items: undefined as typeof playgrounds | undefined,
   loading: false,
   error: undefined as string | undefined,
 }));
@@ -34,7 +35,7 @@ vi.mock("@tanstack/react-router", () => ({
 }));
 vi.mock("../../hooks/usePlaygrounds", () => ({
   usePlaygrounds: () => ({
-    playgrounds,
+    playgrounds: mocks.items ?? playgrounds,
     isLoading: mocks.loading,
     error: mocks.error,
   }),
@@ -75,16 +76,51 @@ vi.mock("../../components/organisms/PlaygroundMap/PlaygroundMap", () => ({
 afterEach(cleanup);
 beforeEach(() => {
   vi.clearAllMocks();
+  mocks.items = undefined;
   mocks.loading = false;
   mocks.error = undefined;
 });
 
 describe("PlaygroundsPage browsing", () => {
+  it("paginates results and resets to page one after changing filters or map area", () => {
+    mocks.items = Array.from({ length: 23 }, (_, i) => ({
+      ...playgrounds[0],
+      id: String(i),
+      name: `Place ${i + 1}`,
+    }));
+    render(<PlaygroundsPage />);
+    const list = screen.getByRole("region", { name: "Playground results" });
+    expect(within(list).getAllByRole("article")).toHaveLength(10);
+    expect(
+      screen.getByRole("button", { name: "Previous page" }),
+    ).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: "Next page" }));
+    expect(within(list).getByText("Place 11")).toBeInTheDocument();
+    expect(screen.getByText("23 playgrounds found")).toHaveFocus();
+    fireEvent.click(screen.getByRole("button", { name: "Next page" }));
+    expect(within(list).getAllByRole("article")).toHaveLength(3);
+    expect(screen.getByRole("button", { name: "Next page" })).toBeDisabled();
+    fireEvent.click(screen.getByText("Filters: address, age and facilities"));
+    fireEvent.click(screen.getByRole("button", { name: "Reset filters" }));
+    expect(within(list).getByText("Place 1")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Next page" }));
+    fireEvent.click(screen.getByRole("button", { name: "Map" }));
+    fireEvent.click(screen.getByRole("button", { name: "Move map" }));
+    fireEvent.click(screen.getByRole("button", { name: "Search this area" }));
+    expect(
+      screen.queryByRole("navigation", { name: "Playground pagination" }),
+    ).not.toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Show all matching results" }),
+    );
+    expect(within(list).getByText("Place 1")).toBeInTheDocument();
+  });
+
   it("keeps the list stable until Search this area is pressed and restores all results", () => {
     render(<PlaygroundsPage />);
     const list = screen.getByRole("region", { name: "Playground results" });
     expect(within(list).getAllByRole("article")).toHaveLength(
-      playgrounds.length,
+      Math.min(10, playgrounds.length),
     );
     expect(
       screen.getByRole("button", { name: "Search this area" }),
@@ -92,18 +128,16 @@ describe("PlaygroundsPage browsing", () => {
     fireEvent.click(screen.getByRole("button", { name: "Map" }));
     fireEvent.click(screen.getByRole("button", { name: "Move map" }));
     expect(within(list).getAllByRole("article")).toHaveLength(
-      playgrounds.length,
+      Math.min(10, playgrounds.length),
     );
     fireEvent.click(screen.getByRole("button", { name: "Search this area" }));
     expect(within(list).getAllByRole("article")).toHaveLength(1);
-    expect(
-      screen.getByRole("button", { name: "List" }),
-    ).toHaveFocus();
+    expect(screen.getByRole("button", { name: "List" })).toHaveFocus();
     fireEvent.click(
       screen.getByRole("button", { name: "Show all matching results" }),
     );
     expect(within(list).getAllByRole("article")).toHaveLength(
-      playgrounds.length,
+      Math.min(10, playgrounds.length),
     );
   });
 
@@ -119,9 +153,10 @@ describe("PlaygroundsPage browsing", () => {
       within(map).getByRole("link", { name: "View details" }),
     ).toHaveAttribute("href", `/playgrounds/${playgrounds[0].id}`);
     fireEvent.click(screen.getByRole("button", { name: "List" }));
-    expect(
-      screen.getByRole("button", { name: "List" }),
-    ).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "List" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
   });
 
   it("clears the applied area when filters are reset", () => {
@@ -131,7 +166,7 @@ describe("PlaygroundsPage browsing", () => {
     fireEvent.click(screen.getByRole("button", { name: "Search this area" }));
     fireEvent.click(screen.getByText("Filters: address, age and facilities"));
     fireEvent.click(screen.getByRole("button", { name: "Reset filters" }));
-    expect(screen.getAllByRole("article")).toHaveLength(playgrounds.length);
+    expect(screen.getAllByRole("article")).toHaveLength(Math.min(10, playgrounds.length));
     expect(
       screen.queryByRole("button", { name: "Show all matching results" }),
     ).not.toBeInTheDocument();
@@ -148,3 +183,4 @@ describe("PlaygroundsPage browsing", () => {
     ).not.toBeInTheDocument();
   });
 });
+

@@ -56,13 +56,13 @@
   flex-shrink: 0;
   accent-color: var(--spot-brand);
 }
-.spot-create-page .playground-editor fieldset label {
+.spot-create-page .playground-editor fieldset label:has(input[type="checkbox"]) {
   min-height: var(--spot-control-height);
   border: 1px solid var(--spot-border);
   border-radius: var(--spot-radius-control);
   background: var(--spot-control-surface);
 }
-.spot-create-page .playground-editor fieldset label:has(input:checked) {
+.spot-create-page .playground-editor fieldset label:has(input[type="checkbox"]:checked) {
   border-color: var(--spot-brand);
   background: var(--spot-selected-surface);
 }

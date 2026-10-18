@@ -20,6 +20,7 @@ import { filterPlaygrounds } from "../../utils/filterPlaygrounds";
 import type { MapLocation } from "../../types/map";
 import { useLanguage } from "../../providers/LanguageProvider";
 import type { PlaygroundFilters } from "../../services/playgrounds";
+import { PlaygroundThumbnail } from "../../components/molecules/PlaygroundThumbnail/PlaygroundThumbnail";
 import "./PlaygroundsPage.css";
 
 function subscribeDesktopView(onChange: () => void) {
@@ -29,6 +30,11 @@ function subscribeDesktopView(onChange: () => void) {
 }
 
 export function PlaygroundsPage() {
+  const { q } = useSearch({ from: "/playgrounds" });
+  return <PlaygroundResults key={q ?? ""} />;
+}
+
+function PlaygroundResults() {
   const isDesktop = useSyncExternalStore(
     subscribeDesktopView,
     () => window.matchMedia("(min-width: 64rem)").matches,
@@ -49,6 +55,8 @@ export function PlaygroundsPage() {
   const [appliedArea, setAppliedArea] = useState<string[] | null>(null);
   const [selectedId, setSelectedId] = useState<string>();
   const [mobileView, setMobileView] = useState<"list" | "map">("list");
+  const [page, setPage] = useState(1);
+  const resultsStartRef = useRef<HTMLParagraphElement>(null);
   const listViewRef = useRef<HTMLButtonElement>(null);
   const mappedPlaygrounds = useMemo(
     () => filterPlaygrounds(playgrounds, q),
@@ -61,6 +69,14 @@ export function PlaygroundsPage() {
         : mappedPlaygrounds.filter((p) => appliedArea.includes(p.id)),
     [mappedPlaygrounds, appliedArea],
   );
+  const pageCount = Math.max(1, Math.ceil(results.length / 10));
+  const currentPage = Math.min(page, pageCount);
+  const pageResults = results.slice((currentPage - 1) * 10, currentPage * 10);
+  function changePage(next: number) {
+    setPage(next);
+    resultsStartRef.current?.focus({ preventScroll: true });
+    resultsStartRef.current?.scrollIntoView?.({ block: "start" });
+  }
   const selected = mappedPlaygrounds.find((p) => p.id === selectedId);
   const pageTitle = q
     ? t("Playgrounds near “{query}”", { query: q })
@@ -72,6 +88,7 @@ export function PlaygroundsPage() {
   const selectPin = useCallback((id: string) => setSelectedId(id), []);
 
   function applyFilters(next: PlaygroundFilters) {
+    setPage(1);
     setFilters(next);
     setAppliedArea(null);
     setPendingArea(undefined);
@@ -133,18 +150,23 @@ export function PlaygroundsPage() {
             className="my-6 rounded-2xl bg-red-50 p-5 text-red-800"
           >
             <h2 className="font-bold">{t("Could not load playgrounds")}</h2>
-            <p className="mt-2">{error}</p>
-            <p className="mt-2">
+            <p className="mt-2">{t(error)}</p>
+            {!error.startsWith("Too many requests") && <p className="mt-2">
               {t(
                 "Use Apply filters to retry with your current choices, or Reset filters to start again.",
               )}
-            </p>
+            </p>}
           </div>
         )}
         {!isLoading && !error && (
           <>
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <p role="status" className="font-semibold text-gray-800">
+              <p
+                ref={resultsStartRef}
+                tabIndex={-1}
+                role="status"
+                className="scroll-mt-28 font-semibold text-gray-800"
+              >
                 {t("{count} playgrounds found", { count: results.length })}
               </p>
               <div
@@ -187,7 +209,10 @@ export function PlaygroundsPage() {
                     <Button
                       variant="secondary"
                       className="min-h-11"
-                      onClick={() => setAppliedArea(null)}
+                      onClick={() => {
+                        setPage(1);
+                        setAppliedArea(null);
+                      }}
                     >
                       {t("Show all matching results")}
                     </Button>
@@ -207,11 +232,12 @@ export function PlaygroundsPage() {
                   </div>
                 ) : (
                   <ul className="space-y-4">
-                    {results.map((p) => (
+                    {pageResults.map((p) => (
                       <li key={p.id}>
                         <article
                           className={`explore-card rounded-2xl border-2 bg-white/90 p-5 ${selectedId === p.id ? "border-green-700" : "border-transparent"}`}
                         >
+                          <PlaygroundThumbnail src={p.image} />
                           <h2 className="break-words text-xl font-bold text-gray-900">
                             <Link
                               to="/playgrounds/$playgroundId"
@@ -273,6 +299,35 @@ export function PlaygroundsPage() {
                     ))}
                   </ul>
                 )}
+                {results.length > 10 && (
+                  <nav
+                    className="mt-6 flex flex-wrap items-center justify-between gap-3"
+                    aria-label={t("Playground pagination")}
+                  >
+                    <Button
+                      variant="secondary"
+                      className="min-h-11"
+                      disabled={currentPage === 1}
+                      onClick={() => changePage(currentPage - 1)}
+                    >
+                      {t("Previous page")}
+                    </Button>
+                    <p className="text-sm font-semibold" aria-live="polite">
+                      {t("Page {page} of {total}", {
+                        page: currentPage,
+                        total: pageCount,
+                      })}
+                    </p>
+                    <Button
+                      variant="secondary"
+                      className="min-h-11"
+                      disabled={currentPage === pageCount}
+                      onClick={() => changePage(currentPage + 1)}
+                    >
+                      {t("Next page")}
+                    </Button>
+                  </nav>
+                )}
               </section>
               <section
                 id="playground-map-panel"
@@ -290,6 +345,7 @@ export function PlaygroundsPage() {
                       disabled={!pendingArea}
                       onClick={() => {
                         if (pendingArea) {
+                          setPage(1);
                           setAppliedArea([...pendingArea.playgroundIds]);
                           setMobileView("list");
                           if (!isDesktop) listViewRef.current?.focus();

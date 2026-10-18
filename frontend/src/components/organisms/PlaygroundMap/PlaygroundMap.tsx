@@ -266,7 +266,9 @@ function PlaygroundMapComponent({
     >
       <MapContainer
         bounds={bounds}
-        boundsOptions={{ padding: [50, 50] }}
+        // A single point (or identical coordinates) otherwise yields infinite zoom
+        // before TileLayer supplies its zoom limits, causing NaN bounds.
+        boundsOptions={{ padding: [50, 50], maxZoom: 15 }}
         scrollWheelZoom={false}
         className="playground-map"
         placeholder={
