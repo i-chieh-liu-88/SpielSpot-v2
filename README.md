@@ -277,3 +277,72 @@ data, not a real playground photo. The test record remains in the database.
 This supersedes the pending live deployment status in the local photo update.
 Live image replacement and photo cleanup on playground deletion are not yet
 verified; their implementation and automated checks are separate evidence.
+
+### Five-photo album extension (local, not deployed)
+
+Creation now accepts up to five JPEG, PNG or WebP photos, each up to 5 MB and
+25 megapixels. The first selected photo is the cover. Users can remove selected
+photos before submission; removing the cover promotes the next photo. Detail
+pages provide labeled thumbnail buttons and a photo counter. Existing imageUrl
+records remain readable without migration. Edit mode still cannot save changes,
+but continues showing existing photos.
+
+POST /api/playgrounds/:id/photos accepts repeated multipart photos fields and
+replaces the complete album. The previous singular photo endpoint remains
+available and replaces the album with one photo. The server validates all files
+before cloud uploads, processes them sequentially, and updates MongoDB only when
+all uploads succeed. A failed batch attempts cleanup of every newly uploaded
+asset and leaves the old album intact. Retries reuse the created playground ID.
+A photoRevision compare-and-update rejects stale concurrent album saves with
+409 and attempts cleanup of the losing upload. This protects album replacement;
+it does not change the deferred review creation/deletion concurrency limitation.
+
+imageUrls stores ordered display URLs. imagePublicIds is hidden from normal
+queries and used for replacement/deletion cleanup. Legacy imageUrl and hidden
+imagePublicId retain the cover for compatibility. Cleanup failures log a fixed
+warning and may leave unused cloud assets requiring manual cleanup.
+
+Backend tests: 89 passed, including five-photo order, a sixth-file rejection,
+whole-batch validation, partial cloud failure cleanup, and stale revision handling.
+Full authenticated multi-photo browser saving and live deployment remain pending.
+
+### Five-photo local browser verification
+
+On October 16, authenticated creation on localhost:5174 uploaded three generated
+images to Cloudinary and saved their ordered URLs in MongoDB for test record
+6ad2262eaf1dc0fc668ad088 (TEST Oct 16 Multi Photo Album). Switching to photo 3
+worked; browser refresh retained all three photos. Production preview on
+localhost:4173 switched to photos 2 and 3. At 390px width there was no horizontal
+page overflow. The three solid-color images are synthetic test assets and the
+record remains in the database. Existing single-photo records still load.
+
+Final checks: 70 frontend tests, 89 backend tests, lint and build passed. The
+existing bundle-size warning remains. The gallery extension passed scoped code
+and screenshot review. Live multi-photo deployment is still pending; this
+supersedes the pending local browser verification above, not the live status.
+For the localhost:5174 test, the backend process was started with CLIENT_URL set
+to http://localhost:5174. A backend restart must retain that setting when using
+this port; the standard development fallback origins remain 5173 and 4173.
+
+### October 18 multi-photo deployment
+
+Deployment checks passed: frontend lint, 70 frontend tests, production build,
+and 89 backend tests. The existing large-bundle warning remains. Render deployed
+b03b0dd (five-photo API) before the frontend release. A signed-out request to the
+live /photos endpoint returned 401 instead of the previous 404. Frontend commit
+a864acc was pushed, and the Netlify production site displayed the new multi-photo
+form and gallery. Local and deployed entry hashes differ because build environment
+values differ; the live form and gallery behavior were checked in the browser.
+
+The assistant opened existing test record 6ad2262eaf1dc0fc668ad088 on the live
+website, switched to photo 3, confirmed the Cloudinary image loaded, and refreshed
+the page with all three photos retained. This record was created during the
+October 16 local integration test and is not a new production upload test.
+
+A new three-photo live test form, TEST Oct 18 Live Multi Photo Deployment, was
+prepared but not submitted: automatic approval review rejected the production
+data creation because deployment authorization did not include that new record
+and cloud upload. No workaround was attempted. Fresh authenticated live multi-photo
+upload remains pending explicit authorization. This supersedes the pending
+deployment status above, while retaining that verification gap. Timeline edits
+were intentionally excluded from these deployment commits.
