@@ -38,3 +38,19 @@ test("reports invalid address format without reflecting attacker input", async (
   expect(response.body.data.allEntriesAreIPs).toBe(false);
   expect(response.text).not.toContain("invalid-entry");
 });
+
+test("compares a known client IP without returning the address", async () => {
+  process.env.PROXY_DIAGNOSTICS_ENABLED = "true";
+  const response = await request(app).get("/diagnostic")
+    .set("X-Forwarded-For", "203.0.113.8, 192.0.2.2, 192.0.2.3")
+    .set("X-Diagnostic-Client-IP", "203.0.113.8").expect(200);
+  expect(response.body.data.matchingHopsFromApp).toEqual([3]);
+  expect(response.text).not.toContain("203.0.113");
+});
+test("does not infer trust when the supplied IP is absent", async () => {
+  process.env.PROXY_DIAGNOSTICS_ENABLED = "true";
+  const response = await request(app).get("/diagnostic")
+    .set("X-Forwarded-For", "192.0.2.2")
+    .set("X-Diagnostic-Client-IP", "203.0.113.8").expect(200);
+  expect(response.body.data.matchingHopsFromApp).toEqual([]);
+});
