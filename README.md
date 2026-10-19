@@ -1,15 +1,10 @@
 <p align="center">
   <a href="https://spielspot.netlify.app/">
-    <img src="docs/images/spielspot-mark.svg" alt="SpielSpot logo" width="88" height="88">
+    <img src="docs/images/spielspot-mark.svg" alt="SpielSpot logo" width="100" height="100">
   </a>
 </p>
 
-<h1 align="center">SpielSpot</h1>
-
-<p align="center">
-  <strong>Find your next playground.</strong><br>
-  Explore places to play. Compare facilities. Share parent reviews.
-</p>
+<h2 align="center">Find your next playground.</h2>
 
 <p align="center">
   <a href="https://spielspot.netlify.app/">Website</a> ·
@@ -18,20 +13,18 @@
   <a href="https://spielspot.onrender.com/health">Health check</a>
 </p>
 
-[![SpielSpot's actual homepage and Berlin map interface in an angled product showcase](docs/images/spielspot-cover.svg)](https://spielspot.netlify.app/)
-
-<p align="center"><sub>Actual SpielSpot interfaces · Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a></sub></p>
+[![SpielSpot homepage in a single angled window on a black-to-green background](docs/images/spielspot-cover.svg)](https://spielspot.netlify.app/)
 
 <p align="center">
-  <a href="#overview">Overview</a> ·
+  <a href="#why-spielspot">Why SpielSpot</a> ·
   <a href="#backend">Backend</a> ·
-  <a href="#local-setup">Local setup</a> ·
+  <a href="#installation">Installation</a> ·
   <a href="#api">API</a> ·
-  <a href="#verification">Verification</a> ·
+  <a href="#testing">Testing</a> ·
   <a href="#documentation">Documentation</a>
 </p>
 
-## Overview
+# Why SpielSpot
 
 **Author:** I-Chieh Liu · Individual End-of-Module Backend Project
 
@@ -53,7 +46,7 @@ Browsing needs no account. Writes save real data, so share content you have perm
 2. Search or filter the list, explore the map, and open a listing for photos and reviews.
 3. Sign in to add a playground with up to five photos or write a review. Review authors can edit their own reviews.
 
-## Backend
+# Backend
 
 Two related entities form the core of the API: **Playground** and **Review**. Each review references one playground. The [API plan](docs/api-plan.md) includes the ERD, technology choices and request/response examples.
 
@@ -87,7 +80,7 @@ flowchart LR
 | React · TypeScript · Vite | Node.js · Express · Mongoose · Zod | MongoDB Atlas · Clerk · Cloudinary |
 | TanStack Router · Leaflet | Helmet · CORS · express-rate-limit | Netlify frontend · Render backend |
 
-## Local setup
+# Installation
 
 Use **Node.js 22.12 or newer** and npm. You need a MongoDB Atlas database, a Clerk application and Cloudinary credentials for photo uploads. Use a separate database for local testing. Review creation and playground deletion require MongoDB transaction support, which Atlas provides.
 
@@ -129,7 +122,7 @@ npm run dev
 
 Open the local URL printed by Vite.
 
-## API
+# API
 
 **Base URL:** [https://spielspot.onrender.com](https://spielspot.onrender.com/)
 
@@ -163,7 +156,7 @@ A protected request without a valid signed-in user returns HTTP 401:
 
 [Request bodies, responses and error cases →](docs/api-plan.md#current-api-examples-october-19)
 
-## Verification
+# Testing
 
 **Latest recorded checks · October 19, 2026**
 
@@ -185,14 +178,14 @@ Automated tests cover validation, authentication and ownership responses, deleti
 
 Separate Atlas checks used an isolated temporary database for both review/delete race orders and rollback. Live checks covered photo upload, photos after refresh, filtering, pagination and selected API responses. The deployed cleanup worker removed all generated assets from the authorized cleanup test. Detailed evidence and its scope are in the [submission checklist](docs/submission-checklist.md) and [cleanup notes](docs/photo-cleanup.md).
 
-## Known limitations
+# Known limitations
 
 - **Clerk:** the demo uses development keys. Production-instance setup is deferred until a suitable owned domain is available.
 - **Frontend publication:** Netlify skipped release `5cf229f` after deployment credits ran out. Owner editing works locally; the public website still uses the previous frontend.
 - **Cloud recovery:** MongoDB and Cloudinary cannot share a transaction. Cleanup jobs retry while the server runs; persistent provider failures need investigation. Older untracked orphan images remain outside this recovery mechanism.
 - **Verification scope:** concurrency tests covered controlled database race orders, not simultaneous authenticated production HTTP requests. Proxy checks support the tested three-hop Render path; live multi-client/IPv6 rate-limit isolation remains unverified. Diagnostics stay disabled.
 
-## Documentation
+# Documentation
 
 | Read | Find |
 | --- | --- |
