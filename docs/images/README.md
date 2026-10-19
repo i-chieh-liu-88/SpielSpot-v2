@@ -11,4 +11,4 @@ These files present the existing SpielSpot product. The cover composition does n
 | `spielspot-brand.svg` | Earlier horizontal brand header retained as a reusable asset. Uses the same brand palette and Hanken Grotesk subset. |
 | `Hanken-Grotesk-LICENSE.txt` | SIL Open Font License for Hanken Grotesk, sourced from the Google Fonts project. |
 
-The SVG cover keeps the screenshot pixels unchanged inside its angled frames. Source URLs and capture date are also recorded in its metadata. Update the screenshot assets when the public UI changes; do not replace them with unverified feature mockups.
+The SVG cover keeps the screenshot pixels unchanged inside its angled window. Source URLs and capture date are also recorded in its metadata. Update the screenshot assets when the public UI changes; do not replace them with unverified feature mockups.
