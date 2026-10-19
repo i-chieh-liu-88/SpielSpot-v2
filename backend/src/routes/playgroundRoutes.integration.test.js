@@ -2,6 +2,12 @@ import { jest } from "@jest/globals";
 import request from "supertest";
 
 // 1. 先 mock 掉外部依賴：資料庫 model 和 Clerk
+// Route tests mock transaction execution; real database concurrency is separate.
+jest.unstable_mockModule("../services/relationshipTransaction.js", () => ({
+  runRelationshipTransaction: work => work(),
+  lockPlayground: jest.fn(),
+  relationshipError: (status, message) => Object.assign(new Error(message), { status, relationship: true }),
+}));
 jest.unstable_mockModule("../models/Playground.js", () => ({
   default: { find: jest.fn(), findById: jest.fn(), create: jest.fn() },
 }));

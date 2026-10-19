@@ -2,6 +2,12 @@ import { jest } from "@jest/globals";
 import request from "supertest";
 
 // Exercise real routing, login checks and controller; isolate external services.
+// Route tests mock transaction execution; real database concurrency is separate.
+jest.unstable_mockModule("../services/relationshipTransaction.js", () => ({
+  runRelationshipTransaction: work => work(),
+  lockPlayground: jest.fn(),
+  relationshipError: (status, message) => Object.assign(new Error(message), { status, relationship: true }),
+}));
 jest.unstable_mockModule("../models/Review.js", () => ({
   default: { findById: jest.fn(), create: jest.fn() },
 }));

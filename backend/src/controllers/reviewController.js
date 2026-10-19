@@ -1,3 +1,4 @@
+import { runRelationshipTransaction, lockPlayground, relationshipError } from "../services/relationshipTransaction.js";
 import { getAuth } from "@clerk/express";
 import Review from "../models/Review.js";
 import Playground from "../models/Playground.js";
@@ -15,20 +16,21 @@ export async function getReviewsForPlayground(req, res) {
 
 export async function createReview(req, res, next) {
   try {
-    const playground = await Playground.findById(req.params.id); //確認存在才繼續建立 review
-    if (!playground) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Playground not found" });
-    }
     const { userId } = getAuth(req);
-    const review = await Review.create({
-      ...req.body,
-      playgroundId: req.params.id,
-      authorId: userId,
-    }); //authorId: userId 放最後，蓋掉任何前端傳來的 authorId
+    const review = await runRelationshipTransaction(async () => {
+      const playground = await Playground.findById(req.params.id);
+      if (!playground) throw relationshipError(404, "Playground not found");
+      await lockPlayground(req.params.id);
+      return Review.create({
+        ...req.body,
+        playgroundId: req.params.id,
+        authorId: userId,
+      });
+    });
+    // Respond only after commit, never inside a callback which may retry.
     res.status(201).json({ success: true, data: review });
   } catch (err) {
+    if (err.relationship) return res.status(err.status).json({ success: false, error: err.message });
     next(err);
   }
 }

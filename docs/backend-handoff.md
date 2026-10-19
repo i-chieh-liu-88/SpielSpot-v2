@@ -383,3 +383,42 @@ returns header counts/format booleans only, with no-store. Disabled returns 404.
 Counts alone do not establish which hop is the real visitor or prove spoof
 resistance. Do not enable TRUST_PROXY_HOPS from counts alone. Turn diagnostics
 off after inspection. This diagnostic preparation is local, not deployed.
+
+## Proxy verification completed (October 19, 2026)
+
+- Render deployed 50c40e2. The user reported normal and forged-prefix responses with trustedProxyHops=3 and matchingHopsFromApp=[3]. Adding the prefix increased forwarded entries from 3 to 4 without changing the matching position. This supports the three-hop setting for this tested connection, not every network path.
+- The user disabled PROXY_DIAGNOSTICS_ENABLED. Assistant checks then confirmed diagnostic GET 404, health GET 200 and Berlin list GET 200. Keep TRUST_PROXY_HOPS=3 on the verified Render path and 0 on direct localhost.
+- Latest backend run: 102 tests passed. Earlier counts are historical. Simulated proxy tests and user-run live checks are separate evidence.
+- Recheck after adding a CDN, proxy, private-network caller or shorter route. Live multi-client/IPv6 rate-limit isolation is not fully verified. Clerk production setup and review/delete concurrency remain separate pending work.
+- This supersedes earlier local-only proxy notes. Keep diagnostics disabled outside intentional verification.
+
+## Review/delete concurrency change (local, not deployed)
+
+Review creation and playground deletion now use Connection.transaction with
+snapshot reads, primary preference and majority commit. Mongoose automatic
+transaction sessions are enabled; all database operations run sequentially
+inside the callback. Both operations increment the same hidden
+relationshipRevision field before checking/inserting/deleting related data.
+The parent write forces conflicts to retry against a fresh state. Responses
+and Cloudinary cleanup happen after commit, outside the retryable callback.
+No fallback to nontransactional writes is allowed if transactions fail.
+Existing records acquire the revision field on their first increment.
+107 mocked backend tests passed; real concurrency verification remains pending.
+The opt-in script backend/scripts/verify-review-concurrency.mjs uses a new
+random sp_review_test_ database and removes only that database after
+testing both race orders and rollback. It requires ALLOW_TEMP_CONCURRENCY_DB=true
+and an Atlas account authorized to create the separate test database.
+
+## Atlas concurrency verification (October 19, 2026)
+
+With explicit user permission, the integration script used a new random
+sp_review_test_ database on Atlas. Create-first preserved the parent/review
+and rejected deletion with 409; delete-first removed the parent and rejected
+review creation with 404. Both outcomes contained no orphan review. An
+intentional failure rolled back the inserted review and parent revision.
+The temporary database was dropped after checks. These are controlled
+database-service checks, not a load test or proof of every failure scenario.
+The first attempt used a name longer than the Atlas limit and was rejected;
+the shortened-name rerun passed. Existing application data was not changed.
+The transaction implementation is locally verified; deployment and live
+authenticated write checks must be recorded separately.

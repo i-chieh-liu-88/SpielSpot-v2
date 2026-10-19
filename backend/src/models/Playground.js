@@ -16,6 +16,7 @@ const playgroundSchema = new mongoose.Schema(
     imagePublicId: { type: String, select: false },
     imageUrls: { type: [String], default: [] },
     imagePublicIds: { type: [String], default: [], select: false },
+    relationshipRevision: { type: Number, default: 0, select: false },
     photoRevision: { type: Number, default: 0 },
   },
   { timestamps: true },

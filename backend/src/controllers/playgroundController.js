@@ -1,3 +1,4 @@
+import { runRelationshipTransaction, lockPlayground, relationshipError } from "../services/relationshipTransaction.js";
 import { getAuth } from "@clerk/express";
 import Playground from "../models/Playground.js";
 import Review from "../models/Review.js";
@@ -100,38 +101,23 @@ export async function updatePlayground(req, res, next) {
 export async function deletePlayground(req, res, next) {
   try {
     const { userId } = getAuth(req);
-    const playground = await Playground.findById(req.params.id, "+imagePublicId +imagePublicIds");
-
-    if (!playground) {
-      return res
-        .status(404)
-        .json({ success: false, error: "Playground not found" });
-    }
-    if (playground.ownerId !== userId) {
-      return res.status(403).json({
-        success: false,
-        error: "Not allowed to delete this playground",
-      });
-    }
-
-    // 通過擁有者驗證後才查評論，避免未授權的請求進入刪除流程。
-    // 只需知道是否存在評論，不必載入全部評論內容。
-    const hasReviews = await Review.exists({ playgroundId: playground._id });
-    if (hasReviews) {
-      // 409 表示目前資料狀態不允許刪除，保留遊樂場與其他使用者的評論。
-      return res.status(409).json({
-        success: false,
-        error: "Cannot delete a playground with reviews",
-      });
-    }
-
-    // 只有確認沒有評論才刪除；查詢若拋出錯誤，會直接進入 catch。
-    // 注意：查詢與刪除不是 transaction，尚未防止兩者之間新增評論的情況。
-    await playground.deleteOne();
-    const photoIds = [...new Set([...(playground.imagePublicIds ?? []), playground.imagePublicId].filter(Boolean))];
-    await Promise.all(photoIds.map((id) => removePhoto(id).catch(() => console.warn("Deleted playground photo cleanup failed"))));
+    const photoIds = await runRelationshipTransaction(async () => {
+      const playground = await Playground.findById(req.params.id, "+imagePublicId +imagePublicIds");
+      if (!playground) throw relationshipError(404, "Playground not found");
+      if (playground.ownerId !== userId) throw relationshipError(403, "Not allowed to delete this playground");
+      // Both review creation and deletion write the same parent before proceeding.
+      await lockPlayground(req.params.id);
+      if (await Review.exists({ playgroundId: playground._id })) {
+        throw relationshipError(409, "Cannot delete a playground with reviews");
+      }
+      await playground.deleteOne();
+      return [...new Set([...(playground.imagePublicIds ?? []), playground.imagePublicId].filter(Boolean))];
+    });
+    // Cloudinary is outside MongoDB: cleanup runs only after a committed deletion.
+    await Promise.all(photoIds.map(id => removePhoto(id).catch(() => console.warn("Deleted playground photo cleanup failed"))));
     res.json({ success: true, data: null });
   } catch (err) {
+    if (err.relationship) return res.status(err.status).json({ success: false, error: err.message });
     next(err);
   }
 }
