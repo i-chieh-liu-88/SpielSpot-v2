@@ -1,6 +1,6 @@
 # Playground editing and photo cleanup
 
-Implementation date: October 19, 2026. Local implementation, signed-in editing and cloud integration checks are complete. Deployment remains pending.
+Implementation date: October 19, 2026. Local implementation, signed-in editing and cloud integration checks are complete. Render deployed backend commit `5cf229f`. Netlify skipped that frontend release because the account exhausted production deployment credits; the public frontend remains on `6587704`.
 
 ## Editing
 
@@ -27,7 +27,7 @@ The worker needs a running server and working MongoDB/Cloudinary credentials. Re
 - Automated tests cover edit PATCH, retained input, photo-only retries, owner/sign-in gates, success messages, durable reservations, queue failures, retained cleanup retries and referenced-asset protection.
 - `backend/scripts/verify-photo-cleanup.mjs` checks replacement cleanup, deletion cleanup and transaction rollback using a fresh Atlas database and generated Cloudinary images. It passed on October 19; both images and the temporary database were removed.
 - The first two integration attempts failed an assertion because the Cloudinary Admin SDK nests the error status under `error.http_code`. Correcting the assertion confirmed that the assets were absent. Each attempt cleaned its own assets and database.
-- These are local code checks against real cloud services. They do not claim that the new worker is deployed or that the signed-in live HTTP flow has passed.
+- The isolated script checks local code against real cloud services. The later deployed-backend verification below records separate live evidence.
 
 To repeat the isolated cloud test, explicitly set `ALLOW_TEMP_PHOTO_TEST=true` and run `node backend/scripts/verify-photo-cleanup.mjs` from the repository root. It reads `backend/.env`, uploads two generated images, uses only a random `sp_photo_test_` database and removes its test resources. If cleanup fails, retain the test database for recovery; inspect it before taking further action.
 
@@ -37,9 +37,21 @@ On October 19, the signed-in owner saved a temporary name change to existing tes
 
 Latest checks: 120 backend tests, 80 frontend tests, lint and production build passed. The existing bundle-size warning remains. New photo replacement/cleanup was verified through the isolated cloud integration script, not the deployed browser flow.
 
-## Release checks
+## Deployed backend verification (October 19)
 
-- Deploy the backend first so the cleanup collection and worker initialize.
+Render reported Deploy succeeded / Live for `5cf229f` (deployment `dep-dbb1993bc2fs73d5r5kg`). The user authorized creating, uploading, replacing and removing only `TEST Oct 19 Edit Cleanup`.
+
+- The existing Netlify creation form saved test record `6ad615305544a35003ef7045` and two generated color-block images through the deployed API.
+- The new local frontend sent authenticated PATCH and album replacement requests to Render through a localhost proxy restricted to that exact test record. The proxy forwarded requests to the production API without changing deployed CORS or authentication. Details persisted and the album changed from two photos to one.
+- Cloudinary Admin API checks confirmed that the Render worker removed both old assets while the replacement remained available. The local backend worker had been stopped before this check.
+- The authorized test record was then deleted with its cleanup job in a MongoDB transaction after checking its exact ID, name, asset and absence of reviews. This cleanup used the database/service path, not a new authenticated DELETE request through the live HTTP route.
+- Final checks confirmed the test record absent, all three generated Cloudinary assets returning 404, and zero pending cleanup jobs for those assets. No existing user listings or reviews were deleted.
+
+Netlify showed `Skipped due to account credit usage exceeded` for `5cf229f`; Trigger deploy was disabled. The team must wait for renewed deployment credits or choose a plan change before publishing the frontend. No billing changes were made. Frontend preview checks do not establish that the new editor is available on the public website.
+
+## Remaining release checks
+
+- Backend deployment is complete; the cleanup collection and worker initialized on Render.
 - Deploy the frontend and verify an owner edit, refresh persistence and photo replacement using a designated disposable test listing.
 - Verify deletion cleanup only on that disposable listing with no reviews. Confirm removal through Cloudinary and the cleanup queue, not only a cached image URL.
 - Do not describe these release checks as complete until they have been performed.

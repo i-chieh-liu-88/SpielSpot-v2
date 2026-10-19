@@ -30,7 +30,7 @@ Browsing does not require an account. Writes save real data, so use content you 
 | Security | Helmet, allowed-origin CORS, rate limiting and a central error handler. Secrets stay on the backend. |
 | Deployment | Netlify hosts the frontend; Render hosts the API; MongoDB Atlas stores application data. |
 
-**Latest local update (October 19):** owners can now save playground edits and replace the photo album. Durable photo cleanup retries failed removals. Signed-in local editing and refresh checks passed; these changes still need deployment; see the [implementation and verification notes](docs/photo-cleanup.md).
+**October 19 update:** owners can save edits and replace photos in the new frontend build. Render runs the new backend with durable cleanup retries. Netlify paused the frontend release because this billing cycle has no production deployment credits left. The public website still has the earlier edit form. See the [release and verification notes](docs/photo-cleanup.md).
 
 ## How the app works
 
@@ -129,8 +129,8 @@ See the [submission checklist](docs/submission-checklist.md) and [backend handof
 ## Current limitations
 
 - **Clerk development instance:** the deployed demo still uses development keys. Production setup is deferred until a suitable owned domain is available.
-- **Release verification:** the new playground editor and durable photo cleanup are implemented locally. Deployment and live HTTP checks remain pending.
-- **Cloud storage cleanup:** MongoDB and Cloudinary do not share a transaction. A durable queue now retries cleanup while the server runs. Persistent provider failures still need investigation; older untracked orphan images are outside this recovery mechanism. Real-cloud replacement/deletion checks passed for isolated test data; deployed HTTP verification remains pending.
+- **Frontend release blocked:** Netlify skipped commit `5cf229f` after the team exhausted production deployment credits. Owner editing works in the tested local build; the public website still uses the previous frontend. Resume publication when deployment credits are available.
+- **Cloud storage cleanup:** MongoDB and Cloudinary do not share a transaction. A durable queue now retries cleanup while the server runs. Persistent provider failures still need investigation; older untracked orphan images are outside this recovery mechanism. Real-cloud checks passed in an isolated database. The deployed worker removed old photos after an authenticated album replacement and completed the authorized test-record cleanup; see the verification notes for scope.
 - **Proxy configuration:** the deployed three-hop setting was checked for the tested Render connection. Other network paths and live multi-client/IPv6 rate-limit isolation need further verification. Diagnostics are disabled.
 
 ## Further documentation
