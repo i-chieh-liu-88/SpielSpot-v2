@@ -15,7 +15,7 @@ import { LocationPickerMap } from "../../molecules/LocationPickerMap/LocationPic
 import { playgroundEditorSchema } from "./PlaygroundForm.schema";
 import { useLanguage } from "../../../providers/LanguageProvider";
 import { useAuth } from "@clerk/clerk-react";
-import { createPlayground, uploadPlaygroundPhotos } from "../../../services/playgrounds";
+import { createPlayground, updatePlayground, uploadPlaygroundPhotos } from "../../../services/playgrounds";
 
 const facilityOptions = [
   "Fenced",
@@ -188,11 +188,6 @@ export function PlaygroundForm({
 
     if (savingRef.current) return;
 
-    if (mode !== "create") {
-      setError(t("Saving is not available in this preview."));
-      return;
-    }
-
     const result = playgroundEditorSchema.safeParse(form);
 
     if (!result.success) {
@@ -227,7 +222,10 @@ export function PlaygroundForm({
       }
 
       // Retain the created ID so a failed photo retry never creates another listing.
-      let savedPlayground = savedDetails ?? await createPlayground(result.data, token);
+      if (mode === "edit" && !playground) throw new Error("Missing playground");
+      let savedPlayground = savedDetails ?? (mode === "edit"
+        ? await updatePlayground(playground!.id, result.data, token)
+        : await createPlayground(result.data, token));
       setSavedDetails(savedPlayground);
       if (photos.length) {
         try {
@@ -235,7 +233,7 @@ export function PlaygroundForm({
           savedPlayground = { ...savedPlayground, image: imageUrls[0], imageUrls };
         } catch (uploadError) {
           const reason = uploadError instanceof Error ? t(uploadError.message) : "";
-          setError(`${t("Playground details are saved, but the photos could not be saved. Retry the photos or continue without them.")}${reason ? ` ${reason}` : ""}`);
+          setError(`${t(mode === "edit" ? "Your details are saved. Photo replacement could not be confirmed. Reload to check the album, or retry the upload." : "Playground details are saved, but the photos could not be saved. Retry the photos or continue without them.")}${reason ? ` ${reason}` : ""}`);
           return;
         }
       }
@@ -278,7 +276,7 @@ export function PlaygroundForm({
           ? t(
               "Add playground details and up to 5 optional photos. Only upload photos you have permission to share.",
             )
-          : t("Preview only. Your changes will not be saved.")}
+          : t("Update your playground details. Selecting new photos replaces the entire album; otherwise your existing photos are kept.")}
       </p>
       {error && (
         <p
@@ -500,7 +498,7 @@ export function PlaygroundForm({
           className={`${fieldClass} file:mr-4 file:rounded-full file:border-0 file:bg-green-100 file:px-4 file:py-2 file:font-bold file:text-green-800`}
           multiple
           type="file"
-          disabled={isSaving || mode !== "create"}
+          disabled={isSaving}
           accept="image/jpeg,image/png,image/webp"
           onChange={choosePhoto}
         />
@@ -519,17 +517,17 @@ export function PlaygroundForm({
         type="submit"
         className="mt-8 w-full sm:w-auto"
         size="lg"
-        disabled={mode !== "create" || isSaving}
+        disabled={isSaving}
       >
         {isSaving
           ? t("Saving...")
-          : mode === "create"
-            ? t(savedDetails ? "Retry photo uploads" : "Add playground")
+          : savedDetails ? t("Retry photo uploads") : mode === "create"
+            ? t("Add playground")
             : t("Save changes")}
       </Button>
       {savedDetails && !isSaving && (
         <Button type="button" className="mt-4 sm:ml-4" onClick={() => onSaved(savedDetails, writeReview)}>
-          {t("Continue without photos")}
+          {t(mode === "edit" ? "Continue to saved playground" : "Continue without photos")}
         </Button>
       )}
     </form>

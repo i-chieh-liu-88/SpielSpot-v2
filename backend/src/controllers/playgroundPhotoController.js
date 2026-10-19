@@ -3,7 +3,9 @@ import mongoose from "mongoose";
 import multer from "multer";
 import sharp from "sharp";
 import Playground from "../models/Playground.js";
-import { photoStorageReady, uploadPhoto, removePhoto } from "../services/photoStorage.js";
+import { photoStorageReady, uploadPhoto } from "../services/photoStorage.js";
+import { reservePhotoUploads, adoptPhotoUploads, queuePhotoCleanup } from "../services/photoCleanup.js";
+import { runRelationshipTransaction, relationshipError } from "../services/relationshipTransaction.js";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -69,15 +71,14 @@ export async function savePhoto(req, res, next) {
     return res.status(400).json({ success: false, error: "Choose a valid, non-animated JPEG, PNG, or WebP photo up to 25 megapixels." });
   }
   const uploaded = [];
-  const cleanup = async (ids) => {
-    const results = await Promise.allSettled(ids.map((id) => removePhoto(id)));
-    if (results.some((result) => result.status === "rejected")) console.warn("Playground album cleanup failed");
-  };
+  let reserved;
+  try { reserved = await reservePhotoUploads(buffers.length); }
+  catch (error) { return next(error); }
   try {
-    for (const buffer of buffers) uploaded.push(await uploadPhoto(buffer));
+    for (const [index, buffer] of buffers.entries()) uploaded.push(await uploadPhoto(buffer, reserved[index]));
   }
   catch (error) {
-    await cleanup(uploaded.map((asset) => asset.public_id));
+    // Reservations survive provider timeouts and process restarts; the worker retries.
     // Log only a fixed category and status; provider messages can contain credentials.
     const message = String(error?.message ?? "");
     const category = /signature/i.test(message) ? "signature_rejected"
@@ -90,6 +91,8 @@ export async function savePhoto(req, res, next) {
     return res.status(502).json({ success: false, error: "Could not upload the photo. Please try again." });
   }
   try {
+    await runRelationshipTransaction(async () => {
+    await adoptPhotoUploads(reserved);
     // Atomic replacement returns the previous image, including during concurrent uploads.
     const previous = await Playground.findOneAndUpdate(
       { _id: req.params.id, ownerId: getAuth(req).userId,
@@ -101,15 +104,16 @@ export async function savePhoto(req, res, next) {
       { returnDocument: "before", runValidators: true, select: "+imagePublicId +imagePublicIds" },
     );
     if (!previous) {
-      await cleanup(uploaded.map((asset) => asset.public_id));
-      return res.status(409).json({ success: false, error: "Playground changed. Reload before trying again." });
+      throw relationshipError(409, "Playground changed. Reload before trying again.");
     }
-    // A cleanup failure must not turn an already saved photo into a failed save.
-    await cleanup([...new Set([...(previous.imagePublicIds ?? []), previous.imagePublicId].filter(Boolean))]);
+    // Save the replacement and its old-asset cleanup jobs in the SAME transaction.
+    await queuePhotoCleanup([...(previous.imagePublicIds ?? []), previous.imagePublicId]);
+    });
     res.json({ success: true, data: { imageUrl: uploaded[0].secure_url,
       imageUrls: uploaded.map((asset) => asset.secure_url) } });
   } catch (error) {
-    await cleanup(uploaded.map((asset) => asset.public_id));
+    // Do not delete on ambiguous commit errors. The worker checks persisted references.
+    if (error.relationship) return res.status(error.status).json({ success: false, error: error.message });
     next(error);
   }
 }

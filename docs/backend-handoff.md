@@ -4,6 +4,12 @@
 
 # Frontend integration boundary
 
+## Latest local update: editing and durable cleanup (October 19)
+
+Owner edit-mode saving now uses PATCH, with validation, loading/error/success states and optional whole-album replacement. Photo retries reuse the saved details. A persistent cleanup outbox replaces best-effort deletion: queue writes share the album/deletion MongoDB transaction, and upload IDs are reserved before calling Cloudinary. A startup/minute worker retries due jobs and checks saved references before deleting.
+
+Real Atlas/Cloudinary checks passed for replacement, deletion and rollback using an isolated database and generated assets, all removed afterward. Signed-in local edit saving and refresh persistence passed; production preview saved the original test name again. Latest checks: 120 backend tests, 80 frontend tests, lint and build passed. Deployment remains pending. This supersedes older disabled-edit and best-effort-cleanup implementation statements below. See [operation and verification details](photo-cleanup.md).
+
 ## October 19 final verification
 
 - Backend: 89 mocked tests passed. Frontend: 74 tests passed; service tests now mock HTTP responses instead of consuming the real API rate limit.

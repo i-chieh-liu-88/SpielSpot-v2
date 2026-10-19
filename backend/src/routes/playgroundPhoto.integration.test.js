@@ -11,6 +11,14 @@ jest.unstable_mockModule("@clerk/express", () => ({
 jest.unstable_mockModule("../services/photoStorage.js", () => ({
   photoStorageReady: jest.fn(), uploadPhoto: jest.fn(), removePhoto: jest.fn(),
 }));
+jest.unstable_mockModule("../services/relationshipTransaction.js", () => ({
+  runRelationshipTransaction: work => work(), lockPlayground: jest.fn(),
+  relationshipError: (status, message) => Object.assign(new Error(message), { status, relationship: true }),
+}));
+jest.unstable_mockModule("../services/photoCleanup.js", () => ({
+  reservePhotoUploads: jest.fn(), adoptPhotoUploads: jest.fn(), queuePhotoCleanup: jest.fn(),
+}));
+const cleanup = await import("../services/photoCleanup.js");
 const { default: app } = await import("../app.js");
 const { default: Playground } = await import("../models/Playground.js");
 const { getAuth } = await import("@clerk/express");
@@ -22,6 +30,7 @@ const send = (data = image, filename = "park.png", contentType = "image/png") =>
 beforeEach(() => {
   jest.resetAllMocks();
   getAuth.mockReturnValue({ userId: "owner" });
+  cleanup.reservePhotoUploads.mockImplementation(async count => Array.from({ length: count }, (_, i) => `reserved-${i}`));
   Playground.findById.mockResolvedValue({ ownerId: "owner" });
   Playground.findOneAndUpdate.mockResolvedValue({ imagePublicId: "previous" });
   storage.photoStorageReady.mockReturnValue(true);
@@ -55,17 +64,18 @@ test("decodes and converts a photo, saves its URL and cleans the replaced photo"
   expect(metadata.format).toBe("webp");
   expect(Playground.findOneAndUpdate).toHaveBeenCalledWith(
     expect.objectContaining({ _id: id, ownerId: "owner" }), expect.objectContaining({ $set: expect.objectContaining({ imagePublicId: "new" }) }), expect.any(Object));
-  expect(storage.removePhoto).toHaveBeenCalledWith("previous");
+  expect(cleanup.queuePhotoCleanup).toHaveBeenCalledWith(["previous"]);
 });
 test("a provider failure does not change the database", async () => {
   storage.uploadPhoto.mockRejectedValue(new Error("provider failed"));
   await send().expect(502);
   expect(Playground.findOneAndUpdate).not.toHaveBeenCalled();
 });
-test("cleans a new cloud asset if the database save fails", async () => {
+test("retains reserved assets for safe deferred cleanup if the database save fails", async () => {
   Playground.findOneAndUpdate.mockRejectedValue(new Error("database failed"));
   await send().expect(500);
-  expect(storage.removePhoto).toHaveBeenCalledWith("new");
+  expect(cleanup.reservePhotoUploads).toHaveBeenCalled();
+  expect(storage.removePhoto).not.toHaveBeenCalled();
 });
 test("reports unavailable storage without uploading", async () => {
   storage.photoStorageReady.mockReturnValue(false);
@@ -97,18 +107,37 @@ test("rejects a sixth photo before cloud uploads", async () => {
   expect(storage.uploadPhoto).not.toHaveBeenCalled();
 });
 // 第二張上傳失敗時，清理第一張，且不更新現有相簿。
-test("cleans partial uploads and leaves the old album unchanged on provider failure", async () => {
+test("reserves partial uploads for recovery and leaves the old album unchanged on provider failure", async () => {
   storage.uploadPhoto.mockResolvedValueOnce({ secure_url: "https://example.com/one.webp", public_id: "partial" })
     .mockRejectedValueOnce(new Error("provider failed"));
   await request(app).post(`/api/playgrounds/${id}/photos`)
     .attach("photos", image, "one.png").attach("photos", image, "two.png").expect(502);
-  expect(storage.removePhoto).toHaveBeenCalledWith("partial");
+  expect(cleanup.reservePhotoUploads).toHaveBeenCalledWith(2);
   expect(Playground.findOneAndUpdate).not.toHaveBeenCalled();
 });
-test("rejects a stale upload and cleans new assets instead of overwriting a newer album", async () => {
+test("rejects a stale upload and retains recovery reservations instead of overwriting a newer album", async () => {
   Playground.findById.mockResolvedValue({ ownerId: "owner", photoRevision: 3 });
   Playground.findOneAndUpdate.mockResolvedValue(null);
   await request(app).post(`/api/playgrounds/${id}/photos`).attach("photos", image, "one.png").expect(409);
   expect(Playground.findOneAndUpdate.mock.calls[0][0].photoRevision).toBe(3);
-  expect(storage.removePhoto).toHaveBeenCalledWith("new");
+  expect(cleanup.reservePhotoUploads).toHaveBeenCalled();
+  expect(storage.removePhoto).not.toHaveBeenCalled();
+});
+
+
+test("does not upload if the durable recovery reservation cannot be saved", async () => {
+  cleanup.reservePhotoUploads.mockRejectedValue(new Error("database unavailable"));
+  await send().expect(500);
+  expect(storage.uploadPhoto).not.toHaveBeenCalled();
+});
+test("does not save an album after its upload reservation expires", async () => {
+  cleanup.adoptPhotoUploads.mockRejectedValue(new Error("reservation expired"));
+  await send().expect(500);
+  expect(Playground.findOneAndUpdate).not.toHaveBeenCalled();
+  expect(storage.removePhoto).not.toHaveBeenCalled();
+});
+test("fails the transaction when old-photo cleanup cannot be queued", async () => {
+  cleanup.queuePhotoCleanup.mockRejectedValue(new Error("outbox unavailable"));
+  await send().expect(500);
+  expect(storage.removePhoto).not.toHaveBeenCalled();
 });

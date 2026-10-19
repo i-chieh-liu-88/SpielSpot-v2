@@ -159,3 +159,10 @@ export async function createPlayground(
 
   return toDisplayPlayground(raw);
 }
+
+export async function updatePlayground(id: string, input: CreatePlaygroundInput, token: string): Promise<Playground> {
+  const raw: BackendPlayground = await apiFetch(`/api/playgrounds/${id}`, {
+    method: "PATCH", body: JSON.stringify(input),
+  }, token);
+  return toDisplayPlayground(raw);
+}

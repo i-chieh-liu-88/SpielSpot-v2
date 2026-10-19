@@ -50,3 +50,13 @@ describe("playground API mapping", () => {
     expect(url.searchParams.get("tags")).toBe("Climbing");
   });
 });
+
+it("sends edit details with PATCH and the Clerk token, preserving returned photos", async () => {
+  const { updatePlayground } = await import("./playgrounds");
+  const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ data: { ...raw, imageUrls: ["https://example.com/photo.webp"] } }) });
+  vi.stubGlobal("fetch", fetchMock);
+  const input = { name: "Edited playground", location: "Berlin", postcode: "10115", latitude: 52.49, longitude: 13.37, ageRange: "3-8", safetyRating: 4, description: "A test description", tags: ["Climbing"] };
+  const result = await updatePlayground("sample", input, "test-token");
+  expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("/api/playgrounds/sample"), expect.objectContaining({ method: "PATCH", body: JSON.stringify(input), headers: expect.objectContaining({ Authorization: "Bearer test-token" }) }));
+  expect(result.imageUrls).toEqual(["https://example.com/photo.webp"]);
+});

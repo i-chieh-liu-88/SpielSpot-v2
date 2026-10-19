@@ -1,4 +1,5 @@
 import LockOutlined from "@mui/icons-material/LockOutlined";
+import { useState } from "react";
 import { SignInButton, useAuth } from "@clerk/clerk-react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import Button from "../../components/atoms/Button";
@@ -13,6 +14,7 @@ function EditPlaygroundContent({ playgroundId }: { playgroundId: string }) {
   const { t } = useLanguage();
   const { isLoaded, userId } = useAuth();
   const { playground, isLoading, error } = usePlayground(playgroundId);
+  const [saved, setSaved] = useState(false);
 
   if (!isLoaded || isLoading) {
     return <LoadingSpinner label={t("Loading playground…")} size="xl" />;
@@ -61,6 +63,15 @@ function EditPlaygroundContent({ playgroundId }: { playgroundId: string }) {
     );
   }
 
+  if (saved) return (
+    <section className="rounded-3xl bg-white/45 p-10 text-center shadow-xl">
+      <p role="status">{t("Your playground has been updated.")}</p>
+      <Button type="button" className="mt-6" onClick={() => navigate({ to: "/playgrounds/$playgroundId", params: { playgroundId } })}>
+        {t("View details")}
+      </Button>
+    </section>
+  );
+
   return (
     <PlaygroundForm
       mode="edit"
@@ -73,10 +84,7 @@ function EditPlaygroundContent({ playgroundId }: { playgroundId: string }) {
           });
           return;
         }
-        navigate({
-          to: "/playgrounds/$playgroundId",
-          params: { playgroundId: savedPlayground.id },
-        });
+        setSaved(true);
       }}
     />
   );

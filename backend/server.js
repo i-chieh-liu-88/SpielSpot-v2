@@ -1,10 +1,14 @@
 import "dotenv/config";
 import app from "./src/app.js";
 import { connectDB } from "./src/config/db.js";
+import PhotoCleanup from "./src/models/PhotoCleanup.js";
+import { startPhotoCleanupWorker } from "./src/services/photoCleanup.js";
 
 const PORT = process.env.PORT || 5000;
 
-connectDB().then(() => {
+connectDB().then(async () => {
+  await PhotoCleanup.init();
+  startPhotoCleanupWorker();
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });

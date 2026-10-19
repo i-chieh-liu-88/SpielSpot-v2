@@ -2,7 +2,7 @@ import { runRelationshipTransaction, lockPlayground, relationshipError } from ".
 import { getAuth } from "@clerk/express";
 import Playground from "../models/Playground.js";
 import Review from "../models/Review.js";
-import { removePhoto } from "../services/photoStorage.js";
+import { queuePhotoCleanup } from "../services/photoCleanup.js";
 
 /* ----------------------------------- GET ---------------------------------- */
 /* ----------------------------------- GET ---------------------------------- */
@@ -101,7 +101,7 @@ export async function updatePlayground(req, res, next) {
 export async function deletePlayground(req, res, next) {
   try {
     const { userId } = getAuth(req);
-    const photoIds = await runRelationshipTransaction(async () => {
+    await runRelationshipTransaction(async () => {
       const playground = await Playground.findById(req.params.id, "+imagePublicId +imagePublicIds");
       if (!playground) throw relationshipError(404, "Playground not found");
       if (playground.ownerId !== userId) throw relationshipError(403, "Not allowed to delete this playground");
@@ -110,11 +110,10 @@ export async function deletePlayground(req, res, next) {
       if (await Review.exists({ playgroundId: playground._id })) {
         throw relationshipError(409, "Cannot delete a playground with reviews");
       }
+      await queuePhotoCleanup([...(playground.imagePublicIds ?? []), playground.imagePublicId]);
       await playground.deleteOne();
-      return [...new Set([...(playground.imagePublicIds ?? []), playground.imagePublicId].filter(Boolean))];
     });
-    // Cloudinary is outside MongoDB: cleanup runs only after a committed deletion.
-    await Promise.all(photoIds.map(id => removePhoto(id).catch(() => console.warn("Deleted playground photo cleanup failed"))));
+    // The worker sees cleanup jobs only after the deletion transaction commits.
     res.json({ success: true, data: null });
   } catch (err) {
     if (err.relationship) return res.status(err.status).json({ success: false, error: err.message });

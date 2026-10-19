@@ -1,6 +1,7 @@
 import { jest } from "@jest/globals";
 import request from "supertest";
 
+jest.unstable_mockModule("../services/photoCleanup.js", () => ({ queuePhotoCleanup: jest.fn(), reservePhotoUploads: jest.fn(), adoptPhotoUploads: jest.fn() }));
 // 1. 先 mock 掉外部依賴：資料庫 model 和 Clerk
 // Route tests mock transaction execution; real database concurrency is separate.
 jest.unstable_mockModule("../services/relationshipTransaction.js", () => ({
@@ -309,4 +310,18 @@ describe("DELETE /api/playgrounds/:id (ownership)", () => {
     expect(Review.exists).toHaveBeenCalledWith({ playgroundId: "p1" });
     expect(res.body).toEqual({ success: true, data: null });
   });
+});
+
+
+
+// A cleanup-outbox failure must abort deletion; real rollback is checked separately.
+test("does not delete a playground when its photo cleanup job cannot be persisted", async () => {
+  const { queuePhotoCleanup } = await import("../services/photoCleanup.js");
+  getAuth.mockReturnValue({ userId: "owner" });
+  const parent = { _id: "p1", ownerId: "owner", imagePublicIds: ["old-asset"], deleteOne: jest.fn() };
+  Playground.findById.mockResolvedValue(parent);
+  Review.exists.mockResolvedValue(null);
+  queuePhotoCleanup.mockRejectedValueOnce(new Error("outbox unavailable"));
+  await request(app).delete("/api/playgrounds/p1").expect(500);
+  expect(parent.deleteOne).not.toHaveBeenCalled();
 });

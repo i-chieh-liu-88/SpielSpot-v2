@@ -8,7 +8,7 @@ import {
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { PlaygroundForm } from "./PlaygroundForm";
 import { playgrounds } from "../../../data/homeContent";
-import { createPlayground, uploadPlaygroundPhotos } from "../../../services/playgrounds";
+import { createPlayground, updatePlayground, uploadPlaygroundPhotos } from "../../../services/playgrounds";
 
 vi.mock("@clerk/clerk-react", () => ({
   useAuth: () => ({
@@ -17,7 +17,7 @@ vi.mock("@clerk/clerk-react", () => ({
 })); //模擬 Clerk，避免出現缺少 ClerkProvider 的錯誤 (安排一位假的登入使用者)
 
 vi.mock("../../../services/playgrounds", () => ({
-  createPlayground: vi.fn(),
+  createPlayground: vi.fn(), updatePlayground: vi.fn(),
   uploadPlaygroundPhotos: vi.fn(),
 }));
 
@@ -120,26 +120,47 @@ describe("playground preview form", () => {
     });
     expect(map).toHaveTextContent("No selected position");
   });
-  it("keeps edits local and never reports a saved playground", () => {
+  // Edit mode must PATCH the existing ID, keep photos, and preserve input on failure.
+  it("saves edits with PATCH and keeps existing photos when none are selected", async () => {
+    const existing = { ...playgrounds[0], postcode: "10115", description: "A sufficiently long playground description.", tags: ["Climbing"] };
+    vi.mocked(updatePlayground).mockReset().mockResolvedValue({ ...existing, name: "Updated park" });
+    vi.mocked(uploadPlaygroundPhotos).mockClear();
     const onSaved = vi.fn();
-    render(
-      <PlaygroundForm
-        mode="edit"
-        playground={playgrounds[0]}
-        onSaved={onSaved}
-      />,
-    );
-    fireEvent.change(screen.getByLabelText("Playground name"), {
-      target: { value: "Local edit" },
-    });
-    expect(screen.getByLabelText("Playground name")).toHaveValue("Local edit");
-    expect(screen.getByRole("button", { name: "Save changes" })).toBeDisabled();
-    expect(screen.getByAltText("Selected photo 1")).toHaveAttribute("src", playgrounds[0].image);
-    fireEvent.submit(screen.getByRole("form", { name: "Edit playground" }));
-    expect(onSaved).not.toHaveBeenCalled();
-    expect(playgrounds[0].name).not.toBe("Local edit");
+    render(<PlaygroundForm mode="edit" playground={existing} onSaved={onSaved} />);
+    fireEvent.change(screen.getByLabelText("Playground name"), { target: { value: "Updated park" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    await waitFor(() => expect(updatePlayground).toHaveBeenCalledWith(existing.id, expect.objectContaining({ name: "Updated park" }), "test-token"));
+    await waitFor(() => expect(onSaved).toHaveBeenCalledWith(expect.objectContaining({ name: "Updated park" }), false));
+    expect(uploadPlaygroundPhotos).not.toHaveBeenCalled();
   });
-
+  it("preserves edit input after a failed PATCH and retries", async () => {
+    const existing = { ...playgrounds[0], postcode: "10115", description: "A sufficiently long playground description.", tags: ["Climbing"] };
+    vi.mocked(updatePlayground).mockReset().mockRejectedValueOnce(new Error("offline")).mockResolvedValueOnce(existing);
+    const onSaved = vi.fn();
+    render(<PlaygroundForm mode="edit" playground={existing} onSaved={onSaved} />);
+    fireEvent.change(screen.getByLabelText("Playground name"), { target: { value: "Retained edit" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    await screen.findByRole("alert");
+    expect(screen.getByLabelText("Playground name")).toHaveValue("Retained edit");
+    expect(onSaved).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    await waitFor(() => expect(onSaved).toHaveBeenCalledTimes(1));
+  });
+  it("retries edit photo replacement without PATCHing the details twice", async () => {
+    const existing = { ...playgrounds[0], postcode: "10115", description: "A sufficiently long playground description.", tags: ["Climbing"] };
+    vi.mocked(updatePlayground).mockReset().mockResolvedValue(existing);
+    vi.mocked(uploadPlaygroundPhotos).mockReset().mockRejectedValueOnce(new Error("offline")).mockResolvedValueOnce(["https://example.com/replacement.webp"]);
+    vi.stubGlobal("URL", Object.assign(URL, { createObjectURL: vi.fn(() => "blob:preview"), revokeObjectURL: vi.fn() }));
+    const onSaved = vi.fn();
+    render(<PlaygroundForm mode="edit" playground={existing} onSaved={onSaved} />);
+    fireEvent.change(screen.getByLabelText("Upload playground photo"), { target: { files: [new File(["photo"], "photo.png", { type: "image/png" })] } });
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+    await screen.findByRole("alert");
+    fireEvent.click(screen.getByRole("button", { name: "Retry photo uploads" }));
+    await waitFor(() => expect(onSaved).toHaveBeenCalledWith(expect.objectContaining({ image: "https://example.com/replacement.webp" }), false));
+    expect(updatePlayground).toHaveBeenCalledTimes(1);
+    vi.unstubAllGlobals();
+  });
   /* -------------------------------- 成功儲存的測試; -------------------------------- */
   it("saves valid playground details with an auth token", async () => {
     vi.mocked(createPlayground).mockReset();
