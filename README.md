@@ -1,26 +1,26 @@
 <p align="center">
   <a href="https://spielspot.netlify.app/">
-    <img src="docs/images/spielspot-brand.svg" alt="SpielSpot" width="100%">
+    <img src="docs/images/spielspot-mark.svg" alt="SpielSpot logo" width="88" height="88">
   </a>
 </p>
 
-<h1 align="center">Find your next playground.</h1>
+<h1 align="center">SpielSpot</h1>
 
 <p align="center">
-  Find playgrounds. Compare facilities and ages. Share parent reviews.
+  <strong>Find your next playground.</strong><br>
+  Explore places to play. Compare facilities. Share parent reviews.
 </p>
 
 <p align="center">
-  <strong>I-Chieh Liu</strong> · Individual End-of-Module Backend Project
-</p>
-
-<p align="center">
-  <a href="https://spielspot.netlify.app/"><strong>Explore the website</strong></a>
-  &nbsp;·&nbsp;
-  <a href="https://spielspot.onrender.com/">Backend API</a>
-  &nbsp;·&nbsp;
+  <a href="https://spielspot.netlify.app/">Website</a> ·
+  <a href="https://spielspot.onrender.com/">Backend API</a> ·
+  <a href="docs/api-plan.md">API documentation</a> ·
   <a href="https://spielspot.onrender.com/health">Health check</a>
 </p>
+
+[![SpielSpot's actual homepage and Berlin map interface in an angled product showcase](docs/images/spielspot-cover.svg)](https://spielspot.netlify.app/)
+
+<p align="center"><sub>Actual SpielSpot interfaces · Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a></sub></p>
 
 <p align="center">
   <a href="#overview">Overview</a> ·
@@ -31,15 +31,15 @@
   <a href="#documentation">Documentation</a>
 </p>
 
-[![SpielSpot homepage showing its playground discovery headline, brand illustrations and main action](docs/images/spielspot-homepage.jpg)](https://spielspot.netlify.app/)
-
 ## Overview
+
+**Author:** I-Chieh Liu · Individual End-of-Module Backend Project
 
 SpielSpot helps parents find playgrounds, compare facilities and age ranges, and share reviews. The React frontend connects to an Express REST API, MongoDB Atlas, Clerk authentication and Cloudinary photo storage.
 
-| Discover | Compare | Contribute |
-| --- | --- | --- |
-| Search by location and explore the map. | Check facilities, listed ages, photos and reviews. | Sign in to add a playground, upload photos or share a review. |
+- **Discover** playgrounds by location and explore them on the map.
+- **Compare** facilities, listed ages, photos and community reviews.
+- **Contribute** a playground, upload photos or share a review after signing in.
 
 Browsing needs no account. Writes save real data, so share content you have permission to publish.
 
