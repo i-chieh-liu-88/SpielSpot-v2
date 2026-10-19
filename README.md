@@ -368,3 +368,12 @@ This completes the fresh authenticated live multi-photo upload check that was
 previously pending approval. It does not establish live replacement/deletion
 cleanup or concurrent-request behavior, which remain separate verification gaps.
 No code changed for this check and no test suite was rerun.
+
+## Final live checks (October 19, 2026)
+
+- Release 6587704 was pushed to main and Netlify showed Published for that commit. The live site displayed the new map guidance.
+- Live Berlin filtering returned one result without a map error. Reset restored 14 results, displayed as 10 and 4 across two pages.
+- The existing five-photo listing loaded, the fifth photo rendered, and its details/gallery remained available after refresh. These checks did not create or delete data.
+- Live API checks: GET /health 200; Berlin list GET 200; duplicate location query 400; unsigned playground POST 401. These checks do not re-establish every authenticated owner/non-owner path. Earlier live ownership checks remain dated evidence.
+- Public GitHub returned 200. Final automated checks: 89 backend tests, 74 frontend tests, lint and production build passed. The existing bundle-size warning remains.
+- User confirmed that submission only needs the GitHub and website links. Links are ready to hand over; instructor receipt and Slack delivery have not been confirmed.
