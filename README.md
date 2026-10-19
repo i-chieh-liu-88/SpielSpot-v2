@@ -6,6 +6,7 @@ SpielSpot helps parents find playgrounds, compare facilities and age ranges, and
 
 - **Website:** [spielspot.netlify.app](https://spielspot.netlify.app/)
 - **GitHub:** [SpielSpot-v2](https://github.com/i-chieh-liu-88/SpielSpot-v2)
+- **Backend API:** [spielspot.onrender.com](https://spielspot.onrender.com/)
 - **API health check:** [spielspot.onrender.com/health](https://spielspot.onrender.com/health)
 
 ## Try the project
@@ -105,6 +106,20 @@ Open the local URL printed by Vite.
 | PATCH / DELETE | `/api/reviews/:id` | Review author |
 
 The legacy single-photo endpoint, `POST /api/playgrounds/:id/photo`, also remains available. Photo uploads accept JPEG, PNG and WebP files up to 5 MB and 25 megapixels each. The first photo becomes the cover.
+
+For a read-only check, send `GET https://spielspot.onrender.com/health`. A successful response is:
+
+```json
+{"success":true,"status":"ok"}
+```
+
+A protected request without a valid signed-in user returns HTTP 401:
+
+```json
+{"success":false,"error":"Please login"}
+```
+
+See [API request bodies, responses and errors](docs/api-plan.md#current-api-examples-october-19) for playground and review CRUD and photo uploads.
 
 ## Tests and verification
 

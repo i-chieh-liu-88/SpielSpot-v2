@@ -4,7 +4,7 @@ Mini project planning document. The frontend reuses `frontend/` from `i-chieh-li
 
 Purpose: help parents find playgrounds and share reviews. Playground is the
 place listing; Review references one Playground through `playgroundId`.
-Current implementation notes below reflect the October 16 review. The final
+Current implementation notes below reflect the October 19 review. The final
 deadline is October 19, 2026, at 23:59 Europe/Berlin; the two-day sketch at the
 end is historical and is not the active schedule.
 
@@ -21,14 +21,15 @@ end is historical and is not the active schedule.
   A larger framework would add conventions this small API does not yet need.
 
 - **MongoDB + Mongoose over a relational database**: the two core entities
-  (Playground, Review) have a simple one-to-many relationship with no need
-  for complex joins or multi-table transactions. Mongoose's schema
+  (Playground, Review) have a simple one-to-many relationship and mostly use
+  direct document queries. MongoDB transactions now protect review/deletion
+  consistency and durable photo cleanup. Mongoose's schema
   validation plus Zod at the API layer gave enough structure without the
   overhead of migrations during fast iteration.
 - **Clerk over a custom auth system**: building and securing password
   storage, session management, and token refresh correctly is a large
   surface area to get right. Clerk handles this, and both frontend and
-  backend already shared the same provider, so verifying backend-issued
+  backend already shared the same provider, so verifying Clerk-issued
   JWTs was a natural fit.
 - **Zod over express-validator**: schema-first validation reads closer to
   the TypeScript types already used on the frontend, supports `.partial()`
@@ -36,7 +37,12 @@ end is historical and is not the active schedule.
   instead of per-field middleware chains.
 - **Render over Vercel for the backend**: this is a long-running Express
   server with a persistent Mongoose connection, not a stateless function,
-  so a traditional always-on host fit better than a serverless platform.
+  so a traditional web service fits the connection and background worker.
+  The free instance sleeps during inactivity; cleanup resumes when it runs.
+- **Cloudinary for photos**: it supplies hosted image URLs and image delivery,
+  while MongoDB stores photo references. The backend validates and processes
+  uploads before sending them to Cloudinary. This adds a second service and
+  requires a durable cleanup queue because it cannot share a MongoDB transaction.
 
 ## ERD
 
@@ -93,6 +99,8 @@ Relationship: `Playground 1 --- N Review` (Review stores `playgroundId` as a for
 | POST   | /api/playgrounds/:id/reviews | Create a review                  | Yes             |
 | PATCH  | /api/reviews/:id             | Edit user's review               | Yes + ownership |
 | DELETE | /api/reviews/:id             | Delete own review                | Yes + ownership |
+| POST   | /api/playgrounds/:id/photos | Replace an album, up to five photos | Yes + ownership |
+| POST   | /api/playgrounds/:id/photo | Legacy single-photo replacement | Yes + ownership |
 
 To load a playground with its reviews, request `GET /api/playgrounds/:id` and
 `GET /api/playgrounds/:id/reviews` separately. The playground list
@@ -137,11 +145,11 @@ are escaped. Invalid filters return 400 before database access.
 - `cors` (whitelisting only the frontend origin)
 - Rate limiting (`express-rate-limit`)
 - Secrets stored in environment variables (`.env`, excluded from git)
-- No server file upload endpoint. JPEG/PNG/WebP and 5 MB checks apply only to
-  the frontend local preview; server upload validation is future work.
+- Server-side photo validation checks file bytes, JPEG/PNG/WebP format,
+  5 MB per file and 25 megapixels; Sharp removes metadata and creates bounded WebP images.
 - Centralized error handling middleware, no stack trace leaks
 
-## Current API examples (October 16)
+## Current API examples (October 19)
 
 Base URL: `https://spielspot.onrender.com`; local API: `http://localhost:5000`.
 Replace `PLAYGROUND_ID` and `REVIEW_ID` with IDs returned by your requests.
@@ -251,11 +259,64 @@ Verify reverse-proxy/IP behavior before relying on it for production abuse contr
 Helmet supplies security headers; Render provides the public HTTPS endpoint.
 Clerk manages passwords and sessions, so this API has no password-storage routes.
 
-Clerk still uses development keys. Review lookup and deletion are separate
-operations and do not prevent concurrent-review races. The review GET endpoint
+Clerk still uses development keys. Review creation and playground deletion now
+use transactions and write the same parent revision to prevent orphan-review
+races. Both controlled race orders passed in an isolated Atlas database;
+this was not a simultaneous authenticated HTTP test of the deployed API.
+The review GET endpoint
 does not separately verify parent existence, so an empty array alone does not
 prove that a Playground exists. The implemented controls do not establish full
-production readiness. Server-side photo storage is outside the submission scope.
+production readiness. The verified Render proxy setting is three trusted hops;
+direct local access keeps zero. Diagnostics stay disabled. Recheck after network
+topology changes; live multi-client/IPv6 rate-limit isolation remains unverified.
+
+### Replace playground photos
+
+Send multipart form data to `POST /api/playgrounds/PLAYGROUND_ID/photos` with
+repeated `photos` fields and an owner bearer token. This replaces the full album;
+the first file is the cover. Do not set the multipart Content-Type manually:
+curl supplies its boundary.
+
+```bash
+curl -X POST "https://spielspot.onrender.com/api/playgrounds/PLAYGROUND_ID/photos" \
+  -H "Authorization: Bearer YOUR_CLERK_TOKEN" \
+  -F "photos=@/path/to/photo-one.jpg" \
+  -F "photos=@/path/to/photo-two.png"
+```
+
+HTTP 200 response shape (illustrative URLs):
+
+```json
+{
+  "success": true,
+  "data": {
+    "imageUrl": "https://res.cloudinary.com/CLOUD_NAME/image/upload/example-one.webp",
+    "imageUrls": [
+      "https://res.cloudinary.com/CLOUD_NAME/image/upload/example-one.webp",
+      "https://res.cloudinary.com/CLOUD_NAME/image/upload/example-two.webp"
+    ]
+  }
+}
+```
+
+The legacy `/photo` endpoint accepts one `photo` field. Uploads support up to five
+JPEG, PNG or WebP files, each up to 5 MB and 25 megapixels. The backend resizes
+images within 1600 by 1600 pixels and removes metadata. Only share permitted photos.
+
+| Status | Error example | Meaning |
+| --- | --- | --- |
+| 400 | `Choose a photo to upload` | No file supplied |
+| 401 | `Please login` | No valid authenticated user |
+| 403 | `Not allowed to upload a photo for this playground` | Non-owner |
+| 404 | `Playground not found` | Missing listing |
+| 409 | `Playground changed. Reload before trying again.` | Stale album revision or concurrent deletion |
+| 502 | `Could not upload the photo. Please try again.` | Cloudinary upload failure |
+| 503 | `Photo uploads are temporarily unavailable` | Storage credentials not configured |
+
+Errors use `{"success":false,"error":"message"}`. Album persistence and old-photo
+cleanup jobs share a MongoDB transaction. A worker retries failed cloud removal.
+See [cleanup operation and verification scope](photo-cleanup.md). Netlify's current
+deployment-credit limit blocks the newest editor UI release; the new backend is live.
 
 ## Two-Day Execution Plan (historical sketch, superseded)
 
