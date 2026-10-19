@@ -363,3 +363,23 @@ No code changed for this check and no test suite was rerun.
 - Live API checks: GET /health 200; Berlin list GET 200; duplicate location query 400; unsigned playground POST 401. These checks do not re-establish every authenticated owner/non-owner path. Earlier live ownership checks remain dated evidence.
 - Public GitHub returned 200. Final automated checks: 89 backend tests, 74 frontend tests, lint and production build passed. The existing bundle-size warning remains.
 - User confirmed that submission only needs the GitHub and website links. Links are ready to hand over; instructor receipt and Slack delivery have not been confirmed.
+
+## Proxy configuration (local implementation, not yet deployed)
+
+TRUST_PROXY_HOPS accepts integers 0-5 and defaults to 0 (no trusted proxy).
+Local direct access must keep 0. Do not set true. Configure the actual trusted
+hop count only after verifying Render’s forwarding path and that clients cannot
+reach Express through a shorter route. A one-hop test is a model, not evidence
+that Render uses exactly one hop. Do not trust the leftmost X-Forwarded-For
+entry without checking the proxy chain. This setting also affects protocol
+and hostname handling. Local tests verify shared-IP rate limiting, separate
+visitor buckets and forged prefix handling for the simulated one-hop path.
+Keep the 100 requests per 15 minutes policy unchanged. Live topology, IPv6
+and spoofed-header verification remain pending before enabling this setting.
+
+Temporary proxy inspection: set PROXY_DIAGNOSTICS_ENABLED=true only during
+verification. GET /api/diagnostics/proxy requires a Clerk bearer token and
+returns header counts/format booleans only, with no-store. Disabled returns 404.
+Counts alone do not establish which hop is the real visitor or prove spoof
+resistance. Do not enable TRUST_PROXY_HOPS from counts alone. Turn diagnostics
+off after inspection. This diagnostic preparation is local, not deployed.

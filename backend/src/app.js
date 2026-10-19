@@ -7,9 +7,12 @@ import helmet from "helmet";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
 
+import { proxyDiagnostics } from "./routes/proxyDiagnostics.js";
+import { configureTrustProxy } from "./config/trustProxy.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
+configureTrustProxy(app);
 
 const allowedOrigins = [
   process.env.CLIENT_URL,
@@ -57,6 +60,7 @@ app.get("/health", (req, res) => {
   });
 });
 
+app.use("/api/diagnostics/proxy", proxyDiagnostics);
 app.use("/api/playgrounds", playgroundRoutes);
 app.use("/api/reviews", reviewRoutes);
 
