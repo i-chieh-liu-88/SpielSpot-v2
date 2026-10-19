@@ -1,61 +1,97 @@
-# SpielSpot
+<p align="center">
+  <a href="https://spielspot.netlify.app/">
+    <img src="docs/images/spielspot-brand.svg" alt="SpielSpot" width="100%">
+  </a>
+</p>
 
-[![SpielSpot homepage with its playground discovery headline, brand illustrations and call to action](docs/images/spielspot-homepage.jpg)](https://spielspot.netlify.app/)
+<h1 align="center">Find your next playground.</h1>
 
-SpielSpot helps parents find playgrounds, compare facilities and age ranges, and share reviews. This individual backend project connects a React frontend to an Express API, MongoDB Atlas, Clerk authentication and Cloudinary photo storage.
+<p align="center">
+  Find playgrounds. Compare facilities and ages. Share parent reviews.
+</p>
 
-**Author:** I-Chieh Liu · **Project:** End-of-Module Backend Project
+<p align="center">
+  <strong>I-Chieh Liu</strong> · Individual End-of-Module Backend Project
+</p>
 
-- **Website:** [spielspot.netlify.app](https://spielspot.netlify.app/)
-- **GitHub:** [SpielSpot-v2](https://github.com/i-chieh-liu-88/SpielSpot-v2)
-- **Backend API:** [spielspot.onrender.com](https://spielspot.onrender.com/)
-- **API health check:** [spielspot.onrender.com/health](https://spielspot.onrender.com/health)
+<p align="center">
+  <a href="https://spielspot.netlify.app/"><strong>Explore the website</strong></a>
+  &nbsp;·&nbsp;
+  <a href="https://spielspot.onrender.com/">Backend API</a>
+  &nbsp;·&nbsp;
+  <a href="https://spielspot.onrender.com/health">Health check</a>
+</p>
 
-## Try the project
+<p align="center">
+  <a href="#overview">Overview</a> ·
+  <a href="#backend">Backend</a> ·
+  <a href="#local-setup">Local setup</a> ·
+  <a href="#api">API</a> ·
+  <a href="#verification">Verification</a> ·
+  <a href="#documentation">Documentation</a>
+</p>
 
-1. Open the website and choose **Find a Playground**.
-2. Search or filter playgrounds, explore the map, and open a listing to view its photos and reviews.
+[![SpielSpot homepage showing its playground discovery headline, brand illustrations and main action](docs/images/spielspot-homepage.jpg)](https://spielspot.netlify.app/)
+
+## Overview
+
+SpielSpot helps parents find playgrounds, compare facilities and age ranges, and share reviews. The React frontend connects to an Express REST API, MongoDB Atlas, Clerk authentication and Cloudinary photo storage.
+
+| Discover | Compare | Contribute |
+| --- | --- | --- |
+| Search by location and explore the map. | Check facilities, listed ages, photos and reviews. | Sign in to add a playground, upload photos or share a review. |
+
+Browsing needs no account. Writes save real data, so share content you have permission to publish.
+
+> **Release status · October 19, 2026**
+>
+> The latest backend is live on Render. Owner editing works in the new local frontend build, but Netlify has paused production deployments after the team exhausted its deployment credits. The public website still uses the previous edit form. [Release and verification details](docs/photo-cleanup.md).
+
+### Try it
+
+1. Open the [website](https://spielspot.netlify.app/) and choose **Find a Playground**.
+2. Search or filter the list, explore the map, and open a listing for photos and reviews.
 3. Sign in to add a playground with up to five photos or write a review. Review authors can edit their own reviews.
 
-Browsing does not require an account. Writes save real data, so use content you have permission to share.
+## Backend
 
-## Backend assessment overview
+Two related entities form the core of the API: **Playground** and **Review**. Each review references one playground. The [API plan](docs/api-plan.md) includes the ERD, technology choices and request/response examples.
 
 | Area | Implementation |
 | --- | --- |
-| Data model | Two related entities: Playground and Review. Each review belongs to one playground. |
-| CRUD API | Create, read, update and delete endpoints for playgrounds and reviews. |
-| Authentication | Clerk bearer tokens identify signed-in users. |
-| Authorization | The backend checks ownership before updates and deletions and assigns owner IDs from authentication. |
-| Validation | Zod validates input, including filter queries and review ratings. Invalid requests return clear errors. |
-| Data protection | Deleting a playground with reviews returns `409` and keeps both. MongoDB transactions protect against simultaneous review creation and playground deletion. |
-| Photo uploads | Owner-only uploads to Cloudinary, with file validation, image resizing and metadata removal. MongoDB stores image URLs and asset references. |
-| Security | Helmet, allowed-origin CORS, rate limiting and a central error handler. Secrets stay on the backend. |
-| Deployment | Netlify hosts the frontend; Render hosts the API; MongoDB Atlas stores application data. |
+| **REST & persistence** | MongoDB Atlas storage; CRUD endpoints for playgrounds and reviews; location, age and facility filters. |
+| **Identity & ownership** | Clerk bearer tokens; server-assigned owner IDs; owner/author checks before updates and deletions. |
+| **Validation & security** | Zod input validation, Helmet, configured CORS, rate limiting and a central error handler. |
+| **Related data** | A playground with reviews returns `409` on deletion. MongoDB transactions coordinate review creation and playground deletion. |
+| **Photos & recovery** | Owner-only Cloudinary uploads, file validation, resizing and metadata removal. Durable cleanup jobs support retries after failures. |
 
-**October 19 update:** owners can save edits and replace photos in the new frontend build. Render runs the new backend with durable cleanup retries. Netlify paused the frontend release because this billing cycle has no production deployment credits left. The public website still has the earlier edit form. See the [release and verification notes](docs/photo-cleanup.md).
+### Architecture
 
-## How the app works
+```mermaid
+flowchart LR
+  UI[React frontend] -->|REST requests| API[Express API]
+  API -->|Authentication| AUTH[Clerk]
+  API -->|Documents & cleanup jobs| DB[(MongoDB Atlas)]
+  API -->|Photos| MEDIA[Cloudinary]
 
-```text
-React frontend (Netlify)
-    | Clerk bearer token for authenticated requests
-    v
-Express API (Render)
-    |-- MongoDB Atlas: playgrounds, reviews and photo references
-    |-- Cloudinary: public photos
-    |-- Clerk: authentication verification
+  classDef client fill:#fdfaf5,stroke:#166534,color:#383030
+  classDef server fill:#166534,stroke:#166534,color:#ffffff
+  classDef service fill:#e8f3eb,stroke:#166534,color:#14532d
+  class UI client
+  class API server
+  class AUTH,DB,MEDIA service
 ```
 
-The main database relationship is **one Playground to many Reviews**. The [API documentation](docs/api-plan.md) contains the ERD and request/response examples.
+| Frontend | Backend | Services |
+| --- | --- | --- |
+| React · TypeScript · Vite | Node.js · Express · Mongoose · Zod | MongoDB Atlas · Clerk · Cloudinary |
+| TanStack Router · Leaflet | Helmet · CORS · express-rate-limit | Netlify frontend · Render backend |
 
-**Stack:** React, TypeScript, Vite, TanStack Router and Leaflet on the frontend; Node.js, Express, Mongoose and Zod on the backend.
+## Local setup
 
-## Run locally
+Use **Node.js 22.12 or newer** and npm. You need a MongoDB Atlas database, a Clerk application and Cloudinary credentials for photo uploads. Use a separate database for local testing. Review creation and playground deletion require MongoDB transaction support, which Atlas provides.
 
-You need Node.js **22.12 or newer**, npm, a MongoDB Atlas database, a Clerk application and Cloudinary credentials for photo uploads. Use a separate database for local testing. Review creation and playground deletion require MongoDB transaction support, which Atlas provides.
-
-### 1. Install dependencies
+### Install
 
 From the repository root:
 
@@ -64,40 +100,42 @@ npm --prefix frontend install
 npm --prefix backend install
 ```
 
-### 2. Configure environment variables
+### Configure
 
 Copy the supplied templates and fill in your own values:
 
-| Template | Local file | Required configuration |
+| Template | Local file | Configuration |
 | --- | --- | --- |
 | `backend/.env.example` | `backend/.env` | MongoDB URI, Clerk keys, frontend origin and Cloudinary credentials |
 | `frontend/.env.example` | `frontend/.env.local` | API base URL and Clerk publishable key |
 
-Use the same Clerk instance on both sides. Keep secret keys out of frontend variables and Git.
+Both sides must use the same Clerk instance. Keep secret keys out of frontend variables and Git.
 
-The default setup uses the API at `http://localhost:5000` and the frontend at `http://localhost:5173`. If Vite uses another port, update the backend's `CLIENT_URL` and restart it. Keep `TRUST_PROXY_HOPS=0` for direct local access and `PROXY_DIAGNOSTICS_ENABLED=false`.
+The default API address is `http://localhost:5000`; the frontend uses `http://localhost:5173`. If Vite chooses another port, update the backend's `CLIENT_URL` and restart it. Keep `TRUST_PROXY_HOPS=0` for direct local access and `PROXY_DIAGNOSTICS_ENABLED=false`.
 
-### 3. Start the app
+### Start
 
-Run these commands in separate terminals from the repository root:
+Run each command in a separate terminal from the repository root:
 
 ```bash
-# Terminal 1: backend
+# Terminal 1 · Backend
 npm --prefix backend start
 ```
 
 ```bash
-# Terminal 2: frontend
+# Terminal 2 · Frontend
 npm run dev
 ```
 
 Open the local URL printed by Vite.
 
-## API routes
+## API
+
+**Base URL:** [https://spielspot.onrender.com](https://spielspot.onrender.com/)
 
 | Method | Route | Access |
 | --- | --- | --- |
-| GET | `/health` | Public; checks the API response, not database health |
+| GET | `/health` | Public; API response check, not database health |
 | GET | `/api/playgrounds` | Public; supports filters |
 | GET | `/api/playgrounds/:id` | Public |
 | POST | `/api/playgrounds` | Signed-in user |
@@ -107,9 +145,11 @@ Open the local URL printed by Vite.
 | POST | `/api/playgrounds/:id/reviews` | Signed-in user |
 | PATCH / DELETE | `/api/reviews/:id` | Review author |
 
-The legacy single-photo endpoint, `POST /api/playgrounds/:id/photo`, also remains available. Photo uploads accept JPEG, PNG and WebP files up to 5 MB and 25 megapixels each. The first photo becomes the cover.
+Photo uploads accept JPEG, PNG and WebP files up to **5 MB and 25 megapixels each**. The first photo becomes the cover. The legacy single-photo endpoint, `POST /api/playgrounds/:id/photo`, remains available.
 
-For a read-only check, send `GET https://spielspot.onrender.com/health`. A successful response is:
+### Example responses
+
+A read-only request to `GET /health` returns HTTP 200:
 
 ```json
 {"success":true,"status":"ok"}
@@ -121,9 +161,15 @@ A protected request without a valid signed-in user returns HTTP 401:
 {"success":false,"error":"Please login"}
 ```
 
-See [API request bodies, responses and errors](docs/api-plan.md#current-api-examples-october-19) for playground and review CRUD and photo uploads.
+[Request bodies, responses and error cases →](docs/api-plan.md#current-api-examples-october-19)
 
-## Tests and verification
+## Verification
+
+**Latest recorded checks · October 19, 2026**
+
+| Backend tests | Frontend tests | Lint | Production build |
+| --- | --- | --- | --- |
+| 120 passed | 80 passed | Passed | Passed, with the existing bundle-size warning |
 
 Run from the repository root:
 
@@ -135,25 +181,37 @@ npm run build
 npm run preview
 ```
 
-The latest recorded checks on **October 19, 2026** passed: **120 backend tests, 80 frontend tests, lint and production build**. The build still reports a bundle-size warning.
+Automated tests cover validation, authentication and ownership responses, deletion protection, uploads, proxy handling and frontend behavior. These suites mock external services.
 
-- Automated tests cover API validation, authentication and ownership responses, deletion protection, uploads, proxy handling and frontend behavior. These suites use mocked external services.
-- Separate Atlas checks used an isolated temporary database to test both review/delete race orders and rollback. The test database was removed afterward.
-- Live checks covered photo upload and photos after refresh, filtering, pagination and API responses. The concurrency fix is deployed; a simultaneous authenticated write/delete test through the live HTTP API has not been run.
+Separate Atlas checks used an isolated temporary database for both review/delete race orders and rollback. Live checks covered photo upload, photos after refresh, filtering, pagination and selected API responses. The deployed cleanup worker removed all generated assets from the authorized cleanup test. Detailed evidence and its scope are in the [submission checklist](docs/submission-checklist.md) and [cleanup notes](docs/photo-cleanup.md).
 
-See the [submission checklist](docs/submission-checklist.md) and [backend handoff](docs/backend-handoff.md) for dated evidence and verification scope.
+## Known limitations
 
-## Current limitations
+- **Clerk:** the demo uses development keys. Production-instance setup is deferred until a suitable owned domain is available.
+- **Frontend publication:** Netlify skipped release `5cf229f` after deployment credits ran out. Owner editing works locally; the public website still uses the previous frontend.
+- **Cloud recovery:** MongoDB and Cloudinary cannot share a transaction. Cleanup jobs retry while the server runs; persistent provider failures need investigation. Older untracked orphan images remain outside this recovery mechanism.
+- **Verification scope:** concurrency tests covered controlled database race orders, not simultaneous authenticated production HTTP requests. Proxy checks support the tested three-hop Render path; live multi-client/IPv6 rate-limit isolation remains unverified. Diagnostics stay disabled.
 
-- **Clerk development instance:** the deployed demo still uses development keys. Production setup is deferred until a suitable owned domain is available.
-- **Frontend release blocked:** Netlify skipped commit `5cf229f` after the team exhausted production deployment credits. Owner editing works in the tested local build; the public website still uses the previous frontend. Resume publication when deployment credits are available.
-- **Cloud storage cleanup:** MongoDB and Cloudinary do not share a transaction. A durable queue now retries cleanup while the server runs. Persistent provider failures still need investigation; older untracked orphan images are outside this recovery mechanism. Real-cloud checks passed in an isolated database. The deployed worker removed old photos after an authenticated album replacement and completed the authorized test-record cleanup; see the verification notes for scope.
-- **Proxy configuration:** the deployed three-hop setting was checked for the tested Render connection. Other network paths and live multi-client/IPv6 rate-limit isolation need further verification. Diagnostics are disabled.
+## Documentation
 
-## Further documentation
+| Read | Find |
+| --- | --- |
+| [API plan & ERD](docs/api-plan.md) | Data model, technology rationale, endpoints, requests and responses |
+| [Backend handoff](docs/backend-handoff.md) | Integration and deployment notes |
+| [Submission checklist](docs/submission-checklist.md) | Brief requirements, verification evidence and submission status |
+| [Photo cleanup](docs/photo-cleanup.md) | Upload recovery, cleanup retries and release checks |
+| [Project timetable](docs/TIMELINE/SpielSpot-v2-timetable-EN.md) | Plan and active schedule |
 
-- [API, ERD and examples](docs/api-plan.md)
-- [Backend integration and deployment notes](docs/backend-handoff.md)
-- [Assessment checklist and verification records](docs/submission-checklist.md)
-- [Project timetable](docs/TIMELINE/SpielSpot-v2-timetable-EN.md)
-- [Archived README development history](docs/readme-history.md) — dated records with superseded statements; use this README for the current overview.
+<details>
+<summary>Development history</summary>
+
+[Archived README development history](docs/readme-history.md) contains dated records with superseded statements. Use the current README for the project overview and the documents above for verification scope.
+
+</details>
+
+---
+
+<p align="center">
+  <strong>SpielSpot</strong><br>
+  Built by <a href="https://github.com/i-chieh-liu-88">I-Chieh Liu</a>
+</p>
