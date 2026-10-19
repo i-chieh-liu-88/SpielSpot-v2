@@ -357,7 +357,7 @@ function PlaygroundResults() {
                   </div>
                   <p className="mb-3 text-sm text-gray-700">
                     {t(
-                      "Scroll to move the page. Use + and − to zoom the map. Results change only when you search this area.",
+                      "Scroll over the map to zoom, or use + and −. Results change only when you search this area.",
                     )}
                   </p>
                   {mappedPlaygrounds.length > 0 ? (
@@ -384,7 +384,7 @@ function PlaygroundResults() {
                         {selected.location}
                       </p>
                       <Link
-                        className="mt-2 inline-flex min-h-11 items-center rounded px-2 font-semibold text-green-950 underline focus-visible:outline-2"
+                        className="explore-detail-link mt-3 inline-flex min-h-11 items-center rounded-full px-5 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2"
                         to="/playgrounds/$playgroundId"
                         params={{ playgroundId: selected.id }}
                       >

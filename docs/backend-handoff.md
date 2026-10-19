@@ -4,6 +4,16 @@
 
 # Frontend integration boundary
 
+## October 19 final verification
+
+- Backend: 89 mocked tests passed. Frontend: 74 tests passed; service tests now mock HTTP responses instead of consuming the real API rate limit.
+- Simultaneous list requests share an in-flight promise; results are cloned per caller. Completed requests are not cached, and a failed request can be retried.
+- After the existing local rate-limit window expired, Berlin filtering returned one result with a working map; Reset restored paginated results. No rate-limit protection was disabled.
+- Latest map controls enable wheel zoom, keep explicit Search this area, and show a brand-styled details link. Initial fitBounds caps zoom at 15 for single/identical coordinates.
+- Multi-photo backend/frontend deployment and live verification completed October 18. These observations supersede older preview-only and local-only photo notes below.
+- Current frontend deployment and final submission receipt require separate confirmation. Historical verification records below remain dated evidence.
+
+
 ## Input validation update (deployed October 16)
 
 - Playground GET filters accept only known keys with single string values.

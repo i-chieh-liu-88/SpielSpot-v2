@@ -1,4 +1,5 @@
 export const germanTranslations: Record<string, string> = {
+  "Scroll over the map to zoom, or use + and −. Results change only when you search this area.": "Zoome mit dem Mausrad über der Karte oder mit + und −. Die Ergebnisse ändern sich erst, wenn du diesen Bereich suchst.",
   "Too many requests. Please wait for the request limit to reset (up to 15 minutes). Applying or resetting filters will not clear this limit.": "Zu viele Anfragen. Bitte warte, bis das Limit zurückgesetzt wird (bis zu 15 Minuten). Filter anzuwenden oder zurückzusetzen hebt dieses Limit nicht auf.",
   "Saving...": "Wird gespeichert...",
   "Overall rating": "Gesamtbewertung",

@@ -61,7 +61,7 @@ describe("PlaygroundMap", () => {
 
     expect(screen.getByTestId("playground-map")).toHaveAttribute(
       "data-wheel-zoom",
-      "false",
+      "true",
     );
     expect(screen.getAllByRole("button")).toHaveLength(playgrounds.length);
     fireEvent.click(

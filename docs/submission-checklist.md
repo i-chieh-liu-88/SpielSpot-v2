@@ -4,6 +4,13 @@ Reviewed October 16, 2026 (Europe/Berlin) against the supplied
 End-of-Module Backend Project brief. Author: I-Chieh Liu, individual project.
 Deadline: October 19, 2026, 23:59 Europe/Berlin.
 
+## October 19 verification update
+
+- Latest actual automated run: 89 backend tests and 74 frontend tests passed. Frontend service tests now mock HTTP responses and need no running API.
+- Multi-photo uploads were deployed on October 18 and verified live with three test images and five licensed images; refresh retrieval and gallery switching passed. This supersedes the old preview-only limitation.
+- Local Berlin filtering and Reset were verified after the rate-limit window reset. Initial map zoom now handles a single result.
+- Final release verification, instructor access and submission receipt remain pending. No Slack delivery is claimed.
+
 ## Deliverables
 
 | Requirement | Evidence or action | Status |
@@ -40,7 +47,7 @@ Deadline: October 19, 2026, 23:59 Europe/Berlin.
   rating POST/PATCH live checks and production IP/rate-limit review remain pending.
 - October 16 npm audit: 19 moderate findings in backend test dependencies,
   zero with --omit=dev. No forced dependency downgrade was applied.
-- Photos are local previews; there is no server upload or storage endpoint.
+- Photo upload/storage is deployed; live replacement/deletion-cleanup and failure recovery are not fully verified.
 - The successful no-review playground DELETE path has mocked-test coverage.
   The October 15 live checks covered 401, 403 and 409, not successful deletion.
 
