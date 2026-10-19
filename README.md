@@ -1,5 +1,7 @@
 # SpielSpot
 
+[![SpielSpot homepage with its playground discovery headline, brand illustrations and call to action](docs/images/spielspot-homepage.jpg)](https://spielspot.netlify.app/)
+
 SpielSpot helps parents find playgrounds, compare facilities and age ranges, and share reviews. This individual backend project connects a React frontend to an Express API, MongoDB Atlas, Clerk authentication and Cloudinary photo storage.
 
 **Author:** I-Chieh Liu · **Project:** End-of-Module Backend Project
