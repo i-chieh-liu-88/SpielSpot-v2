@@ -436,3 +436,15 @@ The first attempt used a name longer than the Atlas limit and was rejected;
 the shortened-name rerun passed. Existing application data was not changed.
 The transaction implementation is locally verified; deployment and live
 authenticated write checks must be recorded separately.
+
+## Concurrency deployment (October 19, 2026)
+
+Render deployed 48c1392 (Deploy succeeded / Live; MongoDB connected). This
+supersedes the local-only status above. Assistant checks returned health 200,
+existing playground/read reviews 200, unsigned review POST 401, and disabled
+diagnostics 404. No production data was modified during these smoke checks.
+Controlled race orders and rollback passed against the isolated Atlas test
+DB before deployment; a new authenticated write/delete race through the live
+HTTP API has not been run. Backend 107 tests, frontend 74 tests, lint and build
+passed. Clerk production-instance setup remains pending. Cloud asset cleanup
+still cannot be atomic with the MongoDB transaction.
